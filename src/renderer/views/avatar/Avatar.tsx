@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Live2DManager } from '../../managers/Live2DManager';
+import { ChatUI } from '../../components/ChatUI';
 
 import './avatar.css';
 
@@ -62,12 +63,21 @@ const Avatar: React.FC = () => {
     }, []);
 
     return (
-        <canvas
-            ref={canvasRef}
-            id="live2d"
-            style={{ width: '100vw', height: '100vh', display: 'block' }}
-        />
+        <>
+            <canvas
+                ref={canvasRef}
+                id="live2d"
+                style={{ width: '100vw', height: '100vh', display: 'block' }}
+            />
+            {/* 채팅 UI - WebSocket URL은 나중에 연결 시 props로 전달 */}
+            {/* 예: websocketUrl="ws://localhost:8080/chat" */}
+            <ChatUI
+                bubbleDuration={5000}
+            // websocketUrl="ws://your-server.com/chat"
+            />
+        </>
     );
 };
 
 export default Avatar;
+

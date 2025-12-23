@@ -1,0 +1,168 @@
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import ChatService, { ChatMessage, ConnectionStatus } from '../../services/ChatService';
+import './chat.css';
+
+interface ChatUIProps {
+    /** WebSocket 서버 URL (선택사항 - 없으면 로컬 모드) */
+    websocketUrl?: string;
+    /** 말풍선 표시 시간 (ms) - 기본값 5000ms */
+    bubbleDuration?: number;
+}
+
+const ChatUI: React.FC<ChatUIProps> = ({
+    websocketUrl,
+    bubbleDuration = 5000
+}) => {
+    const [inputValue, setInputValue] = useState('');
+    const [isInputVisible, setIsInputVisible] = useState(false);
+    const [currentBubble, setCurrentBubble] = useState<ChatMessage | null>(null);
+    const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
+    const inputRef = useRef<HTMLInputElement>(null);
+    const bubbleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const chatService = useRef(ChatService.getInstance());
+
+    // WebSocket 연결 및 메시지 핸들러 설정
+    useEffect(() => {
+        const service = chatService.current;
+
+        // 연결 상태 핸들러
+        const unsubscribeStatus = service.onStatusChange((status) => {
+            setConnectionStatus(status);
+        });
+
+        // 메시지 수신 핸들러
+        const unsubscribeMessage = service.onMessage((message) => {
+            showBubble(message);
+        });
+
+        // WebSocket 연결 (URL이 제공된 경우)
+        service.connect(websocketUrl);
+
+        return () => {
+            unsubscribeStatus();
+            unsubscribeMessage();
+        };
+    }, [websocketUrl]);
+
+    // 말풍선 표시
+    const showBubble = useCallback((message: ChatMessage) => {
+        // 기존 타이머 정리
+        if (bubbleTimeoutRef.current) {
+            clearTimeout(bubbleTimeoutRef.current);
+        }
+
+        setCurrentBubble(message);
+
+        // 일정 시간 후 말풍선 숨김
+        bubbleTimeoutRef.current = setTimeout(() => {
+            setCurrentBubble(null);
+        }, bubbleDuration);
+    }, [bubbleDuration]);
+
+    // 입력창 토글 (단축키: Enter)
+    const toggleInput = useCallback(() => {
+        setIsInputVisible(prev => !prev);
+    }, []);
+
+    // 입력창이 열리면 포커스
+    useEffect(() => {
+        if (isInputVisible && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [isInputVisible]);
+
+    // 키보드 단축키 핸들러
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Enter 키로 입력창 토글 (입력창이 닫혀있을 때)
+            if (e.key === 'Enter' && !isInputVisible) {
+                e.preventDefault();
+                toggleInput();
+            }
+            // Escape 키로 입력창 닫기
+            if (e.key === 'Escape' && isInputVisible) {
+                e.preventDefault();
+                setIsInputVisible(false);
+                setInputValue('');
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isInputVisible, toggleInput]);
+
+    // 메시지 전송
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!inputValue.trim()) return;
+
+        const userMessage = chatService.current.sendMessage(inputValue);
+
+        // 사용자 메시지도 말풍선에 잠깐 표시
+        showBubble(userMessage);
+
+        setInputValue('');
+        setIsInputVisible(false);
+    };
+
+    // 입력 변경
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value);
+    };
+
+    return (
+        <div className="chat-container">
+            {/* 말풍선 */}
+            {currentBubble && (
+                <div className={`speech-bubble ${currentBubble.role}`}>
+                    <div className="bubble-content">
+                        {currentBubble.content}
+                    </div>
+                    <div className="bubble-tail" />
+                </div>
+            )}
+
+            {/* 연결 상태 표시 (디버그용 - 필요시 표시) */}
+            {/* <div className={`connection-status ${connectionStatus}`}>
+                {connectionStatus === 'connected' ? '🟢' : connectionStatus === 'connecting' ? '🟡' : '🔴'}
+            </div> */}
+
+            {/* 입력창 */}
+            <div className={`chat-input-container ${isInputVisible ? 'visible' : ''}`}>
+                <form onSubmit={handleSubmit}>
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        className="chat-input"
+                        placeholder="메시지를 입력하세요... (ESC로 닫기)"
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        onBlur={() => {
+                            // 포커스를 잃으면 입력창 닫기 (약간의 딜레이 추가)
+                            setTimeout(() => {
+                                if (!inputValue.trim()) {
+                                    setIsInputVisible(false);
+                                }
+                            }, 200);
+                        }}
+                    />
+                    <button type="submit" className="chat-send-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" />
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
+            {/* 입력창 열기 힌트 */}
+            {!isInputVisible && !currentBubble && (
+                <div className="chat-hint" onClick={toggleInput}>
+                    <span>Enter를 눌러 대화하기</span>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default ChatUI;
