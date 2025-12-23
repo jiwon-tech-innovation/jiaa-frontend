@@ -21,5 +21,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
         // Return cleanup function
         return () => ipcRenderer.removeListener('avatar-movement-update', handler);
     },
+
+    // Model management
+    checkModelExists: () => ipcRenderer.invoke('check-model-exists'),
+    downloadModel: () => ipcRenderer.invoke('download-model'),
+    getModelBasePath: () => ipcRenderer.invoke('get-model-base-path'),
+    onModelDownloadProgress: (callback: (progress: number) => void) => {
+        const handler = (_event: Electron.IpcRendererEvent, progress: number) => callback(progress);
+        ipcRenderer.on('model-download-progress', handler);
+        return () => ipcRenderer.removeListener('model-download-progress', handler);
+    },
 });
 
