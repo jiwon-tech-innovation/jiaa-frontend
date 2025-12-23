@@ -3,9 +3,9 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld('electronAPI', {
     setIgnoreMouseEvents: (ignore: boolean, options?: any) => ipcRenderer.send('set-ignore-mouse-events', ignore, options),
     showContextMenu: () => ipcRenderer.send('show-context-menu'),
-    openLogin: () => ipcRenderer.send('open-login'),
+    openSignin: () => ipcRenderer.send('open-signin'),
     openSignup: () => ipcRenderer.send('open-signup'),
-    closeLogin: () => ipcRenderer.send('close-login'),
+    closeSignin: () => ipcRenderer.send('close-signin'),
     closeDashboard: () => ipcRenderer.send('close-dashboard'),
-    loginSuccess: (email: string) => ipcRenderer.send('login-success', email),
+    signinSuccess: (email: string) => ipcRenderer.send('signin-success', email),
 });

@@ -1,6 +1,6 @@
 import { ipcMain, BrowserWindow, Menu, app, IpcMainEvent } from 'electron';
 import { getMainWindow, getAvatarWindow } from '../windows/manager';
-import { createMainWindow, loadLoginPage, loadSignupPage, loadDashboardPage } from '../windows/mainWindow';
+import { createMainWindow, loadSigninPage, loadSignupPage, loadDashboardPage } from '../windows/mainWindow';
 
 export const registerIpcHandlers = (): void => {
     // IPC Event for Click-through
@@ -34,12 +34,12 @@ export const registerIpcHandlers = (): void => {
         }
     });
 
-    // IPC Event for Login Window (Now MainWindow)
-    ipcMain.on('open-login', () => {
-        console.log('[Main] open-login event received');
+    // IPC Event for Signin Window (Now MainWindow)
+    ipcMain.on('open-signin', () => {
+        console.log('[Main] open-signin event received');
         const mainWindow = getMainWindow();
         if (mainWindow && !mainWindow.isDestroyed()) {
-            loadLoginPage();
+            loadSigninPage();
             mainWindow.show();
         } else {
             createMainWindow();
@@ -60,9 +60,9 @@ export const registerIpcHandlers = (): void => {
         }
     });
 
-    // IPC Event for Login Success
-    ipcMain.on('login-success', (event: IpcMainEvent, email: string) => {
-        console.log(`[Main] User Logged In: ${email}`);
+    // IPC Event for Signin Success
+    ipcMain.on('signin-success', (event: IpcMainEvent, email: string) => {
+        console.log(`[Main] User Signed In: ${email}`);
 
         // Navigate mainWindow to Dashboard
         loadDashboardPage();

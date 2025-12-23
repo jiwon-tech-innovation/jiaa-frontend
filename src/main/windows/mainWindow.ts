@@ -25,9 +25,9 @@ export const createMainWindow = (): void => {
     });
 
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-        mainWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/login/login.html`);
+        mainWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/signin/signin.html`);
     } else {
-        mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/login/login.html`));
+        mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/signin/signin.html`));
     }
 
     // mainWindow.webContents.openDevTools();
@@ -52,13 +52,13 @@ export const toggleMainWindow = (): void => {
     }
 };
 
-export const loadLoginPage = (): void => {
+export const loadSigninPage = (): void => {
     const mainWindow = getMainWindow();
     if (mainWindow && !mainWindow.isDestroyed()) {
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-            mainWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/login/login.html`);
+            mainWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/signin/signin.html`);
         } else {
-            mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/login/login.html`));
+            mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/signin/signin.html`));
         }
     }
 };
