@@ -1,67 +1,51 @@
 import { spawn, ChildProcess } from 'child_process';
 import path from 'node:path';
+import os from 'os';
 import { app } from 'electron';
 
 let pythonProcess: ChildProcess | null = null;
 
 export const startProcessMonitor = (): void => {
-    // Dev environment path adjustment
-    // In dev, __dirname is likely .../.vite/build/
-    // Source is .../src/main/main.js
-    // monitor_processes.py is in src/
-    let scriptPath = path.join(__dirname, '../../src/monitor_processes.py');
+    const isWin = os.platform() === 'win32';
+    const scriptName = isWin ? 'monitor_win.py' : 'monitor_mac.py';
+    const pythonCmd = isWin ? 'python' : 'python3';
 
-    // If __dirname includes .vite/build, we need to go up two levels to get to project root then into src
+    let scriptPath = path.join(__dirname, '../../src', scriptName);
     if (__dirname.includes('.vite/build')) {
-        scriptPath = path.join(__dirname, '../../src/monitor_processes.py');
+        scriptPath = path.join(__dirname, '../../src', scriptName);
     }
 
-    pythonProcess = spawn('python3', [scriptPath]);
+    pythonProcess = spawn(pythonCmd, [scriptPath]);
 
-    console.log(`[Python] Spawning script at: ${scriptPath}`);
-
-    if (pythonProcess.stdout) {
-        pythonProcess.stdout.on('data', (data) => {
+    pythonProcess.stdout?.on('data', async (data) => {
+        const lines = data.toString().trim().split('\n');
+        for (const line of lines) {
             try {
-                const messages = data.toString().trim().split('\n');
-                messages.forEach((msg: string) => {
-                    if (!msg) return;
-                    const event = JSON.parse(msg);
-                    if (event.event === 'new_process') {
-                        console.log(`[Python] New Process Detected: ${event.name} (PID: ${event.pid})`);
+                const status = JSON.parse(line);
+                if (status.event !== 'status_update') continue;
 
-                        // Focus Guard: 롤(League of Legends) 감지 시 자동 종료
-                        const distractionNames = ['LeagueClient', 'League of Legends', 'LoL'];
-                        // 대소문자 구분 없이 포함 여부 확인 (Mac process names can vary)
-                        if (distractionNames.some(d => event.name.toLowerCase().includes(d.toLowerCase()))) {
-                            console.log(`[Focus Guard] Distraction Detected: ${event.name} (PID: ${event.pid}). Terminating...`);
-                            try {
-                                process.kill(event.pid); // Terminate process
-                                console.log('[Focus Guard] Process terminated successfully.');
+                // [1~2단계] 생존 확인 (10분 부재 및 오디오 없음)
+                if (status.idle_time > 600 && !status.audio_playing) {
+                    console.log("주인님 실종 감지... 4단계 최후의 변론 진입");
+                    continue;
+                }
 
-                                // Optional: Show a balloon/notification? 
-                                // For now just console log.
-                            } catch (err: any) {
-                                console.error(`[Focus Guard] Failed to terminate process: ${err.message}`);
-                            }
-                        }
-                    }
-                });
-            } catch (e) {
-                console.error('[Python] Parse Error:', e);
-            }
-        });
-    }
+                // [3단계] AI 판결 (창 제목 분석)
+                if (status.window_title) {
+                    // Bedrock 연동 함수 호출 (예시)
+                    // const verdict = await askAI(status.window_title);
+                    // if (verdict === 'STOP') process.kill(status.pid);
+                }
 
-    if (pythonProcess.stderr) {
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`[Python API]: ${data}`);
-        });
-    }
+                // [Focus Guard] 롤 감지 (기존 기능 유지)
+                const distractions = ['League', 'LoL'];
+                if (distractions.some(d => status.window_title?.includes(d))) {
+                    process.kill(status.pid);
+                }
 
-    app.on('will-quit', () => {
-        if (pythonProcess) {
-            pythonProcess.kill();
+            } catch (e) { console.error("Parse Error"); }
         }
     });
+
+    app.on('will-quit', () => pythonProcess?.kill());
 };
