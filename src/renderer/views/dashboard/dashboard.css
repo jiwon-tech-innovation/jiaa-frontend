@@ -397,3 +397,45 @@ html {
 .grid-cell.level-4 {
     background-color: #39d353;
 }
+
+/* Appending to dashboard.css for Year Selector styles */
+.contribution-wrapper {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    /* Take remaining space */
+    min-width: 0;
+    /* Allow shrinking below content size for scroll */
+    overflow: hidden;
+    /* Ensure clean bound */
+}
+
+.year-list {
+    display: flex;
+    flex-direction: column;
+    padding-top: 30px;
+    gap: 8px;
+}
+
+.year-item {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.year-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+}
+
+.year-item.active {
+    background: var(--accent-primary);
+    color: #000;
+    font-weight: bold;
+}

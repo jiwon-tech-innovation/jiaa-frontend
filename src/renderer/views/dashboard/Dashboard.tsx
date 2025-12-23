@@ -11,6 +11,7 @@ import './dashboard.css';
 const Dashboard: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [selectedYear, setSelectedYear] = useState(2025);
     const dispatch = useAppDispatch();
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -200,11 +201,17 @@ const Dashboard: React.FC = () => {
                                         <div className="progress-fill" style={{ width: '40%' }}></div>
                                     </div>
                                 </div>
-                                <ContributionGraph data={contributionLevels} />
+                                <ContributionGraph
+                                    data={contributionLevels}
+                                    years={[2025, 2024, 2023, 2022]}
+                                    selectedYear={selectedYear}
+                                    onSelectYear={setSelectedYear}
+                                />
                             </div>
                         </div>
                     </div>
                 </div>
+
 
                 {/* Avatar Canvas */}
                 <div className="avatar-container">
