@@ -3,19 +3,70 @@
 import { useEffect, useState, useRef } from "react";
 import "./landing.css";
 
+type Platform = "mac" | "windows";
+type Arch = "x64" | "arm64";
+
+const downloadOptions = [
+  { platform: "windows" as Platform, arch: "x64" as Arch, label: "Windows (x64)" },
+  { platform: "windows" as Platform, arch: "arm64" as Arch, label: "Windows (ARM64)" },
+  { platform: "mac" as Platform, arch: "x64" as Arch, label: "macOS (Intel)" },
+  { platform: "mac" as Platform, arch: "arm64" as Arch, label: "macOS (Apple Silicon)" },
+];
+
 export default function Home() {
-  const [os, setOs] = useState<"mac" | "windows" | "unknown">("unknown");
+  const [platform, setPlatform] = useState<Platform>("windows");
+  const [arch, setArch] = useState<Arch>("x64");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const featuresSectionRef = useRef<HTMLElement>(null);
   const sectionTitleRef = useRef<HTMLHeadingElement>(null);
   const featureCardsRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Detect OS and architecture
   useEffect(() => {
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    if (userAgent.includes("mac")) {
-      setOs("mac");
-    } else if (userAgent.includes("win")) {
-      setOs("windows");
-    }
+    const detectPlatformAndArch = async () => {
+      const userAgent = window.navigator.userAgent.toLowerCase();
+
+      // Detect OS
+      const isMac = userAgent.includes("mac");
+      setPlatform(isMac ? "mac" : "windows");
+
+      // Try to get architecture using userAgentData (Chrome/Edge only)
+      const nav = navigator as Navigator & {
+        userAgentData?: {
+          getHighEntropyValues: (hints: string[]) => Promise<{ architecture?: string }>;
+        };
+      };
+
+      if (nav.userAgentData?.getHighEntropyValues) {
+        try {
+          const uaData = await nav.userAgentData.getHighEntropyValues(["architecture"]);
+          const isArm = uaData.architecture === "arm" || uaData.architecture === "arm64";
+          setArch(isArm ? "arm64" : "x64");
+          return;
+        } catch {
+          // Fall through to default logic
+        }
+      }
+
+      // Fallback: Use reasonable defaults based on OS
+      // Mac: Most new Macs are Apple Silicon (arm64)
+      // Windows: Most are x64
+      setArch(isMac ? "arm64" : "x64");
+    };
+
+    detectPlatformAndArch();
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Scroll animation observer
@@ -50,10 +101,19 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  const getDownloadText = () => {
-    if (os === "mac") return "macOS용 다운로드";
-    if (os === "windows") return "Windows용 다운로드";
-    return "다운로드";
+  const getCurrentLabel = () => {
+    const option = downloadOptions.find(o => o.platform === platform && o.arch === arch);
+    return option?.label || "다운로드";
+  };
+
+  const getDownloadUrl = () => {
+    return `/api/download?platform=${platform}&arch=${arch}`;
+  };
+
+  const handleOptionSelect = (p: Platform, a: Arch) => {
+    setPlatform(p);
+    setArch(a);
+    setDropdownOpen(false);
   };
 
   return (
@@ -69,7 +129,31 @@ export default function Home() {
             생산성, 엔터테인먼트, 그리고 어시스턴트까지, 모든 것을 한 곳에서.
           </p>
           <div className="hero-cta">
-            <button className="button-primary">{getDownloadText()}</button>
+            <div className="download-wrapper" ref={dropdownRef}>
+              <a href={getDownloadUrl()} className="button-primary">
+                {getCurrentLabel()} 다운로드
+              </a>
+              <button
+                className="dropdown-toggle"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                aria-label="다른 버전 선택"
+              >
+                ▼
+              </button>
+              {dropdownOpen && (
+                <div className="dropdown-menu">
+                  {downloadOptions.map((option) => (
+                    <button
+                      key={`${option.platform}-${option.arch}`}
+                      className={`dropdown-item ${platform === option.platform && arch === option.arch ? 'active' : ''}`}
+                      onClick={() => handleOptionSelect(option.platform, option.arch)}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <button className="button-secondary">더 알아보기</button>
           </div>
         </div>
