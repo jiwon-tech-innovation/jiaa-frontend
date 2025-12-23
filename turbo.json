@@ -7,7 +7,9 @@
             ],
             "outputs": [
                 ".vite/**",
-                "dist/**"
+                "dist/**",
+                ".next/**",
+                "!.next/cache/**"
             ]
         },
         "dev": {
