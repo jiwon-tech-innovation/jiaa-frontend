@@ -44,9 +44,10 @@ const Avatar: React.FC = () => {
 
                 // Events
                 live2dSprite.eventMode = 'static';
-                live2dSprite.on('pointertap', () => {
-                    window.electronAPI?.openSignin();
-                });
+                // Click event removed as per user request
+                // live2dSprite.on('pointertap', () => {
+                //     window.electronAPI?.openSignin();
+                // });
 
                 const handleContextMenu = (e: MouseEvent) => {
                     e.preventDefault();
