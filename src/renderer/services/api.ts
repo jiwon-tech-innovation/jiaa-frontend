@@ -1,13 +1,13 @@
 
 // Mock API Service
 
-interface LoginResponse {
+interface SigninResponse {
     accessToken: string;
     refreshToken: string;
     email: string;
 }
 
-export const signin = async ({ email, password }: { email: string; password?: string }): Promise<LoginResponse> => {
+export const signin = async ({ email, password }: { email: string; password?: string }): Promise<SigninResponse> => {
     // Simulate API call
     return new Promise((resolve) => {
         setTimeout(() => {

@@ -21,7 +21,7 @@ const Signin: React.FC = () => {
         },
         onError: (error) => {
             console.error('Signin failed:', error);
-            alert('Login failed. Please try again.');
+            alert('Signin failed. Please try again.');
         }
     });
 
