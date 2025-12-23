@@ -147,16 +147,16 @@ const Dashboard: React.FC = () => {
                             </div>
                             <div className="card-body">
                                 <svg viewBox="0 0 200 200" className="radar-chart">
-                                    <polygon points="100,20 170,60 170,140 100,180 30,140 30,60" className="radar-bg" />
-                                    <polygon points="100,40 150,70 150,130 100,160 50,130 50,70" className="radar-grid" />
-                                    <polygon points="100,60 130,80 130,120 100,140 70,120 70,80" className="radar-grid" />
-                                    <polygon points="100,30 160,65 140,130 100,170 40,130 50,50" className="radar-data" />
+                                    <polygon points="100,20 169.3,60 169.3,140 100,180 30.7,140 30.7,60" className="radar-bg" />
+                                    <polygon points="100,40 152,70 152,130 100,160 48,130 48,70" className="radar-grid" />
+                                    <polygon points="100,60 134.6,80 134.6,120 100,140 65.4,120 65.4,80" className="radar-grid" />
+                                    <polygon points="100,30 155,68 141,124 100,170 51,128 41,66" className="radar-data" />
                                     <text x="100" y="15" textAnchor="middle" className="radar-label">코딩</text>
-                                    <text x="180" y="60" textAnchor="start" className="radar-label">운동</text>
-                                    <text x="180" y="150" textAnchor="start" className="radar-label">수학</text>
+                                    <text x="178" y="55" textAnchor="start" className="radar-label">운동</text>
+                                    <text x="178" y="145" textAnchor="start" className="radar-label">수학</text>
                                     <text x="100" y="195" textAnchor="middle" className="radar-label">관리</text>
-                                    <text x="20" y="150" textAnchor="end" className="radar-label">분석</text>
-                                    <text x="20" y="60" textAnchor="end" className="radar-label">테스팅</text>
+                                    <text x="22" y="145" textAnchor="end" className="radar-label">분석</text>
+                                    <text x="22" y="55" textAnchor="end" className="radar-label">테스팅</text>
                                 </svg>
                             </div>
                         </div>
