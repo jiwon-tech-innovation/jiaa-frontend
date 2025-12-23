@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useAppDispatch } from '../../store/hooks';
 import { setCredentials } from '../../store/slices/authSlice';
 import { signin } from '../../services/api';
+import { InputGroup } from '../../components/InputGroup';
 import './signin.css';
 
 const Signin: React.FC = () => {
@@ -40,36 +41,32 @@ const Signin: React.FC = () => {
     };
 
     return (
-        <div className="signin-container">
-            <h1>로그인</h1>
-            <form id="signin-form" onSubmit={handleSubmit} noValidate>
-                <div className="input-group">
-                    <input
-                        type="email"
+        <div className="auth-wrapper">
+            <div className="signin-container">
+                <h1>로그인</h1>
+                <form id="signin-form" onSubmit={handleSubmit} noValidate>
+                    <InputGroup
+                        label="아이디"
                         id="email"
+                        type="email"
                         required
                         autoComplete="off"
-                        placeholder=" "
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
-                    <label htmlFor="email">아이디</label>
-                </div>
-                <div className="input-group">
-                    <input
-                        type="password"
+                    <InputGroup
+                        label="비밀번호"
                         id="password"
+                        type="password"
                         required
-                        placeholder=" "
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    <label htmlFor="password">비밀번호</label>
+                    <button type="submit" className="signin-btn">로그인</button>
+                </form>
+                <div className="footer">
+                    <a id="signup-link" onClick={handleSignup} style={{ cursor: 'pointer' }}>회원이 아니신가요?</a>
                 </div>
-                <button type="submit" className="signin-btn">로그인</button>
-            </form>
-            <div className="footer">
-                <a id="signup-link" onClick={handleSignup} style={{ cursor: 'pointer' }}>회원이 아니신가요?</a>
             </div>
         </div>
     );

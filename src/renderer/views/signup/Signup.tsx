@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { InputGroup } from '../../components/InputGroup';
 import './signup.css';
 
 const Signup: React.FC = () => {
@@ -29,47 +30,40 @@ const Signup: React.FC = () => {
     };
 
     return (
-        <div className="signup-container">
-            <h1>회원가입</h1>
-            <form id="signup-form" onSubmit={handleSubmit} noValidate>
-                <div className="input-group">
-                    <input
-                        type="email"
+        <div className="auth-wrapper">
+            <div className="signup-container">
+                <h1>회원가입</h1>
+                <form id="signup-form" onSubmit={handleSubmit} noValidate>
+                    <InputGroup
+                        label="이메일"
                         id="email"
+                        type="email"
                         required
                         autoComplete="off"
-                        placeholder=" "
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
-                    <label htmlFor="email">이메일</label>
-                </div>
-                <div className="input-group">
-                    <input
-                        type="password"
+                    <InputGroup
+                        label="비밀번호"
                         id="password"
+                        type="password"
                         required
-                        placeholder=" "
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    <label htmlFor="password">비밀번호</label>
-                </div>
-                <div className="input-group">
-                    <input
-                        type="password"
+                    <InputGroup
+                        label="비밀번호 확인"
                         id="confirm-password"
+                        type="password"
                         required
-                        placeholder=" "
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                     />
-                    <label htmlFor="confirm-password">비밀번호 확인</label>
+                    <button type="submit" className="signup-btn">회원가입</button>
+                </form>
+                <div className="footer">
+                    <a id="back-to-signin" onClick={handleBackToSignin} style={{ cursor: 'pointer' }}>이미 회원이신가요?</a>
                 </div>
-                <button type="submit" className="signup-btn">회원가입</button>
-            </form>
-            <div className="footer">
-                <a id="back-to-signin" onClick={handleBackToSignin} style={{ cursor: 'pointer' }}>이미 회원이신가요?</a>
             </div>
         </div>
     );

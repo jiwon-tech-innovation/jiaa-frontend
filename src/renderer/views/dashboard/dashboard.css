@@ -1,3 +1,5 @@
+@import '../../styles/variables.css';
+
 /* Basic Reset & Dark Theme */
 body,
 html {
@@ -5,31 +7,11 @@ html {
     padding: 0;
     width: 100%;
     height: 100%;
-    background: #0f1014;
-    background: radial-gradient(circle at top right, #1e204a, #0f1014 60%);
-    color: #ffffff;
+    background: var(--bg-primary);
+    background: var(--bg-gradient-main);
+    color: var(--text-primary);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     overflow-x: hidden;
-    /* Prevent horizontal scroll */
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
 }
 
 /* Close Button (Consistent with Signin) */
@@ -39,7 +21,7 @@ html {
     right: 15px;
     background: transparent;
     border: none;
-    color: #888888;
+    color: var(--text-muted);
     font-size: 24px;
     cursor: pointer;
     z-index: 100;
@@ -47,10 +29,10 @@ html {
 }
 
 .close-btn:hover {
-    color: #ffffff;
+    color: var(--text-primary);
 }
 
-/* Dashboard Wrapper (Flex Row for Sidebar + Content + Avatar) */
+/* Dashboard Wrapper */
 .dashboard-wrapper {
     display: flex;
     width: 100%;
@@ -61,7 +43,7 @@ html {
 /* Sidebar */
 .sidebar {
     width: 60px;
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--bg-tertiary);
     border-right: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     flex-direction: column;
@@ -78,25 +60,24 @@ html {
     justify-content: center;
     color: #666;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     margin-bottom: 20px;
     transition: all 0.2s;
 }
 
 .nav-item:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    color: var(--text-primary);
 }
 
 .nav-item.active {
-    color: #8A00C4;
-    /* Active purple color */
+    color: var(--accent-purple);
 }
 
 .profile-circle {
     width: 24px;
     height: 24px;
-    background: #ccc;
+    background: var(--text-secondary);
     border-radius: 50%;
 }
 
@@ -105,10 +86,9 @@ html {
     position: absolute;
     top: 50px;
     left: 60px;
-    /* Position to the right of sidebar */
-    background: #1a1b26;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
     padding: 8px 0;
     min-width: 150px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
@@ -117,7 +97,7 @@ html {
 
 .dropdown-item {
     padding: 10px 16px;
-    color: #ccc;
+    color: var(--text-secondary);
     font-size: 14px;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
@@ -125,7 +105,7 @@ html {
 
 .dropdown-item:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    color: var(--text-primary);
 }
 
 .nav-group {
@@ -134,27 +114,22 @@ html {
     gap: 10px;
 }
 
-/* Dashboard Container (Middle) */
+/* Dashboard Container */
 .dashboard-container {
     padding: 30px 0 30px 30px;
-    /* Remove right padding so scrollbar hits edge */
     display: flex;
     flex-direction: column;
     height: 100vh;
     box-sizing: border-box;
     flex: 1;
-    /* Take remaining space */
     max-width: 900px;
-    /* Constrain dashboard width so avatar has space */
 }
 
-/* Avatar Container (Right Side) */
+/* Avatar Container */
 .avatar-container {
     flex: 0 0 380px;
-    /* Fixed width for avatar */
     height: 100vh;
     position: relative;
-    /* border-left: 1px solid #333; Optional divider */
 }
 
 #live2d-dashboard {
@@ -174,21 +149,18 @@ html {
     margin: 0 0 20px 0;
 }
 
-/* Dashboard Grid - 2 Columns */
+/* Dashboard Grid */
 .dashboard-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    /* Two equal columns */
     gap: 30px;
     flex: 1;
     overflow-y: auto;
     padding-bottom: 20px;
     padding-right: 15px;
-    /* Add internal padding for spacing from scrollbar */
     width: 100%;
     box-sizing: border-box;
     scrollbar-gutter: stable;
-    /* Prepare space for scrollbar to avoid layout shift */
 }
 
 /* Cards */
@@ -204,7 +176,6 @@ html {
 
 .roadmap-card {
     min-height: 350px;
-    /* Match radar card height */
 }
 
 .roadmap-list {
@@ -231,7 +202,7 @@ html {
 }
 
 .roadmap-item.active {
-    color: #fff;
+    color: var(--text-primary);
     font-weight: bold;
 }
 
@@ -240,7 +211,7 @@ html {
     text-align: center;
 }
 
-/* Bottom card spans full width of grid */
+/* Bottom card */
 .bottom-card {
     grid-column: 1 / -1;
     min-height: 180px;
@@ -251,7 +222,7 @@ html {
     justify-content: space-between;
     margin-bottom: 15px;
     font-size: 18px;
-    color: #ccc;
+    color: var(--text-secondary);
     font-weight: bold;
 }
 
@@ -291,12 +262,12 @@ html {
 
 .radar-data {
     fill: rgba(100, 100, 100, 0.5);
-    stroke: #888;
+    stroke: var(--text-muted);
     stroke-width: 2;
 }
 
 .radar-label {
-    fill: #888;
+    fill: var(--text-muted);
     font-size: 11px;
 }
 
@@ -310,7 +281,7 @@ html {
 
 .stat-box {
     background: #4a3b89;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     width: 100px;
     padding: 12px;
     display: flex;
@@ -322,7 +293,7 @@ html {
 .stat-value {
     font-size: 16px;
     font-weight: bold;
-    color: white;
+    color: var(--text-primary);
 }
 
 .progress-bar {
@@ -353,23 +324,19 @@ html {
 .months-label {
     display: flex;
     margin-left: 30px;
-    /* Offset for days labels */
     margin-bottom: 5px;
     font-size: 10px;
-    color: #888;
+    color: var(--text-muted);
 }
 
 .months-label span {
     flex: 1;
-    /* Distribute evenly or fixed width */
     min-width: 40px;
-    /* Approx width of a month label area */
 }
 
 .graph-area {
     display: flex;
     position: relative;
-    /* width: fit-content; for scrolling if needed */
 }
 
 .days-label {
@@ -381,41 +348,33 @@ html {
     margin: 0;
     margin-right: 5px;
     font-size: 10px;
-    color: #888;
+    color: var(--text-muted);
     height: 98px;
-    /* Fixed height for 7 rows * (12px + 2px gap) */
     padding-top: 15px;
-    /* Alignment adjustment */
 }
 
 .days-label li {
     height: 14px;
-    /* Align with rows */
     line-height: 14px;
 }
 
-/* The actual grid: Columns (Weeks) x Rows (Days) */
 .contribution-grid {
     display: flex;
     gap: 3px;
-    /* Gap between weeks */
 }
 
 .grid-week {
     display: flex;
     flex-direction: column;
     gap: 3px;
-    /* Gap between days */
 }
 
 .grid-cell {
     width: 11px;
     height: 11px;
     background-color: #161b22;
-    /* Github empty dark */
     border-radius: 2px;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    /* Subtle border */
 }
 
 /* Contribution Levels */

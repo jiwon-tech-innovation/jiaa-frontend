@@ -5,9 +5,8 @@ import { useAppDispatch } from '../../store/hooks';
 import { signout } from '../../store/slices/authSlice';
 import { useQuery } from '@tanstack/react-query';
 import { fetchContributionData } from '../../services/api';
+import { ContributionGraph } from '../../components/ContributionGraph';
 import './dashboard.css';
-
-const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const Dashboard: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -201,29 +200,7 @@ const Dashboard: React.FC = () => {
                                         <div className="progress-fill" style={{ width: '40%' }}></div>
                                     </div>
                                 </div>
-                                <div className="contribution-container">
-                                    <div className="months-label">
-                                        {months.map((m, i) => (
-                                            <span key={i}>{m}</span>
-                                        ))}
-                                    </div>
-                                    <div className="graph-area">
-                                        <ul className="days-label">
-                                            <li>Mon</li>
-                                            <li>Wed</li>
-                                            <li>Fri</li>
-                                        </ul>
-                                        <div className="contribution-grid">
-                                            {contributionLevels.map((week, i) => (
-                                                <div key={i} className="grid-week">
-                                                    {week.map((level, j) => (
-                                                        <div key={j} className={`grid-cell level-${level}`}></div>
-                                                    ))}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
+                                <ContributionGraph data={contributionLevels} />
                             </div>
                         </div>
                     </div>
