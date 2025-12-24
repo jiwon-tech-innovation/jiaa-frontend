@@ -16,6 +16,7 @@ export default defineConfig({
                 signup: resolve(__dirname, 'src/renderer/views/signup/signup.html'),
                 dashboard: resolve(__dirname, 'src/renderer/views/dashboard/dashboard.html'),
                 roadmap: resolve(__dirname, 'src/renderer/views/roadmap/roadmap.html'),
+                setting: resolve(__dirname, 'src/renderer/views/setting/setting.html'),
             },
         },
     },
