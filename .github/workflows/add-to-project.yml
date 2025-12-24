@@ -6,10 +6,10 @@ on:
 
 jobs:
   add-to-project:
+    if: github.event.pull_request.head.repo.fork == false
     runs-on: ubuntu-latest
     steps:
       - name: Add PR to Project
-        if: github.event.pull_request.head.repo.fork == false
         id: add_pr 
         uses: actions/add-to-project@v1.0.1
         with:
