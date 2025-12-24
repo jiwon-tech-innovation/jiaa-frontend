@@ -70,6 +70,10 @@ const Dashboard: React.FC = () => {
         window.electronAPI?.closeDashboard();
     };
 
+    const handleSetting = () => {
+        window.electronAPI?.openSetting();
+    }
+
     const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -99,20 +103,19 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div className="nav-group">
                         <div className="nav-item active">
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-                            </svg>
+                            <img src="/Home Icon 16px.svg" alt="" />
                         </div>
                         <div className="nav-item">
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
-                            </svg>
+                            <img src="/DashBoard Icon 24px.svg" alt="" />
                         </div>
                         <div className="nav-item">
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                                <path d="M16 6V4c0-2.21-1.79-4-4-4S8 1.79 8 4v2H5v14c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V6h-3zm-6-2c0-1.1.9-2 2-2s2 .9 2 2v2h-4V4zm9 14H5V8h14v10z" />
-                            </svg>
+                            <img src="/Group Icon 24px.svg" alt="" />
                         </div>
+                        <a id="signup-link" onClick={handleSetting} style={{ cursor: 'pointer' }}>
+                            <div className="nav-item">
+                                <img src="/Setting Icon 24px.svg" alt="" />
+                            </div>
+                        </a>
                     </div>
                 </nav>
 
