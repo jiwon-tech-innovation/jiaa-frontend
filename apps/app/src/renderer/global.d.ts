@@ -3,6 +3,7 @@ export interface IElectronAPI {
     showContextMenu: () => void;
     openSignin: () => void;
     openSignup: () => void;
+    openSetting: () => void;
     closeSignin: () => void;
     closeDashboard: () => void;
     signinSuccess: (email: string) => void;
