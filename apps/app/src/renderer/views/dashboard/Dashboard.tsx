@@ -8,6 +8,7 @@ import { ContributionGraph } from '../../components/ContributionGraph';
 import './dashboard.css';
 
 const Dashboard: React.FC = () => {
+    console.log('[Dashboard] Rendering Dashboard component');
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [selectedYear, setSelectedYear] = useState(2025);
@@ -70,6 +71,9 @@ const Dashboard: React.FC = () => {
         window.electronAPI?.closeDashboard();
     };
 
+    const handleOpenRoadmap = () => {
+        window.location.href = '../roadmap/roadmap.html';
+    };
     const handleSetting = () => {
         window.electronAPI?.openSetting();
     }
@@ -151,7 +155,7 @@ const Dashboard: React.FC = () => {
                         <div className="card roadmap-card">
                             <div className="card-header">
                                 <span>로드맵</span>
-                                <span className="more">자세히 보기</span>
+                                <span className="more" onClick={handleOpenRoadmap} style={{ cursor: 'pointer' }}>자세히 보기</span>
                             </div>
                             <div className="card-body">
                                 <ul className="roadmap-list">
