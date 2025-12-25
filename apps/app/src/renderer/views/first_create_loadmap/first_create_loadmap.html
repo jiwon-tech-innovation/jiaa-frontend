@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' local-model: http://localhost:8080; img-src 'self' local-model:;">
+    <title>create_loadmap</title>
+    <link rel="stylesheet" href="./create_loadmap.css">
+</head>
+
+<body>
+    <div id="root"></div>
+    <script>
+        console.log('[create_loadmap] HTML Content Loaded - Diagnostic started');
+
+        // Catch all errors including syntax and module load errors
+        window.onerror = function (message, source, lineno, colno, error) {
+            const msg = `[create_loadmap HTML Error] ${message} at ${source}:${lineno}:${colno}`;
+            console.error(msg);
+            if (window.electronAPI && window.electronAPI.log) {
+                window.electronAPI.log(msg);
+            }
+        };
+
+        // Catch resource loading errors (like 404s for scripts)
+        window.addEventListener('error', function (e) {
+            if (e.target && (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK')) {
+                const msg = `[create_loadmap Resource Error] Failed to load ${e.target.tagName}: ${e.target.src || e.target.href}`;
+                console.error(msg);
+                if (window.electronAPI && window.electronAPI.log) {
+                    window.electronAPI.log(msg);
+                }
+            }
+        }, true);
+
+        if (window.electronAPI && window.electronAPI.log) {
+            window.electronAPI.log('[create_loadmap] Diagnostic script initialized');
+        }
+    </script>
+    <script src="/live2dcubismcore.min.js"></script>
+    <script type="module" src="./index.tsx"></script>
+</body>
+
+</html>

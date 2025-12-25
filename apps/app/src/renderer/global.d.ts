@@ -5,6 +5,8 @@ export interface IElectronAPI {
     openSignup: () => void;
     openSetting: () => void;
     openProfile: () => void;
+    openAvartarSelect: () => void;
+    openFirstCreateLoadmap: () => void;
     closeSignin: () => void;
     openDashboard: () => void;
     closeDashboard: () => void;

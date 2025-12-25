@@ -12,6 +12,7 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 avatar: resolve(__dirname, 'src/renderer/views/avatar/index.html'),
+                avatar_select: resolve(__dirname, 'src/renderer/views/avatar_select/index.html'),
                 signin: resolve(__dirname, 'src/renderer/views/signin/signin.html'),
                 signup: resolve(__dirname, 'src/renderer/views/signup/signup.html'),
                 dashboard: resolve(__dirname, 'src/renderer/views/dashboard/dashboard.html'),
@@ -19,6 +20,7 @@ export default defineConfig({
                 social: resolve(__dirname, 'src/renderer/views/social/social.html'),
                 setting: resolve(__dirname, 'src/renderer/views/setting/setting.html'),
                 profile: resolve(__dirname, 'src/renderer/views/profile/profile.html'),
+                first_create_loadmap: resolve(__dirname, 'src/renderer/views/first_create_loadmap/first_create_loadmap.html'),
             },
         },
     },

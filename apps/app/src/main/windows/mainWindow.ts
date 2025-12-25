@@ -24,8 +24,8 @@ export const createMainWindow = (): void => {
         }
     });
 
-    const startPage = process.env.START_PAGE || 'signin';
-    const targetPath = `/views/${startPage}/${startPage === 'avatar' ? 'index' : startPage}.html`;
+    const startPage = process.env.START_PAGE || 'avatar_select';
+    const targetPath = `/views/${startPage}/${startPage === 'avatar' || startPage === 'avatar_select' ? 'index' : startPage}.html`;
 
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
         const url = `${MAIN_WINDOW_VITE_DEV_SERVER_URL}${targetPath}`;
@@ -67,6 +67,38 @@ export const loadSigninPage = (): void => {
             : path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/signin/signin.html`);
 
         console.log(`[Main] Navigating to Signin: ${url}`);
+        if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+            mainWindow.loadURL(url);
+        } else {
+            mainWindow.loadFile(url);
+        }
+    }
+};
+
+export const loadFirstCreateLoadmap = (): void => {
+    const mainWindow = getMainWindow();
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        const url = MAIN_WINDOW_VITE_DEV_SERVER_URL
+            ? `${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/first_create_loadmap/first_create_loadmap.html`
+            : path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/first_create_loadmap/first_create_loadmap.html`);
+
+        console.log(`[Main] Navigating to First Create Loadmap: ${url}`);
+        if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+            mainWindow.loadURL(url);
+        } else {
+            mainWindow.loadFile(url);
+        }
+    }
+};
+
+export const loadAvartarSelect = (): void => {
+    const mainWindow = getMainWindow();
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        const url = MAIN_WINDOW_VITE_DEV_SERVER_URL
+            ? `${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/avatar_select/avatar_select.html`
+            : path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/avatar_select/avatar_select.html`);
+
+        console.log(`[Main] Navigating to First Create Loadmap: ${url}`);
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
             mainWindow.loadURL(url);
         } else {

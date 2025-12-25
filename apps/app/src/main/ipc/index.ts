@@ -1,6 +1,6 @@
 import { ipcMain, BrowserWindow, Menu, app, IpcMainEvent } from 'electron';
 import { getMainWindow, getAvatarWindow } from '../windows/manager';
-import { createMainWindow, loadSigninPage, loadSignupPage, loadDashboardPage, loadSettingPage, loadProfilePage } from '../windows/mainWindow';
+import { createMainWindow, loadSigninPage, loadSignupPage, loadDashboardPage, loadSettingPage, loadProfilePage, loadFirstCreateLoadmap, loadAvartarSelect } from '../windows/mainWindow';
 import { checkModelExists, downloadAndExtractModel, getModelDirectory } from '../services/modelManager';
 import { MODEL_NAME } from '../../common/constants';
 
@@ -95,6 +95,18 @@ export const registerIpcHandlers = (): void => {
         }
     });
 
+    ipcMain.on('open-avartar-select', () => {
+        console.log('[Main] open-dashboard event received');
+        const mainWindow = getMainWindow();
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            loadAvartarSelect();
+            mainWindow.show();
+        } else {
+            createMainWindow();
+            loadAvartarSelect();
+        }
+    });
+
     // IPC Event for Closing Dashboard (closes mainWindow)
     ipcMain.on('close-dashboard', () => {
         const mainWindow = getMainWindow();
@@ -120,6 +132,19 @@ export const registerIpcHandlers = (): void => {
             loadSettingPage();
         }
     });
+
+    ipcMain.on('open-first-create-loadmap', () => {
+        console.log('[Main] open-first-create-loadmap event received');
+        const mainWindow = getMainWindow();
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            loadFirstCreateLoadmap();
+            mainWindow.show();
+        } else {
+            createMainWindow();
+            loadFirstCreateLoadmap();
+        }
+    });
+
 
     // IPC Event for Opening Profile Page
     ipcMain.on('open-profile', () => {

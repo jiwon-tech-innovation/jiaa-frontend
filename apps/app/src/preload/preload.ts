@@ -4,6 +4,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     setIgnoreMouseEvents: (ignore: boolean, options?: any) => ipcRenderer.send('set-ignore-mouse-events', ignore, options),
     showContextMenu: () => ipcRenderer.send('show-context-menu'),
     openSignin: () => ipcRenderer.send('open-signin'),
+    openAvartarSelect: () => ipcRenderer.send('open-avartar-select'),
+    openFirstCreateLoadmap: () => ipcRenderer.send('open-first-create-loadmap'),
     openSignup: () => ipcRenderer.send('open-signup'),
     openDashboard: () => ipcRenderer.send('open-dashboard'),
     openSetting: () => ipcRenderer.send('open-setting'),
