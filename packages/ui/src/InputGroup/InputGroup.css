@@ -1,0 +1,47 @@
+.input-group {
+    width: 100%;
+    margin-bottom: 40px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group .form-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: #1a1b26;
+    color: #ffffff;
+    font-size: 16px;
+    outline: none;
+    box-sizing: border-box;
+    height: 48px;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.input-group .form-input:focus {
+    box-shadow: inset 0 0 0 2px #6e8efb;
+}
+
+/* Floating Label Styling */
+.input-group .form-label {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #888888;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Active State */
+.input-group .form-input:focus + .form-label,
+.input-group .form-input:not(:placeholder-shown) + .form-label {
+    top: -28px;
+    left: 0;
+    transform: translateY(0);
+    font-size: 14px;
+    color: #cccccc;
+}

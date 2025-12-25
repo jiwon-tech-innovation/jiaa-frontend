@@ -1,0 +1,35 @@
+/* Mobile Menu Styling override */
+.mobile-menu .nav-link {
+    font-size: 24px;
+    font-weight: 500;
+    color: white;
+}
+
+.mobile-menu .btn-download {
+    font-size: 24px;
+    padding: 12px 32px;
+    margin-top: 20px;
+}
+
+/* Hide desktop nav on mobile, show hamburger on mobile */
+@media (max-width: 768px) {
+    .desktop-nav {
+        display: none;
+    }
+
+    .mobile-menu {
+        display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    .desktop-nav {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-lg);
+    }
+
+    .mobile-menu {
+        display: none;
+    }
+}

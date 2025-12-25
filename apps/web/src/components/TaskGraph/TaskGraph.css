@@ -1,0 +1,144 @@
+.task-graph {
+    width: 500px;
+    height: 400px;
+    background: rgba(26, 27, 38, 0.9);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    animation: slideIn 1s ease-out 0.8s forwards;
+    opacity: 0;
+    transform: translateX(20px);
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.task-graph-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.task-graph-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.task-count {
+    font-size: 14px;
+    color: #4ade80;
+    font-weight: 500;
+}
+
+.task-graph-content {
+    padding: 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.months-row {
+    position: relative;
+    height: 20px;
+    margin-bottom: 8px;
+    margin-left: 32px;
+}
+
+.months-row span {
+    position: absolute;
+    font-size: 12px;
+    color: #888888;
+}
+
+.graph-body {
+    display: flex;
+    gap: 8px;
+}
+
+.days-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    font-size: 11px;
+    color: #888888;
+    width: 24px;
+    height: 98px;
+}
+
+.graph-grid {
+    display: flex;
+    gap: 3px;
+    overflow-x: auto;
+}
+
+.graph-week {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.graph-cell {
+    width: 11px;
+    height: 11px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.graph-cell.empty {
+    background: transparent;
+    border-color: transparent;
+}
+
+.graph-cell.level-0 {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.graph-cell.level-1 {
+    background: #0e4429;
+    border-color: #0e4429;
+}
+
+.graph-cell.level-2 {
+    background: #006d32;
+    border-color: #006d32;
+}
+
+.graph-cell.level-3 {
+    background: #26a641;
+    border-color: #26a641;
+}
+
+.graph-cell.level-4 {
+    background: #39d353;
+    border-color: #39d353;
+}
+
+.graph-legend {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 12px;
+    color: #888888;
+}
+
+.legend-cells {
+    display: flex;
+    gap: 3px;
+}

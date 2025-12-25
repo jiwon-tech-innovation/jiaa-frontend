@@ -43,6 +43,7 @@
     "vite": "^7.3.0"
   },
   "dependencies": {
+    "@repo/ui": "workspace:*",
     "@reduxjs/toolkit": "^2.11.2",
     "@tanstack/react-query": "^5.90.12",
     "adm-zip": "^0.5.16",

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { InputGroup } from '../../components/InputGroup';
+import { InputGroup } from '@repo/ui';
 import './signup.css';
 
 const Signup: React.FC = () => {

@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useAppDispatch } from '../../store/hooks';
 import { setCredentials } from '../../store/slices/authSlice';
 import { signin } from '../../services/api';
-import { InputGroup } from '../../components/InputGroup';
+import { InputGroup } from '@repo/ui';
 import './signin.css';
 
 const Signin: React.FC = () => {

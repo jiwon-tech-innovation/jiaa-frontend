@@ -1,9 +1,9 @@
-
 import React from 'react';
+import './InputGroup.css';
 
 interface InputGroupProps extends React.InputHTMLAttributes<HTMLInputElement> {
     label: string;
-    id: string; // id is required for label association
+    id: string;
 }
 
 export const InputGroup: React.FC<InputGroupProps> = ({ label, id, className = '', ...props }) => {

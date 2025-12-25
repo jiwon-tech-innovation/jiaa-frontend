@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { ChatDemo } from "../components/ChatDemo/ChatDemo";
+import { TaskGraph } from "../components/TaskGraph/TaskGraph";
 import "./landing.css";
 
 type Platform = "mac" | "windows";
@@ -128,6 +130,7 @@ export default function Home() {
             나만의 AI 아바타와 함께하는 새로운 데스크톱 경험을 만나보세요.<br />
             생산성, 엔터테인먼트, 그리고 어시스턴트까지, 모든 것을 한 곳에서.
           </p>
+
           <div className="hero-cta">
             <div className="download-wrapper" ref={dropdownRef}>
               <a href={getDownloadUrl()} className="button-primary">
@@ -176,6 +179,17 @@ export default function Home() {
               <h3>철저한 보안과 프라이버시</h3>
               <p>사용자의 데이터는 안전하게 보호됩니다. 프라이버시 중심 설계.</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Demo Section */}
+      <section className="demo-section">
+        <div className="container">
+          <h2 className="section-title">AI와 함께하는 일상</h2>
+          <div className="demo-grid">
+            <ChatDemo />
+            <TaskGraph />
           </div>
         </div>
       </section>

@@ -1,3 +1,5 @@
+@import './HeaderMobile.css';
+
 .header {
     position: fixed;
     top: 0;
@@ -36,8 +38,9 @@
 .nav {
     display: flex;
     align-items: center;
-    gap: var(--spacing-lg);
 }
+
+
 
 .nav-link {
     color: var(--text-secondary);
