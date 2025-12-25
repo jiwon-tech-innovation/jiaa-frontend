@@ -1,24 +1,277 @@
+// API Service - Auth Service Integration
 
-// Mock API Service
+import { tokenService } from './tokenService';
 
-interface SigninResponse {
+const API_BASE_URL = 'http://localhost:8080';
+
+// API Response wrapper
+interface ApiResponse<T> {
+    success: boolean;
+    message: string;
+    data: T;
+}
+
+// Auth Types
+interface AuthResponse {
     accessToken: string;
     refreshToken: string;
     email: string;
 }
 
-export const signin = async ({ email, password }: { email: string; password?: string }): Promise<SigninResponse> => {
-    // Simulate API call
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve({
-                accessToken: 'mock-access-token-' + Date.now(),
-                refreshToken: 'mock-refresh-token-' + Date.now(),
-                email: email,
+interface SignUpResponse {
+    username: string;
+    email: string;
+}
+
+// Request Types
+interface SignInRequest {
+    usernameOrEmail: string;
+    password: string;
+}
+
+interface SignUpRequest {
+    username: string;
+    email: string;
+    password: string;
+    name: string;
+}
+
+interface SendVerificationCodeRequest {
+    email: string;
+}
+
+interface VerifyEmailRequest {
+    email: string;
+    code: string;
+}
+
+// API Error class
+export class ApiError extends Error {
+    constructor(
+        public message: string, 
+        public success: boolean = false,
+        public statusCode?: number
+    ) {
+        super(message);
+        this.name = 'ApiError';
+    }
+}
+
+// 인증이 필요 없는 엔드포인트 목록
+const PUBLIC_ENDPOINTS = [
+    '/api/v1/auth/signin',
+    '/api/v1/auth/signup',
+    '/api/v1/auth/refresh',
+    '/api/v1/auth/send-verification-code',
+    '/api/v1/auth/verify-email',
+];
+
+// Generic fetch wrapper with token handling
+async function apiRequest<T>(
+    endpoint: string,
+    options: RequestInit = {},
+    skipAuth = false
+): Promise<T> {
+    const url = `${API_BASE_URL}${endpoint}`;
+    const isPublicEndpoint = PUBLIC_ENDPOINTS.some(e => endpoint.startsWith(e));
+    
+    const defaultHeaders: HeadersInit = {
+        'Content-Type': 'application/json',
+    };
+
+    // 인증이 필요한 엔드포인트에 액세스 토큰 추가
+    if (!skipAuth && !isPublicEndpoint) {
+        const accessToken = tokenService.getAccessToken();
+        if (accessToken) {
+            (defaultHeaders as Record<string, string>)['Authorization'] = `Bearer ${accessToken}`;
+        }
+    }
+
+    let response = await fetch(url, {
+        ...options,
+        headers: {
+            ...defaultHeaders,
+            ...options.headers,
+        },
+    });
+
+    // 401 에러 시 토큰 갱신 후 재시도 (public 엔드포인트 제외)
+    if (response.status === 401 && !isPublicEndpoint && !skipAuth) {
+        console.log('[API] 401 received, attempting token refresh...');
+        
+        const newAccessToken = await tokenService.refreshAccessToken();
+        
+        if (newAccessToken) {
+            // 새 토큰으로 재시도
+            console.log('[API] Retrying request with new token...');
+            response = await fetch(url, {
+                ...options,
+                headers: {
+                    ...defaultHeaders,
+                    ...options.headers,
+                    'Authorization': `Bearer ${newAccessToken}`,
+                },
             });
-        }, 800);
+        } else {
+            // 토큰 갱신 실패 - 로그인 페이지로 이동
+            console.log('[API] Token refresh failed, redirecting to login...');
+            window.electronAPI?.openSignin();
+            throw new ApiError('세션이 만료되었습니다. 다시 로그인해주세요.', false, 401);
+        }
+    }
+
+    let rawResult: unknown;
+    
+    try {
+        rawResult = await response.json();
+        console.log('[API Response]', { endpoint, status: response.status, body: JSON.stringify(rawResult, null, 2) });
+    } catch {
+        // JSON 파싱 실패 시
+        throw new ApiError(
+            `서버 오류가 발생했습니다. (${response.status})`,
+            false,
+            response.status
+        );
+    }
+
+    const result = rawResult as ApiResponse<T>;
+
+    // HTTP 에러 또는 success: false인 경우
+    if (!response.ok || !result.success) {
+        // 서버 에러 응답 형식 처리 (Spring Boot 기본 에러 형식 지원)
+        const errorBody = rawResult as { 
+            message?: string; 
+            error?: string; 
+            errors?: Array<{ defaultMessage?: string; field?: string }>;
+            // Spring Boot validation 에러 형식
+            fieldErrors?: Record<string, string>;
+        };
+        
+        let errorMessage = '요청에 실패했습니다.';
+        
+        if (result.message && result.message.trim()) {
+            errorMessage = result.message;
+        } else if (errorBody.message && errorBody.message.trim()) {
+            errorMessage = errorBody.message;
+        } else if (errorBody.errors && errorBody.errors.length > 0) {
+            // Validation 에러 - 첫 번째 에러 메시지 사용
+            const firstError = errorBody.errors[0];
+            errorMessage = firstError.field 
+                ? `${firstError.field}: ${firstError.defaultMessage}`
+                : firstError.defaultMessage || errorMessage;
+        } else if (errorBody.fieldErrors) {
+            // fieldErrors 형식
+            const firstField = Object.keys(errorBody.fieldErrors)[0];
+            if (firstField) {
+                errorMessage = `${firstField}: ${errorBody.fieldErrors[firstField]}`;
+            }
+        } else {
+            // 상태 코드별 기본 메시지
+            switch (response.status) {
+                case 400:
+                    errorMessage = '입력 정보를 확인해주세요.';
+                    break;
+                case 401:
+                    errorMessage = '아이디 또는 비밀번호가 올바르지 않습니다.';
+                    break;
+                case 403:
+                    errorMessage = '접근 권한이 없습니다.';
+                    break;
+                case 404:
+                    errorMessage = '요청한 리소스를 찾을 수 없습니다.';
+                    break;
+                case 409:
+                    errorMessage = '이미 존재하는 정보입니다.';
+                    break;
+                case 500:
+                    errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+                    break;
+                default:
+                    errorMessage = errorBody.error || `요청에 실패했습니다. (${response.status})`;
+            }
+        }
+        
+        console.error('[API Error]', {
+            endpoint,
+            status: response.status,
+            rawResult: JSON.stringify(rawResult, null, 2)
+        });
+        
+        throw new ApiError(errorMessage, false, response.status);
+    }
+
+    return result.data;
+}
+
+// ============ Auth APIs ============
+
+// 로그인
+export const signin = async ({ 
+    usernameOrEmail, 
+    password 
+}: SignInRequest): Promise<AuthResponse> => {
+    const requestBody = { usernameOrEmail, password };
+    console.log('[Signin API] Request body:', JSON.stringify(requestBody));
+    
+    const response = await apiRequest<AuthResponse>('/api/v1/auth/signin', {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+    });
+
+    // 로그인 성공 시 토큰 저장
+    await tokenService.setTokensOnLogin(response.accessToken, response.refreshToken);
+    
+    return response;
+};
+
+// 회원가입
+export const signup = async (data: SignUpRequest): Promise<SignUpResponse> => {
+    return apiRequest<SignUpResponse>('/api/v1/auth/signup', {
+        method: 'POST',
+        body: JSON.stringify(data),
     });
 };
+
+// 이메일 인증 코드 전송
+export const sendVerificationCode = async ({ email }: SendVerificationCodeRequest): Promise<void> => {
+    return apiRequest<void>('/api/v1/auth/send-verification-code', {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+    });
+};
+
+// 이메일 인증
+export const verifyEmail = async ({ email, code }: VerifyEmailRequest): Promise<boolean> => {
+    return apiRequest<boolean>('/api/v1/auth/verify-email', {
+        method: 'POST',
+        body: JSON.stringify({ email, code }),
+    });
+};
+
+// 로그아웃
+export const signout = async (): Promise<void> => {
+    try {
+        await apiRequest<void>('/api/v1/auth/signout', {
+            method: 'POST',
+        });
+    } finally {
+        // API 호출 성공/실패와 관계없이 로컬 토큰 삭제
+        await tokenService.clearTokens();
+    }
+};
+
+// 자동 로그인 시도
+export const tryAutoLogin = async (): Promise<boolean> => {
+    return tokenService.tryAutoLogin();
+};
+
+// 인증 상태 확인
+export const isAuthenticated = (): boolean => {
+    return tokenService.isAuthenticated();
+};
+
+// 토큰 서비스 export (필요한 경우 직접 접근용)
+export { tokenService };
 
 export const fetchContributionData = async (year: number): Promise<number[][]> => {
     // Simulate API call for dashboard data

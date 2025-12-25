@@ -97,3 +97,18 @@ button.signin-btn:hover {
     justify-content: flex-end;
     font-size: 12px;
 }
+
+.error-message {
+    color: #ff6b6b;
+    font-size: 13px;
+    margin-bottom: var(--spacing-sm);
+    padding: 8px 12px;
+    background: rgba(255, 107, 107, 0.1);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid #ff6b6b;
+}
+
+button.signin-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

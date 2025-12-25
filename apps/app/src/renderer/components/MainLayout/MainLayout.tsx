@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Sidebar, type SidebarItem } from '@repo/ui';
 import { useAppDispatch } from '../../store/hooks';
-import { signout } from '../../store/slices/authSlice';
+import { signout as signoutAction } from '../../store/slices/authSlice';
+import { signout } from '../../services/api';
 import { Live2DManager } from '../../managers/Live2DManager';
 import './MainLayout.css';
 
@@ -16,9 +17,19 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab }) =
     const dispatch = useAppDispatch();
 
     const handleSignout = async () => {
-        dispatch(signout());
-        await window.electronAPI.deleteRefreshToken();
-        window.electronAPI.closeDashboard();
+        try {
+            console.log('[MainLayout] Logging out...');
+            await signout(); // API 호출 및 토큰 삭제
+            dispatch(signoutAction());
+            console.log('[MainLayout] Logout successful, redirecting to signin...');
+            // 로그인 페이지로 이동 (아바타 모드가 아님)
+            window.electronAPI.openSignin();
+        } catch (error) {
+            console.error('[MainLayout] Logout error:', error);
+            // 에러가 발생해도 로컬 토큰은 이미 삭제됨
+            dispatch(signoutAction());
+            window.electronAPI.openSignin();
+        }
     };
 
     const handleClose = () => {
