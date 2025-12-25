@@ -18,6 +18,10 @@ const Dashboard: React.FC = () => {
         window.location.href = '../roadmap/roadmap.html';
     };
 
+    const handleOpenStatistics = () => {
+        window.location.href = '../statistics/statistics.html';
+    };
+
     return (
         <MainLayout activeTab="home">
             <div className="dashboard-container">
@@ -30,7 +34,7 @@ const Dashboard: React.FC = () => {
                     <div className="card radar-card">
                         <div className="card-header">
                             <span>대시보드</span>
-                            <span className="more">자세히 보기</span>
+                            <span className="more" onClick={handleOpenStatistics} style={{ cursor: 'pointer' }}>자세히 보기</span>
                         </div>
                         <div className="card-body">
                             <svg viewBox="0 0 200 200" className="radar-chart">
@@ -84,6 +88,7 @@ const Dashboard: React.FC = () => {
                         <div className="card-body flex-row">
                             <div className="stat-box">
                                 <div className="stat-value">10/8</div>
+                                <div className="streak-info">12일 연속 🔥</div>
                                 <div className="progress-bar">
                                     <div className="progress-fill" style={{ width: '70%' }}></div>
                                 </div>

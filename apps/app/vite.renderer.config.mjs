@@ -19,6 +19,7 @@ export default defineConfig({
                 social: resolve(__dirname, 'src/renderer/views/social/social.html'),
                 setting: resolve(__dirname, 'src/renderer/views/setting/setting.html'),
                 profile: resolve(__dirname, 'src/renderer/views/profile/profile.html'),
+                statistics: resolve(__dirname, 'src/renderer/views/statistics/statistics.html'),
             },
         },
     },

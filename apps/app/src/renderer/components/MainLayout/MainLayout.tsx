@@ -9,9 +9,10 @@ import './MainLayout.css';
 interface MainLayoutProps {
     children: React.ReactNode;
     activeTab: 'home' | 'dashboard' | 'group' | 'setting' | 'roadmap';
+    hideAvatar?: boolean;
 }
 
-export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab }) => {
+export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, hideAvatar = false }) => {
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const dispatch = useAppDispatch();
@@ -128,13 +129,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab }) =
                 {children}
             </main>
 
-            <div className="avatar-sidebar-container">
-                <canvas
-                    ref={canvasRef}
-                    id="live2d-sidebar-canvas"
-                    onMouseMove={handleMouseMove}
-                ></canvas>
-            </div>
+            {!hideAvatar && (
+                <div className="avatar-sidebar-container">
+                    <canvas
+                        ref={canvasRef}
+                        id="live2d-sidebar-canvas"
+                        onMouseMove={handleMouseMove}
+                    ></canvas>
+                </div>
+            )}
         </div>
     );
 };

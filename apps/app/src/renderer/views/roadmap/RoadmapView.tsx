@@ -43,7 +43,7 @@ const RoadmapView: React.FC = () => {
     };
 
     return (
-        <MainLayout activeTab="roadmap">
+        <MainLayout activeTab="roadmap" hideAvatar={true}>
             <div className="roadmap-container">
                 <header className="roadmap-page-header">
                     <h1 className="main-title">
