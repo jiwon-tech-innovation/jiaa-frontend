@@ -1,6 +1,6 @@
 import { ipcMain, BrowserWindow, Menu, app, IpcMainEvent } from 'electron';
 import { getMainWindow, getAvatarWindow } from '../windows/manager';
-import { createMainWindow, loadSigninPage, loadSignupPage, loadDashboardPage } from '../windows/mainWindow';
+import { createMainWindow, loadSigninPage, loadSignupPage, loadDashboardPage, loadSettingPage } from '../windows/mainWindow';
 import { checkModelExists, downloadAndExtractModel, getModelDirectory } from '../services/modelManager';
 import { MODEL_NAME } from '../../common/constants';
 
@@ -94,6 +94,20 @@ export const registerIpcHandlers = (): void => {
             avatarWindow.show();
         }
     });
+
+    // IPC Event for Opening Setting Page
+    ipcMain.on('open-setting', () => {
+        console.log('[Main] open-setting event received');
+        const mainWindow = getMainWindow();
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            loadSettingPage();
+            mainWindow.show();
+        } else {
+            createMainWindow();
+            loadSettingPage();
+        }
+    });
+
 
     // IPC Event for Avatar Movement Sync
     // Broadcasts mouse position from one window to all other windows

@@ -24,10 +24,17 @@ export const createMainWindow = (): void => {
         }
     });
 
+    const startPage = process.env.START_PAGE || 'signin';
+    const targetPath = `/views/${startPage}/${startPage === 'avatar' ? 'index' : startPage}.html`;
+
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-        mainWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/signin/signin.html`);
+        const url = `${MAIN_WINDOW_VITE_DEV_SERVER_URL}${targetPath}`;
+        console.log(`[Main] Loading URL: ${url}`);
+        mainWindow.loadURL(url);
     } else {
-        mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/signin/signin.html`));
+        const filePath = path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}${targetPath}`);
+        console.log(`[Main] Loading File: ${filePath}`);
+        mainWindow.loadFile(filePath);
     }
 
     mainWindow.webContents.openDevTools({ mode: 'detach' });
@@ -81,6 +88,17 @@ export const loadDashboardPage = (): void => {
             mainWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/dashboard/dashboard.html`);
         } else {
             mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/dashboard/dashboard.html`));
+        }
+    }
+};
+
+export const loadSettingPage = (): void => {
+    const mainWindow = getMainWindow();
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+            mainWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/setting/setting.html`);
+        } else {
+            mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/setting/setting.html`));
         }
     }
 };

@@ -1,0 +1,238 @@
+@import '../../styles/variables.css';
+
+.roadmap-container {
+    width: 100vw;
+    min-height: 100vh;
+    background: var(--bg-primary);
+    background: var(--bg-gradient-main);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif;
+    padding: 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Header */
+.roadmap-page-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.back-btn-minimal {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.back-btn-minimal:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.main-title {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+}
+
+.main-title .brace {
+    color: var(--text-primary);
+}
+
+.main-title .title-text {
+    color: #8a5cf662;
+    /* 전송해주신 이미지와 유사한 다크 퍼플 */
+    margin: 0 4px;
+}
+
+/* Layout */
+.roadmap-layout {
+    display: grid;
+    grid-template-columns: 7fr 3fr;
+    gap: 24px;
+    flex: 1;
+    min-height: 800px;
+    /* 캘린더가 충분히 보일 수 있는 최소 높이 */
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.section-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.section-label {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    padding-left: 4px;
+}
+
+.calendar-controls {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.content-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 24px;
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px;
+    color: var(--text-primary);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Calendar Specific Styles */
+.calendar-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-grid-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.weekday {
+    font-weight: 700;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 12px;
+    flex: 1;
+}
+
+.calendar-cell {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 12px;
+    position: relative;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.calendar-cell:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #544186;
+}
+
+.calendar-cell.empty {
+    background: transparent;
+    border: none;
+}
+
+.day-number {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.event-dot {
+    width: 6px;
+    height: 6px;
+    background: #544186;
+    border-radius: 50%;
+    margin-top: auto;
+    align-self: center;
+    box-shadow: 0 0 8px rgba(84, 65, 134, 0.6);
+}
+
+.completed-mark {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 6px;
+    height: 6px;
+    background: #10b981;
+    border-radius: 50%;
+}
+
+.calendar-cell.active {
+    outline: 2px solid #544186;
+    background: rgba(109, 26, 219, 0.1);
+}
+
+/* Todo List Styles */
+.card-placeholder-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.todo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.todo-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.todo-list .checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #666;
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.todo-list .checkbox svg {
+    width: 14px;
+    height: 14px;
+}
+
+.todo-list li.done {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
+
+.todo-list li.done .checkbox {
+    background: #10b981;
+    border-color: #10b981;
+}
