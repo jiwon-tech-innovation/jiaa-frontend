@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Sidebar, SidebarItem } from '@repo/ui';
+import { Sidebar, type SidebarItem } from '@repo/ui';
 import { useAppDispatch } from '../../store/hooks';
 import { signout } from '../../store/slices/authSlice';
 import { Live2DManager } from '../../managers/Live2DManager';
