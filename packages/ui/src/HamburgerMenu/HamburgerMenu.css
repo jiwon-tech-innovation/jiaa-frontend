@@ -1,0 +1,86 @@
+.hamburger-menu {
+    display: none;
+    /* Hidden by default, explicit display block needed in media query */
+}
+
+/* Button Styles */
+.hamburger-button {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.hamburger-line {
+    width: 100%;
+    height: 2px;
+    background-color: #ffffff;
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: left;
+}
+
+/* Open State Animation */
+.hamburger-button.open .hamburger-line:first-child {
+    transform: rotate(45deg) translate(2px, -2px);
+}
+
+.hamburger-button.open .hamburger-line:nth-child(2) {
+    opacity: 0;
+    transform: translateX(10px);
+}
+
+.hamburger-button.open .hamburger-line:last-child {
+    transform: rotate(-45deg) translate(2px, 2px);
+}
+
+/* Fullscreen Overlay */
+.hamburger-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(15, 16, 20, 0.95);
+    backdrop-filter: blur(20px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.hamburger-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.hamburger-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    transform: translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hamburger-overlay.open .hamburger-content {
+    transform: translateY(0);
+}
+
+/* Responsive visibility - helper class */
+@media (max-width: 768px) {
+    .hamburger-menu {
+        display: block;
+    }
+}
