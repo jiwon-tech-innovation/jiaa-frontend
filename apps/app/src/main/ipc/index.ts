@@ -1,6 +1,6 @@
 import { ipcMain, BrowserWindow, Menu, app, IpcMainEvent } from 'electron';
 import { getMainWindow, getAvatarWindow } from '../windows/manager';
-import { createMainWindow, loadSigninPage, loadSignupPage, loadDashboardPage, loadSettingPage } from '../windows/mainWindow';
+import { createMainWindow, loadSigninPage, loadSignupPage, loadDashboardPage, loadSettingPage, loadProfilePage } from '../windows/mainWindow';
 import { checkModelExists, downloadAndExtractModel, getModelDirectory } from '../services/modelManager';
 import { MODEL_NAME } from '../../common/constants';
 
@@ -118,6 +118,19 @@ export const registerIpcHandlers = (): void => {
         } else {
             createMainWindow();
             loadSettingPage();
+        }
+    });
+
+    // IPC Event for Opening Profile Page
+    ipcMain.on('open-profile', () => {
+        console.log('[Main] open-profile event received');
+        const mainWindow = getMainWindow();
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            loadProfilePage();
+            mainWindow.show();
+        } else {
+            createMainWindow();
+            loadProfilePage();
         }
     });
 

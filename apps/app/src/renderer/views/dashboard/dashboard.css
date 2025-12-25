@@ -121,12 +121,62 @@ html {
     cursor: pointer;
 }
 
+.card-header .header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.roadmap-footer {
+    width: 100%;
+    margin-top: auto;
+    padding-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.create-btn {
+    background: rgba(84, 65, 134, 0.4);
+    color: var(--text-secondary);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    padding: 10px 0;
+    width: 100%;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.create-btn:hover {
+    background: rgba(84, 65, 134, 0.6);
+    color: var(--text-primary);
+    border-color: var(--accent-purple);
+    transform: translateY(-2px);
+}
+
+.create-btn::before {
+    content: '+';
+    font-size: 18px;
+    font-weight: 400;
+}
+
 .card-body {
     flex: 1;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.roadmap-card .card-body {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
 }
 
 /* Radar Chart SVG Styles */

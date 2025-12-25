@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchContributionData } from '../../services/api';
 import { ContributionGraph } from '../../components/ContributionGraph';
@@ -8,15 +8,10 @@ import './dashboard.css';
 const Dashboard: React.FC = () => {
     const [selectedYear, setSelectedYear] = useState(2025);
 
-    useEffect(() => {
-    }, []);
-
     // Fetch Contribution Data
     const { data: contributionLevels = [] } = useQuery({
         queryKey: ['contributionData', selectedYear],
-        queryFn: () => {
-            return fetchContributionData(selectedYear);
-        }
+        queryFn: () => fetchContributionData(selectedYear)
     });
 
     const handleOpenRoadmap = () => {
@@ -74,6 +69,9 @@ const Dashboard: React.FC = () => {
                                     <span>실전 프로젝트</span>
                                 </li>
                             </ul>
+                            <div className="roadmap-footer">
+                                <button className="create-btn" onClick={() => alert('로드맵 생성 기능 준비 중입니다.')}>로드맵 생성</button>
+                            </div>
                         </div>
                     </div>
 

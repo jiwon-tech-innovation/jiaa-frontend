@@ -96,7 +96,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab }) =
             icon: '/Group Icon 24px.svg',
             label: '그룹',
             active: activeTab === 'group',
-            onClick: () => { }
+            onClick: () => {
+                navigate('../social/social.html');
+            }
         },
         {
             id: 'setting',
@@ -116,7 +118,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab }) =
                 isProfileDropdownOpen={isProfileDropdownOpen}
                 onProfileClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                 onSignout={handleSignout}
-                onProfileDetail={() => { }}
+                onProfileDetail={() => {
+                    window.electronAPI?.openProfile();
+                }}
             />
 
             <main className="main-content">

@@ -12,7 +12,7 @@ const Setting: React.FC = () => {
 
     const handleLogout = async () => {
         if (isLoggingOut) return;
-        
+
         setIsLoggingOut(true);
         try {
             console.log('[Setting] Logging out...');
@@ -75,7 +75,7 @@ const Setting: React.FC = () => {
                     <div className="setting-section">
                         <label className="setting-label">로그아웃</label>
                         <p className="setting-description">현재 계정에서 로그아웃합니다.</p>
-                        <button 
+                        <button
                             className="logout-button"
                             onClick={handleLogout}
                             disabled={isLoggingOut}

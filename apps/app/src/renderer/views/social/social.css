@@ -1,0 +1,501 @@
+/* Social Page Specific Styles */
+
+/* Main Container */
+.social-main-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    width: 100%;
+}
+
+/* Search Container */
+.search-container {
+    padding: 20px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.search-input:focus {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* Content Wrapper */
+.social-content-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px;
+}
+
+/* Section Styles */
+.social-section {
+    margin-bottom: 40px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.scroll-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.scroll-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Horizontal Scroll for Recommended Users */
+.horizontal-scroll {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+/* User Card (Recommended Users) */
+.user-card {
+    min-width: 140px;
+    height: 220px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.user-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(102, 126, 234, 0.5);
+    transform: translateY(-4px);
+}
+
+.user-card-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+}
+
+.user-card-name {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Groups Grid */
+.groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+}
+
+/* Group Card */
+.group-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 220px;
+}
+
+.group-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(102, 126, 234, 0.5);
+    transform: translateY(-4px);
+}
+
+.group-card-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+}
+
+.group-card-info {
+    text-align: center;
+    width: 100%;
+}
+
+.group-card-name {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.group-card-members {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+}
+
+/* Create Group Button */
+.create-group-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 420px;
+    padding: 14px 28px;
+    background: white;
+    color: #1a1a1a;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.create-group-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Scrollbar for content wrapper */
+.social-content-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.social-content-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.social-content-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.social-content-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    padding: 24px 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h2 {
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Modal Tabs */
+.modal-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-tab {
+    padding: 16px 24px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.modal-tab:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.modal-tab.active {
+    color: #7c5cdb;
+}
+
+.modal-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #7c5cdb;
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 30px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-section {
+    margin-bottom: 30px;
+}
+
+.modal-section h3 {
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 20px 0;
+}
+
+/* Permission Options */
+.permission-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.permission-btn {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+}
+
+.permission-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.permission-btn.active {
+    background: rgba(124, 92, 219, 0.2);
+    border-color: #7c5cdb;
+}
+
+.radio-icon {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.permission-btn.active .radio-icon {
+    border-color: #7c5cdb;
+}
+
+.permission-btn.active .radio-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: #7c5cdb;
+    border-radius: 50%;
+}
+
+.permission-description {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Detail Settings Placeholder */
+.detail-settings-placeholder {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 100px 40px;
+    text-align: center;
+}
+
+.detail-settings-placeholder p {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 20px;
+    margin: 0;
+}
+
+/* Modal Submit Button */
+.modal-submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: #7c5cdb;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.modal-submit-btn:hover {
+    background: #6b4bc9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124, 92, 219, 0.4);
+}
+
+/* Join Content */
+.join-content {
+    padding: 0;
+}
+
+.code-input {
+    width: 100%;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+}
+
+.code-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.code-input:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #7c5cdb;
+}
+
+.code-description {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.join-content p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+}
+
+/* Modal Scrollbar */
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}

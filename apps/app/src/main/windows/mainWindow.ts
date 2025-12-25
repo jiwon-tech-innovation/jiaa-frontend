@@ -102,6 +102,17 @@ export const loadDashboardPage = (): void => {
     }
 };
 
+export const loadProfilePage = (): void => {
+    const mainWindow = getMainWindow();
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+            mainWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/profile/profile.html`);
+        } else {
+            mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/profile/profile.html`));
+        }
+    }
+};
+
 export const loadSettingPage = (): void => {
     const mainWindow = getMainWindow();
     if (mainWindow && !mainWindow.isDestroyed()) {
