@@ -5,6 +5,7 @@ export interface IElectronAPI {
     openSignup: () => void;
     openSetting: () => void;
     closeSignin: () => void;
+    openDashboard: () => void;
     closeDashboard: () => void;
     signinSuccess: (email: string) => void;
     saveRefreshToken: (token: string) => Promise<{ success: boolean; error?: string }>;

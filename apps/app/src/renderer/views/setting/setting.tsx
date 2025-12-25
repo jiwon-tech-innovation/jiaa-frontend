@@ -1,16 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { Live2DManager } from '../../managers/Live2DManager';
+import { useAppDispatch } from '../../store/hooks';
 import { signout } from '../../store/slices/authSlice';
 import './setting.css';
 
 const Setting: React.FC = () => {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [screenMode, setScreenMode] = useState<'light' | 'dark'>('dark');
+    const [screenMode, setScreenMode] = useState<'light' | 'dark' | 'system'>('dark');
     const dispatch = useAppDispatch();
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const user = useAppSelector((state) => state.auth.user);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -26,6 +23,10 @@ const Setting: React.FC = () => {
         };
     }, []);
 
+    const handleDashboard = () => {
+        window.electronAPI?.openDashboard();
+    };
+
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
@@ -36,47 +37,10 @@ const Setting: React.FC = () => {
         window.electronAPI.closeDashboard();
     };
 
-    // Live2D Init
-    useEffect(() => {
-        if (!canvasRef.current) return;
-
-        const init = async () => {
-            if (!canvasRef.current) return;
-            const manager = Live2DManager.getInstance();
-            manager.initialize(canvasRef.current);
-            manager.enableSync();
-        };
-
-        init();
-
-        return () => {
-            const manager = Live2DManager.getInstance();
-            manager.disableSync();
-            Live2DManager.releaseInstance();
-        };
-    }, []);
-
-    const handleClose = () => {
-        window.electronAPI?.closeDashboard();
-    };
-
-    const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const manager = Live2DManager.getInstance();
-        manager.onMouseMove(x, y);
-    };
-
     return (
         <>
-            <button className="close-btn" id="close-btn" onClick={handleClose}>&times;</button>
+            <button className="close-btn" id="close-btn" onClick={() => window.electronAPI?.closeDashboard()}>&times;</button>
             <div className="dashboard-wrapper">
-                {/* Sidebar */}
                 <nav className="sidebar">
                     <div className="nav-item profile" onClick={toggleDropdown} ref={dropdownRef}>
                         <div className="profile-circle"></div>
@@ -88,7 +52,7 @@ const Setting: React.FC = () => {
                         )}
                     </div>
                     <div className="nav-group">
-                        <div className="nav-item">
+                        <div className="nav-item" onClick={handleDashboard}>
                             <img src="/Home Icon 16px.svg" alt="" />
                         </div>
                         <div className="nav-item">
@@ -104,8 +68,8 @@ const Setting: React.FC = () => {
                 </nav>
 
                 <div className="setting-container">
+                    <h1 className="setting-page-title">설정</h1>
                     <div className="setting-content">
-                        <h1 className="setting-title">설정</h1>
                         <h2 className="setting-subtitle">화면 설정</h2>
 
                         {/* 화면 모드 섹션 */}
@@ -124,6 +88,12 @@ const Setting: React.FC = () => {
                                 >
                                     다크 모드
                                 </button>
+                                <button
+                                    className={`mode-button ${screenMode === 'system' ? 'active' : ''}`}
+                                    onClick={() => setScreenMode('system')}
+                                >
+                                    시스템 설정
+                                </button>
                             </div>
                         </div>
 
@@ -133,11 +103,6 @@ const Setting: React.FC = () => {
                             <p className="setting-description">아바타에 대한 세부설명</p>
                         </div>
                     </div>
-                </div>
-
-                {/* Avatar Canvas */}
-                <div className="avatar-container">
-                    <canvas ref={canvasRef} id="live2d-dashboard" onMouseMove={handleMouseMove}></canvas>
                 </div>
             </div>
         </>

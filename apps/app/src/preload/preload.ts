@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     showContextMenu: () => ipcRenderer.send('show-context-menu'),
     openSignin: () => ipcRenderer.send('open-signin'),
     openSignup: () => ipcRenderer.send('open-signup'),
+    openDashboard: () => ipcRenderer.send('open-dashboard'),
     openSetting: () => ipcRenderer.send('open-setting'),
     closeSignin: () => ipcRenderer.send('close-signin'),
     closeDashboard: () => ipcRenderer.send('close-dashboard'),
