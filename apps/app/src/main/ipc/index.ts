@@ -82,6 +82,19 @@ export const registerIpcHandlers = (): void => {
         }
     });
 
+    // IPC Event for Opening Dashboard
+    ipcMain.on('open-dashboard', () => {
+        console.log('[Main] open-dashboard event received');
+        const mainWindow = getMainWindow();
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            loadDashboardPage();
+            mainWindow.show();
+        } else {
+            createMainWindow();
+            loadDashboardPage();
+        }
+    });
+
     // IPC Event for Closing Dashboard (closes mainWindow)
     ipcMain.on('close-dashboard', () => {
         const mainWindow = getMainWindow();
@@ -105,6 +118,18 @@ export const registerIpcHandlers = (): void => {
         } else {
             createMainWindow();
             loadSettingPage();
+        }
+    });
+
+    ipcMain.on('close-setting', () => {
+        const mainWindow = getMainWindow();
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.close();
+        }
+        // Show Avatar Window when Dashboard closes
+        const avatarWindow = getAvatarWindow();
+        if (avatarWindow && !avatarWindow.isDestroyed()) {
+            avatarWindow.show();
         }
     });
 

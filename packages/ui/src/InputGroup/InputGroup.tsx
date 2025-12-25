@@ -13,7 +13,7 @@ export const InputGroup: React.FC<InputGroupProps> = ({ label, id, className = '
                 id={id}
                 placeholder=" "
                 className="form-input"
-                {...props}
+                {...props} 
             />
             <label htmlFor={id} className="form-label">{label}</label>
         </div>

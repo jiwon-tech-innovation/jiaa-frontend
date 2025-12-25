@@ -1,6 +1,9 @@
 .hamburger-menu {
-    display: none;
-    /* Hidden by default, explicit display block needed in media query */
+    display: block;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1001;
 }
 
 /* Button Styles */
@@ -78,9 +81,7 @@
     transform: translateY(0);
 }
 
-/* Responsive visibility - helper class */
-@media (max-width: 768px) {
-    .hamburger-menu {
-        display: block;
-    }
+/* Button positioning */
+.hamburger-button {
+    position: relative;
 }
