@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchContributionData } from '../../services/api';
 import { ContributionGraph } from '../../components/ContributionGraph';
@@ -8,81 +8,22 @@ import './dashboard.css';
 const Dashboard: React.FC = () => {
     const [selectedYear, setSelectedYear] = useState(2025);
 
-    useEffect(() => {
-    }, []);
-
     // Fetch Contribution Data
     const { data: contributionLevels = [] } = useQuery({
         queryKey: ['contributionData', selectedYear],
-        queryFn: () => {
-            return fetchContributionData(selectedYear);
-        }
+        queryFn: () => fetchContributionData(selectedYear)
     });
 
     const handleOpenRoadmap = () => {
         window.location.href = '../roadmap/roadmap.html';
     };
-    const handleSetting = () => {
-        window.electronAPI?.openSetting();
-    }
-
-    const handleOpenProfile = () => {
-        window.electronAPI.openProfile();
-    };
-
-    const handleOpenSocial = () => {
-        window.location.href = '../social/social.html';
-    };
-
-    const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const manager = Live2DManager.getInstance();
-        manager.onMouseMove(x, y);
-    };
 
     return (
-        <>
-            <button className="close-btn" id="close-btn" onClick={handleClose}>&times;</button>
-            <div className="dashboard-wrapper">
-                {/* Sidebar */}
-                <nav className="sidebar">
-                    <div className="nav-item profile" onClick={toggleDropdown} ref={dropdownRef}>
-                        <div className="profile-circle"></div>
-                        {isDropdownOpen && (
-                            <div className="dropdown-menu">
-                                <div className="dropdown-item" onClick={handleOpenProfile}>내 프로필</div>
-                                <div className="dropdown-item" onClick={handleSignout}>로그아웃</div>
-                            </div>
-                        )}
-                    </div>
-                    <div className="nav-group">
-                        <div className="nav-item active">
-                            <img src="/Home Icon 16px.svg" alt="" />
-                        </div>
-                        <div className="nav-item">
-                            <img src="/DashBoard Icon 24px.svg" alt="" />
-                        </div>
-                        <div className="nav-item" onClick={handleOpenSocial} style={{ cursor: 'pointer' }}>
-                            <img src="/Group Icon 24px.svg" alt="" />
-                        </div>
-                        <a id="signup-link" onClick={handleSetting} style={{ cursor: 'pointer' }}>
-                            <div className="nav-item">
-                                <img src="/Setting Icon 24px.svg" alt="" />
-                            </div>
-                        </a>
-                    </div>
-                </nav>
-
-                <div className="dashboard-container">
-                    <header className="header">
-                        <h1>홈</h1>
-                    </header>
+        <MainLayout activeTab="home">
+            <div className="dashboard-container">
+                <header className="header">
+                    <h1>홈</h1>
+                </header>
 
                 <div className="dashboard-grid">
                     {/* Radar Chart Panel */}
@@ -107,32 +48,32 @@ const Dashboard: React.FC = () => {
                         </div>
                     </div>
 
-                        {/* Roadmap Panel */}
-                        <div className="card roadmap-card">
-                            <div className="card-header">
-                                <span>로드맵</span>
-                                <span className="more" onClick={handleOpenRoadmap} style={{ cursor: 'pointer' }}>자세히 보기</span>
-                            </div>
-                            <div className="card-body">
-                                <ul className="roadmap-list">
-                                    <li className="roadmap-item completed">
-                                        <span className="status-icon">✓</span>
-                                        <span>기초 다지기</span>
-                                    </li>
-                                    <li className="roadmap-item active">
-                                        <span className="status-icon">▶</span>
-                                        <span>심화 학습</span>
-                                    </li>
-                                    <li className="roadmap-item">
-                                        <span className="status-icon">○</span>
-                                        <span>실전 프로젝트</span>
-                                    </li>
-                                </ul>
-                                <div className="roadmap-footer">
-                                    <button className="create-btn" onClick={() => alert('로드맵 생성 기능 준비 중입니다.')}>로드맵 생성</button>
-                                </div>
+                    {/* Roadmap Panel */}
+                    <div className="card roadmap-card">
+                        <div className="card-header">
+                            <span>로드맵</span>
+                            <span className="more" onClick={handleOpenRoadmap} style={{ cursor: 'pointer' }}>자세히 보기</span>
+                        </div>
+                        <div className="card-body">
+                            <ul className="roadmap-list">
+                                <li className="roadmap-item completed">
+                                    <span className="status-icon">✓</span>
+                                    <span>기초 다지기</span>
+                                </li>
+                                <li className="roadmap-item active">
+                                    <span className="status-icon">▶</span>
+                                    <span>심화 학습</span>
+                                </li>
+                                <li className="roadmap-item">
+                                    <span className="status-icon">○</span>
+                                    <span>실전 프로젝트</span>
+                                </li>
+                            </ul>
+                            <div className="roadmap-footer">
+                                <button className="create-btn" onClick={() => alert('로드맵 생성 기능 준비 중입니다.')}>로드맵 생성</button>
                             </div>
                         </div>
+                    </div>
 
                     {/* Bottom Stats Panel */}
                     <div className="card bottom-card">

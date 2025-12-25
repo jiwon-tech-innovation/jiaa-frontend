@@ -1,91 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useAppDispatch } from '../../store/hooks';
-import { Live2DManager } from '../../managers/Live2DManager';
-import { signout } from '../../store/slices/authSlice';
+import React, { useState } from 'react';
+import { MainLayout } from '../../components/MainLayout/MainLayout';
 import './social.css';
 
 const Social: React.FC = () => {
-    console.log('[Social] Rendering Social component');
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [modalTab, setModalTab] = useState<'create' | 'join'>('create');
     const [groupPermission, setGroupPermission] = useState<'strict' | 'open'>('strict');
-    const dispatch = useAppDispatch();
-    const dropdownRef = useRef<HTMLDivElement>(null);
-
-    // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsDropdownOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
-
-    const handleSignout = async () => {
-        dispatch(signout());
-        await window.electronAPI.deleteRefreshToken();
-        window.electronAPI.closeDashboard();
-    };
-
-    // Live2D Init
-    useEffect(() => {
-        if (!canvasRef.current) return;
-
-        const init = async () => {
-            if (!canvasRef.current) return;
-            const manager = Live2DManager.getInstance();
-            manager.initialize(canvasRef.current);
-            manager.enableSync();
-        };
-
-        init();
-
-        return () => {
-            const manager = Live2DManager.getInstance();
-            manager.disableSync();
-            Live2DManager.releaseInstance();
-        };
-    }, []);
-
-    const handleClose = () => {
-        window.electronAPI?.closeDashboard();
-    };
-
-    const handleOpenDashboard = () => {
-        window.location.href = '../dashboard/dashboard.html';
-    };
-
-    const handleSetting = () => {
-        window.electronAPI?.openSetting();
-    };
-
-    const handleOpenProfile = () => {
-        window.electronAPI.openProfile();
-    };
-
-    const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        const manager = Live2DManager.getInstance();
-        manager.onMouseMove(x, y);
-    };
 
     // Mock data for recommended users
     const recommendedUsers = [
@@ -112,112 +33,75 @@ const Social: React.FC = () => {
     ];
 
     return (
-        <>
-            <button className="close-btn" id="close-btn" onClick={handleClose}>&times;</button>
-            <div className="dashboard-wrapper">
-                {/* Sidebar */}
-                <nav className="sidebar">
-                    <div className="nav-item profile" onClick={toggleDropdown} ref={dropdownRef}>
-                        <div className="profile-circle"></div>
-                        {isDropdownOpen && (
-                            <div className="dropdown-menu">
-                                <div className="dropdown-item" onClick={handleOpenProfile}>내 프로필</div>
-                                <div className="dropdown-item" onClick={handleSignout}>로그아웃</div>
-                            </div>
-                        )}
-                    </div>
-                    <div className="nav-group">
-                        <div className="nav-item" onClick={handleOpenDashboard} style={{ cursor: 'pointer' }}>
-                            <img src="/Home Icon 16px.svg" alt="" />
-                        </div>
-                        <div className="nav-item">
-                            <img src="/DashBoard Icon 24px.svg" alt="" />
-                        </div>
-                        <div className="nav-item active">
-                            <img src="/Group Icon 24px.svg" alt="" />
-                        </div>
-                        <a id="signup-link" onClick={handleSetting} style={{ cursor: 'pointer' }}>
-                            <div className="nav-item">
-                                <img src="/Setting Icon 24px.svg" alt="" />
-                            </div>
-                        </a>
-                    </div>
-                </nav>
-
-                <div className="social-main-container">
-                    {/* Search Bar */}
-                    <div className="search-container">
-                        <input
-                            type="text"
-                            className="search-input"
-                            placeholder="검색"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
-
-                    {/* Content Area */}
-                    <div className="social-content-wrapper">
-                        {/* Recommended Users Section */}
-                        <section className="social-section">
-                            <div className="section-header">
-                                <h2>추천 사용자</h2>
-                                <button className="scroll-btn">›</button>
-                            </div>
-                            <div className="horizontal-scroll">
-                                {recommendedUsers.map(user => (
-                                    <div key={user.id} className="user-card">
-                                        <div className="user-card-avatar">{user.avatar}</div>
-                                        <div className="user-card-name">{user.name}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* Friend Groups Section */}
-                        <section className="social-section">
-                            <div className="section-header">
-                                <h2>친구 Group</h2>
-                            </div>
-                            <div className="groups-grid">
-                                {friendGroups.map(group => (
-                                    <div key={group.id} className="group-card">
-                                        <div className="group-card-avatar">{group.avatar}</div>
-                                        <div className="group-card-info">
-                                            <div className="group-card-name">{group.name}</div>
-                                            <div className="group-card-members">{group.members}명</div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* My Groups Section */}
-                        <section className="social-section">
-                            <div className="section-header">
-                                <h2>내가 참여 중인 Group</h2>
-                            </div>
-                            <div className="groups-grid">
-                                {myGroups.map(group => (
-                                    <div key={group.id} className="group-card">
-                                        <div className="group-card-avatar">{group.avatar}</div>
-                                        <div className="group-card-info">
-                                            <div className="group-card-name">{group.name}</div>
-                                            <div className="group-card-members">{group.members}명</div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        {/* Create Group Button */}
-                        <button className="create-group-btn" onClick={() => setIsCreateModalOpen(true)}>Group 생성하기</button>
-                    </div>
+        <MainLayout activeTab="group">
+            <div className="social-main-container">
+                {/* Search Bar */}
+                <div className="search-container">
+                    <input
+                        type="text"
+                        className="search-input"
+                        placeholder="검색"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                 </div>
 
-                {/* Avatar Canvas */}
-                <div className="avatar-container">
-                    <canvas ref={canvasRef} id="live2d-social" onMouseMove={handleMouseMove}></canvas>
+                {/* Content Area */}
+                <div className="social-content-wrapper">
+                    {/* Recommended Users Section */}
+                    <section className="social-section">
+                        <div className="section-header">
+                            <h2>추천 사용자</h2>
+                            <button className="scroll-btn">›</button>
+                        </div>
+                        <div className="horizontal-scroll">
+                            {recommendedUsers.map(user => (
+                                <div key={user.id} className="user-card">
+                                    <div className="user-card-avatar">{user.avatar}</div>
+                                    <div className="user-card-name">{user.name}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* Friend Groups Section */}
+                    <section className="social-section">
+                        <div className="section-header">
+                            <h2>친구 Group</h2>
+                        </div>
+                        <div className="groups-grid">
+                            {friendGroups.map(group => (
+                                <div key={group.id} className="group-card">
+                                    <div className="group-card-avatar">{group.avatar}</div>
+                                    <div className="group-card-info">
+                                        <div className="group-card-name">{group.name}</div>
+                                        <div className="group-card-members">{group.members}명</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* My Groups Section */}
+                    <section className="social-section">
+                        <div className="section-header">
+                            <h2>내가 참여 중인 Group</h2>
+                        </div>
+                        <div className="groups-grid">
+                            {myGroups.map(group => (
+                                <div key={group.id} className="group-card">
+                                    <div className="group-card-avatar">{group.avatar}</div>
+                                    <div className="group-card-info">
+                                        <div className="group-card-name">{group.name}</div>
+                                        <div className="group-card-members">{group.members}명</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* Create Group Button */}
+                    <button className="create-group-btn" onClick={() => setIsCreateModalOpen(true)}>Group 생성하기</button>
                 </div>
             </div>
 
@@ -303,7 +187,7 @@ const Social: React.FC = () => {
                     </div>
                 </div>
             )}
-        </>
+        </MainLayout>
     );
 };
 
