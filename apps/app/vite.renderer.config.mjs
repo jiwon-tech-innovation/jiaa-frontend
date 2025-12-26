@@ -21,6 +21,7 @@ export default defineConfig({
                 setting: resolve(__dirname, 'src/renderer/views/setting/setting.html'),
                 profile: resolve(__dirname, 'src/renderer/views/profile/profile.html'),
                 first_create_loadmap: resolve(__dirname, 'src/renderer/views/first_create_loadmap/first_create_loadmap.html'),
+                statistics: resolve(__dirname, 'src/renderer/views/statistics/statistics.html'),
             },
         },
     },
