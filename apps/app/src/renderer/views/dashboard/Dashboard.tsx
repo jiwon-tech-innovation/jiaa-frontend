@@ -21,6 +21,49 @@ const Dashboard: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
+    // Radar chart data (0-100 scale)
+    const radarData = [
+        { label: '코딩', value: 75 },
+        { label: '운동', value: 60 },
+        { label: '수학', value: 45 },
+        { label: '관리', value: 85 },
+        { label: '분석', value: 55 },
+        { label: '테스팅', value: 40 }
+    ];
+
+    // Calculate hexagon points for radar chart
+    const calculateRadarPoints = (centerX: number, centerY: number, radius: number, values: number[]) => {
+        const points = values.map((value, index) => {
+            const angle = (Math.PI / 3) * index - Math.PI / 2; // 60 degrees apart, starting from top
+            const r = (value / 100) * radius;
+            const x = centerX + r * Math.cos(angle);
+            const y = centerY + r * Math.sin(angle);
+            return `${x.toFixed(1)},${y.toFixed(1)}`;
+        });
+        return points.join(' ');
+    };
+
+    // Generate grid hexagon points
+    const generateGridHexagon = (centerX: number, centerY: number, radius: number) => {
+        const points = [];
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i - Math.PI / 2;
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+            points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+        }
+        return points.join(' ');
+    };
+
+    // Calculate label positions
+    const getLabelPosition = (centerX: number, centerY: number, radius: number, index: number) => {
+        const angle = (Math.PI / 3) * index - Math.PI / 2;
+        const labelRadius = radius + 15;
+        const x = centerX + labelRadius * Math.cos(angle);
+        const y = centerY + labelRadius * Math.sin(angle);
+        return { x: x.toFixed(1), y: y.toFixed(1) };
+    };
+
     // Fetch Contribution Data
     const { data: contributionLevels = [] } = useQuery({
         queryKey: ['contributionData', selectedYear],
@@ -108,17 +151,33 @@ const Dashboard: React.FC = () => {
                             <span className="more" onClick={handleOpenStatistics} style={{ cursor: 'pointer' }}>자세히 보기</span>
                         </div>
                         <div className="card-body">
-                            <svg viewBox="0 0 200 200" className="radar-chart">
-                                <polygon points="100,20 169.3,60 169.3,140 100,180 30.7,140 30.7,60" className="radar-bg" />
-                                <polygon points="100,40 152,70 152,130 100,160 48,130 48,70" className="radar-grid" />
-                                <polygon points="100,60 134.6,80 134.6,120 100,140 65.4,120 65.4,80" className="radar-grid" />
-                                <polygon points="100,30 155,68 141,124 100,170 51,128 41,66" className="radar-data" />
-                                <text x="100" y="15" textAnchor="middle" className="radar-label">코딩</text>
-                                <text x="178" y="55" textAnchor="start" className="radar-label">운동</text>
-                                <text x="178" y="145" textAnchor="start" className="radar-label">수학</text>
-                                <text x="100" y="195" textAnchor="middle" className="radar-label">관리</text>
-                                <text x="22" y="145" textAnchor="end" className="radar-label">분석</text>
-                                <text x="22" y="55" textAnchor="end" className="radar-label">테스팅</text>
+                            <svg viewBox="0 0 200 200" className="radar-chart" preserveAspectRatio="xMidYMid meet">
+                                {/* Background hexagon */}
+                                <polygon points={generateGridHexagon(100, 100, 65)} className="radar-bg" />
+                                {/* Grid lines - inner hexagons */}
+                                <polygon points={generateGridHexagon(100, 100, 48)} className="radar-grid" />
+                                <polygon points={generateGridHexagon(100, 100, 32)} className="radar-grid" />
+                                <polygon points={generateGridHexagon(100, 100, 16)} className="radar-grid" />
+                                {/* Data polygon */}
+                                <polygon
+                                    points={calculateRadarPoints(100, 100, 65, radarData.map(d => d.value))}
+                                    className="radar-data"
+                                />
+                                {/* Labels */}
+                                {radarData.map((item, index) => {
+                                    const pos = getLabelPosition(100, 100, 65, index);
+                                    return (
+                                        <text
+                                            key={index}
+                                            x={pos.x}
+                                            y={pos.y}
+                                            textAnchor="middle"
+                                            className="radar-label"
+                                        >
+                                            {item.label}
+                                        </text>
+                                    );
+                                })}
                             </svg>
                         </div>
                     </div>
@@ -154,7 +213,6 @@ const Dashboard: React.FC = () => {
                     <div className="card bottom-card">
                         <div className="card-header">
                             <span>활동기록</span>
-                            <span className="more">자세히 보기</span>
                         </div>
                         <div className="card-body flex-row">
                             <div className="stat-box">
