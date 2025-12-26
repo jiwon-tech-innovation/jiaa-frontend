@@ -12,6 +12,10 @@ export interface IElectronAPI {
     closeSignin: () => void;
     openDashboard: () => void;
     closeDashboard: () => void;
+    minimize: () => void;
+    maximize: () => void;
+    unmaximize: () => void;
+    isMaximized: () => Promise<boolean>;
     signinSuccess: (email: string) => void;
     saveRefreshToken: (token: string) => Promise<{ success: boolean; error?: string }>;
     getRefreshToken: () => Promise<string | null>;

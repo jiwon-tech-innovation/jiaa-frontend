@@ -13,10 +13,24 @@ export const registerIpcHandlers = (): void => {
         }
     });
 
-    ipcMain.on('renderer-log', (event, message: string) => {
+    ipcMain.on('minimize-window', (event) => {
         const win = BrowserWindow.fromWebContents(event.sender);
-        const title = win?.getTitle() || 'Renderer';
-        console.log(`[${title}] ${message}`);
+        if (win) win.minimize();
+    });
+
+    ipcMain.on('maximize-window', (event) => {
+        const win = BrowserWindow.fromWebContents(event.sender);
+        if (win) win.maximize();
+    });
+
+    ipcMain.on('unmaximize-window', (event) => {
+        const win = BrowserWindow.fromWebContents(event.sender);
+        if (win) win.unmaximize();
+    });
+
+    ipcMain.handle('is-maximized', (event) => {
+        const win = BrowserWindow.fromWebContents(event.sender);
+        return win ? win.isMaximized() : false;
     });
 
     // IPC Event for Context Menu

@@ -7,6 +7,17 @@
     background: var(--bg-gradient-main);
 }
 
+.title-bar-drag-area {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 138px;
+    /* space for window controls (46px * 3) */
+    height: 32px;
+    -webkit-app-region: drag;
+    z-index: 999;
+}
+
 .main-content {
     flex: 1;
     display: flex;
@@ -16,6 +27,7 @@
     min-width: 0;
     position: relative;
     overflow-y: auto;
+    -webkit-app-region: no-drag;
 }
 
 .avatar-sidebar-container {
@@ -31,20 +43,44 @@
     display: block;
 }
 
-/* Close button for all views */
-.global-close-btn {
+
+/* Window Controls */
+.window-controls {
     position: fixed;
-    top: 15px;
-    right: 15px;
+    top: 0;
+    right: 0;
+    display: flex;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(4px);
+    border-bottom-left-radius: 8px;
+}
+
+.win-btn {
+    width: 46px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: transparent;
     border: none;
     color: var(--text-muted);
-    font-size: 24px;
     cursor: pointer;
-    z-index: 1000;
-    transition: color 0.2s;
+    transition: all 0.2s ease;
+    -webkit-app-region: no-drag;
 }
 
-.global-close-btn:hover {
+.win-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
     color: var(--text-primary);
 }
+
+.win-btn.close-btn:hover {
+    background: #e81123;
+    color: white;
+}
+
+/* Ensure the main layout handles drag area if needed */
+/* If the top area of Sidebar/MainContent should be draggable, use -webkit-app-region: drag */
+/* .main-layout { -webkit-app-region: drag; } */
+/* .sidebar, .main-content { -webkit-app-region: no-drag; } */

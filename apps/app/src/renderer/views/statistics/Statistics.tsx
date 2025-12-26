@@ -61,6 +61,24 @@ export const Statistics: React.FC = () => {
         }
     ];
 
+    // Radar Chart Data ( 육각형 스텟 )
+    const radarData = [
+        { subject: '코딩', value: 85, fullMark: 100 },
+        { subject: '운동', value: 65, fullMark: 100 },
+        { subject: '수학', value: 70, fullMark: 100 },
+        { subject: '관리', value: 90, fullMark: 100 },
+        { subject: '분석', value: 75, fullMark: 100 },
+        { subject: '테스팅', value: 80, fullMark: 100 },
+    ];
+
+    // Monthly Record Data ( 월간 학습 기록 )
+    const monthlyRecords = [
+        { month: '12월', hours: 142, goal: '달성', status: 'high' },
+        { month: '11월', hours: 128, goal: '달성', status: 'high' },
+        { month: '10월', hours: 95, goal: '미달', status: 'normal' },
+        { month: '9월', hours: 110, goal: '달성', status: 'normal' },
+    ];
+
     const currentWeek = allWeeksData[weekIndex];
     const weeklyData = currentWeek.data;
 
@@ -76,17 +94,28 @@ export const Statistics: React.FC = () => {
         }
     };
 
+    // Helper to calculate radar chart points
+    const getRadarPoints = (data: any[], radius: number, centerX: number, centerY: number) => {
+        return data.map((d, i) => {
+            const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
+            const r = (d.value / 100) * radius;
+            const x = centerX + r * Math.cos(angle);
+            const y = centerY + r * Math.sin(angle);
+            return `${x},${y}`;
+        }).join(' ');
+    };
+
     const hoursList = weeklyData.map(d => d.hours);
     const maxDataValue = Math.max(...hoursList);
     const minDataValue = Math.min(...hoursList);
     const avgValue = hoursList.reduce((sum, current) => sum + current, 0) / hoursList.length;
 
     // Y축 스케일을 위해 최대값 조정 (여유 공간 확보)
-    const maxScale = Math.ceil(maxDataValue * 1.1);
+    const maxScale = Math.ceil(maxDataValue * 1.1) || 10;
 
-    const chartHeight = 200;
-    const barWidth = 40;
-    const gap = 30;
+    const chartHeight = 180;
+    const barWidth = 36;
+    const gap = 24;
     const padding = 40;
     const svgWidth = (barWidth + gap) * 7 + padding * 2;
     const svgHeight = chartHeight + padding * 2;
@@ -97,106 +126,131 @@ export const Statistics: React.FC = () => {
         <MainLayout activeTab="home" hideAvatar={true}>
             <div className="statistics-container">
                 <header className="statistics-header">
-                    <h1>주간 학습 통계</h1>
+                    <button className="back-btn" onClick={() => window.history.back()} title="뒤로가기">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
+                    <h1>학습 통계 리포트</h1>
                 </header>
+
                 <div className="statistics-content">
-                    <div className="chart-card">
-                        <div className="chart-title-row">
-                            <h3>
-                                {currentWeek.label} ({currentWeek.dateRange})
-                            </h3>
-                            <div className="week-buttons">
-                                <button
-                                    onClick={handlePrevWeek}
-                                    disabled={weekIndex >= allWeeksData.length - 1}
-                                    className="nav-btn"
-                                >
-                                    &lt;
-                                </button>
-                                <button
-                                    onClick={handleNextWeek}
-                                    disabled={weekIndex <= 0}
-                                    className="nav-btn"
-                                >
-                                    &gt;
-                                </button>
+                    <div className="stats-grid">
+                        {/* Weekly Activity Bar Chart */}
+                        <div className="chart-card">
+                            <div className="chart-title-row">
+                                <h3>주간 활동량 ({currentWeek.dateRange})</h3>
+                                <div className="week-buttons">
+                                    <button onClick={handlePrevWeek} disabled={weekIndex >= allWeeksData.length - 1} className="nav-btn">&lt;</button>
+                                    <button onClick={handleNextWeek} disabled={weekIndex <= 0} className="nav-btn">&gt;</button>
+                                </div>
+                            </div>
+                            <div className="chart-wrapper">
+                                <svg width="100%" height="100%" viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="bar-chart">
+                                    {/* Grid Lines */}
+                                    {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+                                        const y = padding + chartHeight * (1 - ratio);
+                                        return (
+                                            <g key={ratio}>
+                                                <line x1={padding} y1={y} x2={svgWidth - padding} y2={y} stroke="rgba(255,255,255,0.05)" strokeDasharray="4" />
+                                                <text x={padding - 10} y={y + 4} fill="rgba(255,255,255,0.3)" fontSize="10" textAnchor="end">{Math.round(maxScale * ratio)}h</text>
+                                            </g>
+                                        );
+                                    })}
+
+                                    {/* Average Line */}
+                                    <line x1={padding} y1={avgY} x2={svgWidth - padding} y2={avgY} stroke="#7c5cdb" strokeWidth="1.5" strokeDasharray="5,5" opacity="0.6" />
+
+                                    {/* Bars */}
+                                    {weeklyData.map((data, index) => {
+                                        const barHeight = (data.hours / maxScale) * chartHeight;
+                                        const x = padding + index * (barWidth + gap) + gap / 2;
+                                        const y = padding + (chartHeight - barHeight);
+                                        let barColor = "rgba(124, 92, 219, 0.6)";
+                                        if (data.hours === maxDataValue && data.hours > 0) barColor = "rgba(16, 185, 129, 0.7)";
+                                        if (data.hours === minDataValue && data.hours > 0) barColor = "rgba(239, 68, 68, 0.7)";
+
+                                        return (
+                                            <g key={data.day} className="bar-group">
+                                                <rect x={x} y={padding} width={barWidth} height={chartHeight} fill="rgba(255,255,255,0.02)" rx="6" />
+                                                <rect className="bar-rect" x={x} y={y} width={barWidth} height={barHeight} fill={barColor} rx="6" />
+                                                <text x={x + barWidth / 2} y={svgHeight - padding + 20} fill="rgba(255,255,255,0.6)" fontSize="12" textAnchor="middle">{data.day}</text>
+                                                {data.hours > 0 && <text x={x + barWidth / 2} y={y - 8} fill="white" fontSize="10" fontWeight="bold" textAnchor="middle">{data.hours}h</text>}
+                                            </g>
+                                        );
+                                    })}
+                                </svg>
                             </div>
                         </div>
-                        <div className="chart-wrapper">
-                            <svg width="100%" height="100%" viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="bar-chart">
-                                {/* Grid Lines */}
-                                {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
-                                    const y = padding + chartHeight * (1 - ratio);
-                                    return (
-                                        <g key={ratio}>
-                                            <line x1={padding} y1={y} x2={svgWidth - padding} y2={y} stroke="rgba(255,255,255,0.1)" strokeDasharray="4" />
-                                            <text x={padding - 10} y={y + 4} fill="rgba(255,255,255,0.5)" fontSize="12" textAnchor="end">
-                                                {Math.round(maxScale * ratio)}h
-                                            </text>
-                                        </g>
-                                    );
-                                })}
 
-                                {/* Average Line */}
-                                <g>
-                                    <line
-                                        x1={padding}
-                                        y1={avgY}
-                                        x2={svgWidth - padding}
-                                        y2={avgY}
-                                        stroke="#ff9d00"
-                                        strokeWidth="2"
-                                        strokeDasharray="5,5"
-                                        opacity="0.8"
+                        {/* Hexagon Stats ( Radar Chart ) */}
+                        <div className="radar-card">
+                            <h3>역량 다이어그램</h3>
+                            <div className="radar-chart-container">
+                                <svg viewBox="0 0 200 200" className="radar-chart">
+                                    {/* Background Hexagons */}
+                                    {[1, 0.8, 0.6, 0.4, 0.2].map((scale) => (
+                                        <polygon
+                                            key={scale}
+                                            points={getRadarPoints(radarData.map(d => ({ ...d, value: 100 * scale })), 80, 100, 100)}
+                                            className="radar-grid"
+                                        />
+                                    ))}
+                                    {/* Axis Lines */}
+                                    {radarData.map((_, i) => {
+                                        const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
+                                        return (
+                                            <line
+                                                key={i}
+                                                x1="100" y1="100"
+                                                x2={100 + 80 * Math.cos(angle)}
+                                                y2={100 + 80 * Math.sin(angle)}
+                                                stroke="rgba(255,255,255,0.1)"
+                                            />
+                                        );
+                                    })}
+                                    {/* Data Polygon */}
+                                    <polygon
+                                        points={getRadarPoints(radarData, 80, 100, 100)}
+                                        className="radar-data"
                                     />
-                                    <text x={svgWidth - padding + 5} y={avgY + 4} fill="#ff9d00" fontSize="12" fontWeight="bold">
-                                        Avg {avgValue.toFixed(1)}
-                                    </text>
-                                </g>
-
-                                {/* Bars */}
-                                {weeklyData.map((data, index) => {
-                                    const barHeight = (data.hours / maxScale) * chartHeight;
-                                    const x = padding + index * (barWidth + gap) + gap / 2;
-                                    const y = padding + (chartHeight - barHeight);
-
-                                    // Determine Bar Color
-                                    let barColor = "#7c5cdb"; // Default Purple
-                                    if (data.hours === maxDataValue) barColor = "#10b981"; // Max Green
-                                    if (data.hours === minDataValue) barColor = "#ef4444"; // Min Red
-
-                                    return (
-                                        <g key={data.day} className="bar-group">
-                                            {/* Bar Background */}
-                                            <rect
-                                                x={x}
-                                                y={padding}
-                                                width={barWidth}
-                                                height={chartHeight}
-                                                fill="rgba(255,255,255,0.03)"
-                                                rx="4"
-                                            />
-                                            {/* Data Bar */}
-                                            <rect
-                                                x={x}
-                                                y={y}
-                                                width={barWidth}
-                                                height={barHeight}
-                                                fill={barColor}
-                                                rx="4"
-                                                style={{ transition: 'all 0.3s ease' }}
-                                            />
-                                            {/* Labels */}
-                                            <text x={x + barWidth / 2} y={svgHeight - padding + 20} fill="white" fontSize="14" fontWeight="bold" textAnchor="middle">
-                                                {data.day}
+                                    {/* Labels */}
+                                    {radarData.map((d, i) => {
+                                        const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
+                                        const x = 100 + 95 * Math.cos(angle);
+                                        const y = 100 + 95 * Math.sin(angle);
+                                        return (
+                                            <text
+                                                key={d.subject}
+                                                x={x} y={y}
+                                                textAnchor="middle"
+                                                className="radar-label"
+                                                alignmentBaseline="middle"
+                                            >
+                                                {d.subject}
                                             </text>
-                                            <text x={x + barWidth / 2} y={y - 8} fill={barColor} fontSize="12" fontWeight="bold" textAnchor="middle">
-                                                {data.hours}h
-                                            </text>
-                                        </g>
-                                    );
-                                })}
-                            </svg>
+                                        );
+                                    })}
+                                </svg>
+                            </div>
+                        </div>
+
+                        {/* Monthly Records */}
+                        <div className="monthly-card">
+                            <h3>월간 학습 기록</h3>
+                            <div className="monthly-record-list">
+                                {monthlyRecords.map((record, index) => (
+                                    <div key={index} className="monthly-item">
+                                        <div className="month-info">
+                                            <div className="month-name">{record.month}</div>
+                                            <div className="month-stat">총 {record.hours}시간 학습</div>
+                                        </div>
+                                        <div className={`month-badge ${record.status}`}>
+                                            목표 {record.goal}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

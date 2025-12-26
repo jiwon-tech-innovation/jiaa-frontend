@@ -210,6 +210,11 @@ const RoadmapView: React.FC = () => {
         <MainLayout activeTab="roadmap" hideAvatar={true}>
             <div className="roadmap-container">
                 <header className="roadmap-page-header">
+                    <button className="back-btn" onClick={() => window.history.back()} title="뒤로가기">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </button>
                     <h1 className="main-title">
                         <span className="title-text">{roadmapData.name}</span>
                     </h1>
