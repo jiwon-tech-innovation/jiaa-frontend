@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchContributionData } from '../../services/api';
+import { fetchContributionData, fetchDashboardStats, tryAutoLogin } from '../../services/api';
 import { ContributionGraph } from '../../components/ContributionGraph';
 import { MainLayout } from '../../components/MainLayout/MainLayout';
-import { sendMessageToBedrock } from '../../services/bedrockService';
+import { sendChatMessage, startRoadmapMode, parseRoadmapResponse, RoadmapResponse } from '../../services/chatApiService';
 import './dashboard.css';
 
 interface Message {
@@ -19,17 +19,39 @@ const Dashboard: React.FC = () => {
     const [inputValue, setInputValue] = useState('');
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isTokenReady, setIsTokenReady] = useState(false);
+    const [roadmapSessionId, setRoadmapSessionId] = useState<string | null>(null);
+    const [roadmapData, setRoadmapData] = useState<RoadmapResponse | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // Radar chart data (0-100 scale)
-    const radarData = [
-        { label: '코딩', value: 75 },
-        { label: '운동', value: 60 },
-        { label: '수학', value: 45 },
-        { label: '관리', value: 85 },
-        { label: '분석', value: 55 },
-        { label: '테스팅', value: 40 }
-    ];
+    // 앱 시작 시 자동 로그인 시도 (토큰이 없을 경우)
+    useEffect(() => {
+        const attemptAutoLogin = async () => {
+            try {
+                const success = await tryAutoLogin();
+                if (success) {
+                    console.log('[Dashboard] Auto-login successful, tokens refreshed');
+                } else {
+                    console.log('[Dashboard] Auto-login failed or no refresh token');
+                }
+            } catch (error) {
+                console.error('[Dashboard] Auto-login error:', error);
+            } finally {
+                // 토큰 준비 완료 (성공/실패 여부와 관계없이)
+                setIsTokenReady(true);
+            }
+        };
+
+        attemptAutoLogin();
+    }, []);
+
+    // Fetch Dashboard Stats (토큰 준비 완료 후 실행)
+    const { data: radarData = [] } = useQuery({
+        queryKey: ['dashboardStats'],
+        queryFn: fetchDashboardStats,
+        enabled: isTokenReady, // 토큰 준비 완료 후에만 실행
+        staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
+    });
 
     // Calculate hexagon points for radar chart
     const calculateRadarPoints = (centerX: number, centerY: number, radius: number, values: number[]) => {
@@ -88,7 +110,7 @@ const Dashboard: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (inputValue.trim() && !isLoading) {
+        if (inputValue.trim() && !isLoading && roadmapSessionId) {
             const userMessage: Message = {
                 id: Date.now(),
                 text: inputValue,
@@ -101,21 +123,44 @@ const Dashboard: React.FC = () => {
             setIsLoading(true);
 
             try {
-                const response = await sendMessageToBedrock(inputValue);
+                const response = await sendChatMessage(inputValue, roadmapSessionId);
 
                 if (response.error) {
                     console.error('AI 응답 오류:', response.error);
                     return;
                 }
 
-                const aiMessage: Message = {
-                    id: Date.now() + 1,
-                    text: response.content,
-                    timestamp: new Date(),
-                    sender: 'ai'
-                };
+                const aiResponseText = response.response || '';
 
-                setMessages(prev => [...prev, aiMessage]);
+                // JSON 로드맵 응답인지 확인
+                const roadmap = parseRoadmapResponse(aiResponseText);
+                if (roadmap) {
+                    setRoadmapData(roadmap);
+                    console.log('[Dashboard] 로드맵 생성 완료:', roadmap);
+                    
+                    // 로드맵 생성 완료 메시지 표시
+                    const successMessage: Message = {
+                        id: Date.now() + 1,
+                        text: '로드맵이 성공적으로 생성되었습니다!',
+                        timestamp: new Date(),
+                        sender: 'ai'
+                    };
+                    setMessages(prev => [...prev, successMessage]);
+                    
+                    // 2초 후 모달 닫기
+                    setTimeout(() => {
+                        handleCloseCreateModal();
+                    }, 2000);
+                } else {
+                    // 일반 응답
+                    const aiMessage: Message = {
+                        id: Date.now() + 1,
+                        text: aiResponseText,
+                        timestamp: new Date(),
+                        sender: 'ai'
+                    };
+                    setMessages(prev => [...prev, aiMessage]);
+                }
             } catch (error) {
                 console.error('메시지 전송 오류:', error);
             } finally {
@@ -124,16 +169,33 @@ const Dashboard: React.FC = () => {
         }
     };
 
-    const handleOpenCreateModal = () => {
+    const handleOpenCreateModal = async () => {
         setIsCreateModalOpen(true);
         setMessages([]);
         setInputValue('');
+        setRoadmapData(null);
+        
+        // 로드맵 모드 시작
+        try {
+            const newSessionId = `roadmap-${Date.now()}`;
+            const sessionIdResult = await startRoadmapMode(newSessionId);
+            if (sessionIdResult) {
+                setRoadmapSessionId(sessionIdResult);
+                console.log('[Dashboard] 로드맵 모드 시작:', sessionIdResult);
+            } else {
+                console.error('[Dashboard] 로드맵 모드 시작 실패');
+            }
+        } catch (error) {
+            console.error('[Dashboard] 로드맵 모드 시작 오류:', error);
+        }
     };
 
     const handleCloseCreateModal = () => {
         setIsCreateModalOpen(false);
         setMessages([]);
         setInputValue('');
+        setRoadmapSessionId(null);
+        setRoadmapData(null);
     };
 
     return (
@@ -159,10 +221,12 @@ const Dashboard: React.FC = () => {
                                 <polygon points={generateGridHexagon(100, 100, 32)} className="radar-grid" />
                                 <polygon points={generateGridHexagon(100, 100, 16)} className="radar-grid" />
                                 {/* Data polygon */}
-                                <polygon
-                                    points={calculateRadarPoints(100, 100, 65, radarData.map(d => d.value))}
-                                    className="radar-data"
-                                />
+                                {radarData.length > 0 && (
+                                    <polygon
+                                        points={calculateRadarPoints(100, 100, 65, radarData.map(d => d.value))}
+                                        className="radar-data"
+                                    />
+                                )}
                                 {/* Labels */}
                                 {radarData.map((item, index) => {
                                     const pos = getLabelPosition(100, 100, 65, index);
@@ -280,14 +344,15 @@ const Dashboard: React.FC = () => {
                                 <input
                                     type="text"
                                     className="loadmap-input"
-                                    placeholder="로드맵 이름을 입력하세요..."
+                                    placeholder="원하는 목표를 구체적으로 말씀해주세요..."
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
+                                    disabled={isLoading || !roadmapSessionId}
                                 />
                                 <button
                                     type="submit"
                                     className="send-button"
-                                    disabled={!inputValue.trim() || isLoading}
+                                    disabled={!inputValue.trim() || isLoading || !roadmapSessionId}
                                 >
                                     <svg
                                         width="20"

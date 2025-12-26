@@ -82,10 +82,16 @@ async function apiRequest<T>(
     // 인증이 필요한 엔드포인트에 액세스 토큰 추가
     if (!skipAuth && !isPublicEndpoint) {
         const accessToken = tokenService.getAccessToken();
+        console.log(`[API Request] Endpoint: ${endpoint}, AccessToken exists: ${!!accessToken}`);
         if (accessToken) {
             (defaultHeaders as Record<string, string>)['Authorization'] = `Bearer ${accessToken}`;
+            console.log(`[API Request] Authorization header added for ${endpoint}`);
+        } else {
+            console.warn(`[API Request] No access token found for ${endpoint}`);
         }
     }
+
+    console.log(`[API Request] Making request to ${url} with headers:`, defaultHeaders);
 
     let response = await fetch(url, {
         ...options,
@@ -325,4 +331,23 @@ export const fetchContributionData = async (year: number): Promise<number[][]> =
             resolve(data);
         }, 300); // reduced latency
     });
+};
+
+// ============ Analysis APIs ============
+
+interface RadarStat {
+    label: string;
+    value: number;
+}
+
+interface DashboardStatsResponse {
+    radarData: RadarStat[];
+}
+
+// 대시보드 통계 조회
+export const fetchDashboardStats = async (): Promise<RadarStat[]> => {
+    const response = await apiRequest<DashboardStatsResponse>('/api/analysis/stats', {
+        method: 'GET',
+    });
+    return response.radarData;
 };

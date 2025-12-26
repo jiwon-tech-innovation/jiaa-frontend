@@ -16,10 +16,63 @@ const ChatUI: React.FC<ChatUIProps> = ({
     const [inputValue, setInputValue] = useState('');
     const [isInputVisible, setIsInputVisible] = useState(false);
     const [currentBubble, setCurrentBubble] = useState<ChatMessage | null>(null);
+    const [bubbleUpdateKey, setBubbleUpdateKey] = useState(0); // 강제 리렌더링을 위한 key
     const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected');
     const inputRef = useRef<HTMLInputElement>(null);
     const bubbleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const streamingMessageIdRef = useRef<string | null>(null); // 스트리밍 중인 메시지 ID 추적
     const chatService = useRef(ChatService.getInstance());
+
+    // 말풍선 표시
+    const showBubble = useCallback((message: ChatMessage) => {
+        // 스트리밍 중인 메시지는 즉시 업데이트 (같은 메시지 ID로 계속 업데이트)
+        if (message.isStreaming) {
+            // 스트리밍 시작 시 ID 저장
+            if (!streamingMessageIdRef.current) {
+                streamingMessageIdRef.current = message.id;
+            }
+            
+            // 즉시 상태 업데이트 - 스트리밍 메시지는 실시간으로 표시되어야 함
+            setCurrentBubble(prev => {
+                // 같은 메시지 ID면 내용만 업데이트, 아니면 새 메시지로 설정
+                if (prev && prev.id === message.id) {
+                    return {
+                        ...prev,
+                        content: message.content,
+                    };
+                }
+                return {
+                    id: message.id,
+                    role: message.role,
+                    content: message.content,
+                    timestamp: message.timestamp,
+                    isStreaming: true,
+                };
+            });
+            
+            // 스트리밍 중에는 타이머를 설정하지 않음
+            return;
+        }
+
+        // 스트리밍 완료
+        if (streamingMessageIdRef.current && message.id === streamingMessageIdRef.current) {
+            streamingMessageIdRef.current = null;
+        }
+
+        // 일반 메시지는 표시 후 일정 시간 후 숨김
+        // 기존 타이머 정리
+        if (bubbleTimeoutRef.current) {
+            clearTimeout(bubbleTimeoutRef.current);
+        }
+        
+        setCurrentBubble({
+            ...message,
+            isStreaming: false,
+        });
+        bubbleTimeoutRef.current = setTimeout(() => {
+            setCurrentBubble(null);
+        }, bubbleDuration);
+    }, [bubbleDuration]);
 
     // WebSocket 연결 및 메시지 핸들러 설정
     useEffect(() => {
@@ -32,6 +85,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
 
         // 메시지 수신 핸들러
         const unsubscribeMessage = service.onMessage((message) => {
+            console.log(`[ChatUI] Received message:`, message.isStreaming ? 'streaming' : 'complete', message.content.substring(0, 50));
             showBubble(message);
         });
 
@@ -42,22 +96,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
             unsubscribeStatus();
             unsubscribeMessage();
         };
-    }, [websocketUrl]);
-
-    // 말풍선 표시
-    const showBubble = useCallback((message: ChatMessage) => {
-        // 기존 타이머 정리
-        if (bubbleTimeoutRef.current) {
-            clearTimeout(bubbleTimeoutRef.current);
-        }
-
-        setCurrentBubble(message);
-
-        // 일정 시간 후 말풍선 숨김
-        bubbleTimeoutRef.current = setTimeout(() => {
-            setCurrentBubble(null);
-        }, bubbleDuration);
-    }, [bubbleDuration]);
+    }, [websocketUrl, showBubble]);
 
     // 입력창 토글 (단축키: Enter)
     const toggleInput = useCallback(() => {
@@ -147,13 +186,28 @@ const ChatUI: React.FC<ChatUIProps> = ({
         }
     }, [isInputVisible]);
 
+    // 컴포넌트 언마운트 시 정리
+    useEffect(() => {
+        return () => {
+            if (bubbleTimeoutRef.current) {
+                clearTimeout(bubbleTimeoutRef.current);
+            }
+        };
+    }, []);
+
     return (
         <div className="chat-container">
             {/* 말풍선 */}
             {currentBubble && (
-                <div className={`speech-bubble ${currentBubble.role}`}>
+                <div 
+                    className={`speech-bubble ${currentBubble.role}`} 
+                    key={`bubble-${currentBubble.id}-${bubbleUpdateKey}-${currentBubble.content.length}`}
+                >
                     <div className="bubble-content">
                         {currentBubble.content}
+                        {currentBubble.isStreaming && (
+                            <span className="streaming-cursor">▋</span>
+                        )}
                     </div>
                     <div className="bubble-tail" />
                 </div>

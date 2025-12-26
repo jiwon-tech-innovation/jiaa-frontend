@@ -37,7 +37,7 @@ export const createAvatarWindow = (): BrowserWindow => {
         avatarWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/avatar/index.html`));
     }
 
-    // avatarWindow.webContents.openDevTools({ mode: 'detach' });
+    avatarWindow.webContents.openDevTools({ mode: 'detach' });
 
     setAvatarWindow(avatarWindow);
     return avatarWindow;

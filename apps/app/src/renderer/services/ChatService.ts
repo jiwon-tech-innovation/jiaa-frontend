@@ -1,9 +1,10 @@
 /**
  * ChatService - WebSocket 기반 채팅 서비스
  * 
- * 현재는 로컬 에코 모드로 동작하며, 나중에 WebSocket 서버 연결 시
- * connect() 메서드의 URL을 변경하고 handleMessage를 수정하면 됩니다.
+ * WebSocket 연결이 실패하면 HTTP API를 fallback으로 사용합니다.
  */
+
+import { CHAT_API_URL, CHAT_WS_URL } from '../../common/constants';
 
 export type MessageRole = 'user' | 'assistant';
 
@@ -12,6 +13,7 @@ export interface ChatMessage {
     role: MessageRole;
     content: string;
     timestamp: Date;
+    isStreaming?: boolean; // 스트리밍 중인지 여부
 }
 
 export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
@@ -29,6 +31,7 @@ class ChatService {
     private maxReconnectAttempts = 5;
     private reconnectDelay = 3000;
     private sessionId: string | undefined;
+    private currentStreamingMessage: ChatMessage | null = null; // 현재 스트리밍 중인 메시지
 
     private constructor() { }
 
@@ -41,30 +44,39 @@ class ChatService {
 
     /**
      * WebSocket 서버에 연결
-     * @param url WebSocket 서버 URL (예: 'ws://localhost:8080/chat')
+     * @param url WebSocket 서버 URL (예: 'ws://localhost:8000/ws/chat')
+     *            제공되지 않으면 constants의 CHAT_WS_URL 사용
      */
     public connect(url?: string): void {
-        // TODO: 실제 WebSocket 서버 URL로 변경
-        // 현재는 연결 시뮬레이션만 수행
-        if (!url) {
-            console.log('[ChatService] No URL provided, running in local mode');
-            this.setStatus('connected');
+        // URL이 제공되지 않으면 기본값 사용
+        const targetUrl = url || CHAT_WS_URL;
+        
+        if (!targetUrl) {
+            console.log('[ChatService] No WebSocket URL provided, will use HTTP API fallback');
+            this.setStatus('disconnected');
             return;
         }
 
-        if (this.ws && this.status === 'connected') {
+        // 이미 연결되어 있으면 재연결하지 않음
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             console.log('[ChatService] Already connected');
             return;
         }
 
-        console.log(`[ChatService] Attempting to connect to: ${url}`);
+        // 기존 연결이 있으면 정리
+        if (this.ws) {
+            this.ws.close();
+            this.ws = null;
+        }
+
+        console.log(`[ChatService] Attempting to connect to: ${targetUrl}`);
         this.setStatus('connecting');
 
         try {
-            this.ws = new WebSocket(url);
+            this.ws = new WebSocket(targetUrl);
 
             this.ws.onopen = () => {
-                console.log('[ChatService] Connected to server');
+                console.log('[ChatService] WebSocket connected to server');
                 this.reconnectAttempts = 0;
                 this.setStatus('connected');
             };
@@ -73,19 +85,31 @@ class ChatService {
                 this.handleIncomingMessage(event.data);
             };
 
-            this.ws.onclose = () => {
-                console.log('[ChatService] Connection closed');
+            this.ws.onclose = (event) => {
+                console.log('[ChatService] WebSocket connection closed', event.code, event.reason);
                 this.setStatus('disconnected');
-                this.attemptReconnect(url);
+                
+                // 정상 종료가 아니면 재연결 시도
+                if (event.code !== 1000) {
+                    this.attemptReconnect(targetUrl);
+                }
             };
 
             this.ws.onerror = (error) => {
                 console.error('[ChatService] WebSocket error:', error);
                 this.setStatus('error');
+                // 에러 발생 시 재연결 시도
+                setTimeout(() => {
+                    if (this.status === 'error') {
+                        this.attemptReconnect(targetUrl);
+                    }
+                }, this.reconnectDelay);
             };
         } catch (error) {
-            console.error('[ChatService] Failed to connect:', error);
+            console.error('[ChatService] Failed to create WebSocket:', error);
             this.setStatus('error');
+            // 연결 실패 시 재연결 시도
+            this.attemptReconnect(targetUrl);
         }
     }
 
@@ -119,8 +143,8 @@ class ChatService {
                 session_id: this.sessionId, // 세션 유지
             }));
         } else {
-            // 로컬 모드: 에코 응답 시뮬레이션
-            this.simulateResponse(message.content);
+            // WebSocket이 연결되지 않았으면 HTTP API 사용
+            this.sendMessageViaHttp(message.content);
         }
 
         return message;
@@ -151,6 +175,23 @@ class ChatService {
         return this.status;
     }
 
+    /**
+     * 서버 연결 상태 확인 (헬스체크)
+     */
+    public async checkServerHealth(): Promise<boolean> {
+        try {
+            const response = await fetch('http://localhost:8000/health', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            return response.ok;
+        } catch {
+            return false;
+        }
+    }
+
     // ==================== Private Methods ====================
 
     private setStatus(status: ConnectionStatus): void {
@@ -175,11 +216,62 @@ class ChatService {
                 return;
             }
 
+            // 스트리밍 청크 처리
+            if (parsed.type === 'chunk' && parsed.text !== undefined) {
+                console.log(`[ChatService] Received chunk: "${parsed.text.substring(0, 30)}..."`);
+                if (!this.currentStreamingMessage) {
+                    // 새로운 스트리밍 메시지 시작
+                    const messageId = this.generateId();
+                    this.currentStreamingMessage = {
+                        id: messageId,
+                        role: 'assistant',
+                        content: parsed.text,
+                        timestamp: new Date(),
+                        isStreaming: true,
+                    };
+                    console.log(`[ChatService] Started new streaming message: ${messageId}`);
+                } else {
+                    // 기존 스트리밍 메시지에 텍스트 추가
+                    this.currentStreamingMessage.content += parsed.text;
+                }
+                
+                // 청크를 핸들러에 전달 (실시간 업데이트) - 같은 ID로 계속 업데이트
+                this.notifyMessageHandlers({ 
+                    ...this.currentStreamingMessage,
+                    id: this.currentStreamingMessage.id // 같은 ID 유지
+                });
+                return;
+            }
+
+            // 완전한 메시지 처리 (스트리밍 완료 또는 일반 메시지)
+            if (parsed.type === 'message' && parsed.response) {
+                // 스트리밍이 완료된 경우
+                if (this.currentStreamingMessage) {
+                    this.currentStreamingMessage.content = parsed.response;
+                    this.currentStreamingMessage.isStreaming = false;
+                    this.notifyMessageHandlers({ ...this.currentStreamingMessage });
+                    this.currentStreamingMessage = null;
+                } else {
+                    // 일반 메시지
+                    const message: ChatMessage = {
+                        id: this.generateId(),
+                        role: 'assistant',
+                        content: parsed.response,
+                        timestamp: new Date(),
+                        isStreaming: false,
+                    };
+                    this.notifyMessageHandlers(message);
+                }
+                return;
+            }
+
+            // 기타 메시지 처리
             const message: ChatMessage = {
                 id: this.generateId(),
                 role: 'assistant',
                 content: parsed.response || parsed.content || parsed.message || data,
                 timestamp: new Date(),
+                isStreaming: false,
             };
             this.notifyMessageHandlers(message);
         } catch {
@@ -189,6 +281,7 @@ class ChatService {
                 role: 'assistant',
                 content: data,
                 timestamp: new Date(),
+                isStreaming: false,
             };
             this.notifyMessageHandlers(message);
         }
@@ -198,32 +291,101 @@ class ChatService {
         this.messageHandlers.forEach(handler => handler(message));
     }
 
-    private simulateResponse(userMessage: string): void {
-        // 로컬 모드에서의 시뮬레이션 응답
-        // TODO: 실제 WebSocket 연결 시 이 메서드는 사용되지 않음
-        setTimeout(() => {
-            const responses = [
-                '안녕하세요! 무엇을 도와드릴까요?',
-                '네, 알겠습니다!',
-                '흥미로운 질문이네요!',
-                '더 자세히 설명해 주실 수 있나요?',
-                '음... 생각해볼게요!',
-            ];
-            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+    /**
+     * HTTP API를 통한 메시지 전송 (WebSocket fallback)
+     */
+    private async sendMessageViaHttp(userMessage: string): Promise<void> {
+        try {
+            console.log('[ChatService] Using HTTP API fallback to:', CHAT_API_URL);
+            
+            const response = await fetch(CHAT_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: userMessage,
+                    session_id: this.sessionId,
+                }),
+            });
 
+            console.log('[ChatService] HTTP response status:', response.status, response.statusText);
+
+            if (!response.ok) {
+                let errorText = '';
+                try {
+                    errorText = await response.text();
+                    const errorData = JSON.parse(errorText);
+                    // 서버에서 반환한 상세 오류 메시지 사용
+                    if (errorData.detail) {
+                        throw new Error(`서버 오류 (${response.status}): ${errorData.detail}`);
+                    }
+                } catch (parseError) {
+                    // JSON 파싱 실패 시 원본 텍스트 사용
+                }
+                throw new Error(`HTTP ${response.status} ${response.statusText}${errorText ? ': ' + errorText : ''}`);
+            }
+
+            const data = await response.json();
+            console.log('[ChatService] HTTP response data:', data);
+            
+            // 세션 ID 저장
+            if (data.session_id && !this.sessionId) {
+                this.sessionId = data.session_id;
+                console.log(`[ChatService] Session initialized via HTTP: ${this.sessionId}`);
+            }
+
+            // 응답 메시지 생성
             const message: ChatMessage = {
                 id: this.generateId(),
                 role: 'assistant',
-                content: randomResponse,
+                content: data.response || data.message || '응답을 받을 수 없습니다.',
                 timestamp: new Date(),
             };
+            
             this.notifyMessageHandlers(message);
-        }, 1000 + Math.random() * 1000);
+        } catch (error: any) {
+            console.error('[ChatService] HTTP API request failed:', error);
+            console.error('[ChatService] Error details:', {
+                message: error.message,
+                name: error.name,
+                stack: error.stack,
+            });
+            
+            // 더 자세한 에러 메시지 생성
+            let errorMessage = '서버에 연결할 수 없습니다.';
+            
+            // 네트워크 오류 (서버가 실행되지 않음)
+            if (error.message?.includes('Failed to fetch') || 
+                error.message?.includes('NetworkError') ||
+                error.message?.includes('Network request failed') ||
+                error.name === 'TypeError') {
+                errorMessage = `서버에 연결할 수 없습니다.\n\nFastAPI 서버가 실행 중인지 확인해주세요:\n${CHAT_API_URL}\n\n서버 실행 명령어:\ncd jiaa-fastapi/ai-chat-service\nuvicorn main:app --host 0.0.0.0 --port 8000 --reload`;
+            } 
+            // HTTP 오류 (서버는 실행 중이지만 오류 발생)
+            else if (error.message?.includes('HTTP') || error.message?.includes('서버 오류')) {
+                errorMessage = error.message;
+            } 
+            // 기타 오류
+            else {
+                errorMessage = `연결 오류: ${error.message || '알 수 없는 오류'}`;
+            }
+            
+            // 에러 메시지 표시
+            const errorMsg: ChatMessage = {
+                id: this.generateId(),
+                role: 'assistant',
+                content: errorMessage,
+                timestamp: new Date(),
+            };
+            this.notifyMessageHandlers(errorMsg);
+        }
     }
 
     private attemptReconnect(url: string): void {
         if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-            console.log('[ChatService] Max reconnect attempts reached');
+            console.log('[ChatService] Max reconnect attempts reached. Will use HTTP API fallback.');
+            this.setStatus('disconnected');
             return;
         }
 
@@ -231,6 +393,7 @@ class ChatService {
         console.log(`[ChatService] Reconnecting... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
 
         setTimeout(() => {
+            // 재연결 시도
             this.connect(url);
         }, this.reconnectDelay);
     }

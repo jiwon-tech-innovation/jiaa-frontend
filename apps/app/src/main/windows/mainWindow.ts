@@ -24,7 +24,7 @@ export const createMainWindow = (): void => {
         }
     });
 
-    const startPage = process.env.START_PAGE || 'dashboard';
+    const startPage = process.env.START_PAGE || 'signin';
     const targetPath = `/views/${startPage}/${startPage === 'avatar' || startPage === 'avatar_select' ? 'index' : startPage}.html`;
 
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
