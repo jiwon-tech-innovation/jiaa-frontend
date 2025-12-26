@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Live2DManager } from '../../managers/Live2DManager';
 import { ChatUI } from '../../components/ChatUI';
+import { CHAT_WS_URL } from '../../../common/constants';
 
 import './avatar.css';
 
@@ -121,11 +122,10 @@ const Avatar: React.FC = () => {
                     display: isDownloading || error ? 'none' : 'block'
                 }}
             />
-            {/* 채팅 UI - WebSocket URL은 나중에 연결 시 props로 전달 */}
-            {/* 예: websocketUrl="ws://localhost:8080/chat" */}
+            {/* 채팅 UI - WebSocket URL 연결 */}
             <ChatUI
                 bubbleDuration={5000}
-            // websocketUrl="ws://your-server.com/chat"
+                websocketUrl={CHAT_WS_URL}
             />
         </>
     );

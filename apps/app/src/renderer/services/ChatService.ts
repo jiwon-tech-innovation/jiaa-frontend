@@ -56,6 +56,7 @@ class ChatService {
             return;
         }
 
+        console.log(`[ChatService] Attempting to connect to: ${url}`);
         this.setStatus('connecting');
 
         try {

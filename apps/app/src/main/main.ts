@@ -1,5 +1,6 @@
-import { app, BrowserWindow, protocol, net } from 'electron';
+import { app, BrowserWindow, protocol, net, globalShortcut } from 'electron';
 import path from 'path';
+import { getAvatarWindow } from './windows/manager';
 import fs from 'fs';
 import url from 'url';
 import started from 'electron-squirrel-startup';
@@ -65,6 +66,21 @@ app.whenReady().then(() => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createAvatarWindow();
+    }
+  });
+
+  // Global Shortcut to Open Chat
+  globalShortcut.register('Alt+Shift+Enter', () => {
+    const avatarWindow = getAvatarWindow();
+    if (avatarWindow && !avatarWindow.isDestroyed()) {
+      console.log('[Main] Global Shortcut: Open Chat');
+      // Ensure window can receive input by disabling click-through temporarily
+      avatarWindow.setIgnoreMouseEvents(false);
+      avatarWindow.moveTop();
+      avatarWindow.focus();
+
+      // Send event to renderer to open chat UI
+      avatarWindow.webContents.send('open-chat-event');
     }
   });
 });

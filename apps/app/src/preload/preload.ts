@@ -36,5 +36,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.on('model-download-progress', handler);
         return () => ipcRenderer.removeListener('model-download-progress', handler);
     },
+
+    // Global Shortcut Chat Open
+    onOpenChat: (callback: () => void) => {
+        const handler = () => callback();
+        ipcRenderer.on('open-chat-event', handler);
+        return () => ipcRenderer.removeListener('open-chat-event', handler);
+    },
 });
 

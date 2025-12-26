@@ -91,6 +91,21 @@ const ChatUI: React.FC<ChatUIProps> = ({
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isInputVisible, toggleInput]);
 
+    // Global Shortcut Listener (IPC)
+    useEffect(() => {
+        const api = window.electronAPI;
+        if (api && api.onOpenChat) {
+            const cleanup = api.onOpenChat(() => {
+                setIsInputVisible(true);
+                // Also force focus immediately just in case
+                setTimeout(() => {
+                    inputRef.current?.focus();
+                }, 0);
+            });
+            return cleanup;
+        }
+    }, []);
+
     // 메시지 전송
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -103,13 +118,34 @@ const ChatUI: React.FC<ChatUIProps> = ({
         showBubble(userMessage);
 
         setInputValue('');
-        setIsInputVisible(false);
+
+        // 연속 대화를 위해 입력창 닫지 않음
+        // setIsInputVisible(false);
+
+        // 전송 후 입력창에 다시 포커스
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
     };
 
     // 입력 변경
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
     };
+
+    // 입력창 상태에 따라 마우스 이벤트 무시 여부 설정 (Click-through)
+    useEffect(() => {
+        const api = window.electronAPI;
+        if (api && api.setIgnoreMouseEvents) {
+            if (isInputVisible) {
+                // 입력창이 열려있으면 마우스 이벤트 받음
+                api.setIgnoreMouseEvents(false);
+            } else {
+                // 입력창이 닫혀있으면 마우스 이벤트 무시 (투명, 클릭 통과)
+                api.setIgnoreMouseEvents(true, { forward: true });
+            }
+        }
+    }, [isInputVisible]);
 
     return (
         <div className="chat-container">

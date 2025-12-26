@@ -1,6 +1,6 @@
 import { ipcMain, BrowserWindow, Menu, app, IpcMainEvent } from 'electron';
 import { getMainWindow, getAvatarWindow } from '../windows/manager';
-import { createMainWindow, loadSigninPage, loadSignupPage, loadDashboardPage, loadSettingPage } from '../windows/mainWindow';
+import { createMainWindow, loadSigninPage, loadSignupPage, loadDashboardPage, loadSettingPage, loadProfilePage, loadFirstCreateLoadmap, loadAvartarSelect } from '../windows/mainWindow';
 import { checkModelExists, downloadAndExtractModel, getModelDirectory } from '../services/modelManager';
 import { MODEL_NAME } from '../../common/constants';
 
@@ -142,6 +142,43 @@ export const registerIpcHandlers = (): void => {
         const avatarWindow = getAvatarWindow();
         if (avatarWindow && !avatarWindow.isDestroyed()) {
             avatarWindow.show();
+        }
+    });
+
+    ipcMain.on('open-first-create-loadmap', () => {
+        console.log('[Main] open-first-create-loadmap event received');
+        const mainWindow = getMainWindow();
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            loadFirstCreateLoadmap();
+            mainWindow.show();
+        } else {
+            createMainWindow();
+            loadFirstCreateLoadmap();
+        }
+    });
+
+    // IPC Event for Opening Profile Page
+    ipcMain.on('open-profile', () => {
+        console.log('[Main] open-profile event received');
+        const mainWindow = getMainWindow();
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            loadProfilePage();
+            mainWindow.show();
+        } else {
+            createMainWindow();
+            loadProfilePage();
+        }
+    });
+
+    ipcMain.on('open-avartar-select', () => {
+        console.log('[Main] open-avartar-select event received');
+        const mainWindow = getMainWindow();
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            loadAvartarSelect();
+            mainWindow.show();
+        } else {
+            createMainWindow();
+            loadAvartarSelect();
         }
     });
 
