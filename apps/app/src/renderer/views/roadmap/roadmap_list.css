@@ -1,0 +1,152 @@
+@import '../../styles/variables.css';
+
+/* Roadmap List Page Styles */
+.roadmap-list-container {
+    padding: var(--spacing-xl);
+    height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+    background: var(--bg-primary);
+    background: var(--bg-gradient-main);
+    color: var(--text-primary);
+    overflow-y: auto;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.roadmap-page-header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+}
+
+.roadmap-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin: 0;
+    padding-left: 4px;
+}
+
+.roadmap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.roadmap-card-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    aspect-ratio: 16 / 10;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Gradient overlay for better text readability if we add images later */
+.roadmap-card-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.2));
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.roadmap-card-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+    border-color: var(--accent-primary);
+}
+
+.roadmap-card-item:hover::before {
+    opacity: 1;
+}
+
+.card-content {
+    z-index: 1;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.card-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Mock progress bar */
+.card-progress {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-top: 12px;
+    overflow: hidden;
+}
+
+.card-progress-bar {
+    height: 100%;
+    background: var(--accent-primary);
+    width: 0%;
+    /* Default */
+}
+
+/* Status variants */
+.roadmap-card-item.completed {
+    opacity: 0.8;
+}
+
+.roadmap-card-item.completed:hover {
+    opacity: 1;
+    border-color: #10b981;
+}
+
+.roadmap-card-item.completed .card-progress-bar {
+    background: #10b981;
+    width: 100% !important;
+}
+
+/* Scrollbar styles */
+.roadmap-list-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.roadmap-list-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.roadmap-list-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.roadmap-list-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}

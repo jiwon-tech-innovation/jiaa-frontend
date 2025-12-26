@@ -15,7 +15,7 @@ const Dashboard: React.FC = () => {
     });
 
     const handleOpenRoadmap = () => {
-        window.location.href = '../roadmap/roadmap.html';
+        window.location.href = '../roadmap/roadmap_list.html';
     };
 
     const handleOpenStatistics = () => {
