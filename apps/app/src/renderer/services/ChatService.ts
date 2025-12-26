@@ -28,6 +28,7 @@ class ChatService {
     private reconnectAttempts = 0;
     private maxReconnectAttempts = 5;
     private reconnectDelay = 3000;
+    private sessionId: string | undefined;
 
     private constructor() { }
 
@@ -114,8 +115,8 @@ class ChatService {
         // WebSocket이 연결되어 있으면 서버로 전송
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             this.ws.send(JSON.stringify({
-                type: 'message',
-                content: message.content,
+                message: message.content, // 백엔드는 'message' 필드를 기대함
+                session_id: this.sessionId, // 세션 유지
             }));
         } else {
             // 로컬 모드: 에코 응답 시뮬레이션
@@ -160,10 +161,24 @@ class ChatService {
     private handleIncomingMessage(data: string): void {
         try {
             const parsed = JSON.parse(data);
+
+            // 세션 ID가 오면 저장
+            if (parsed.type === 'session' && parsed.session_id) {
+                this.sessionId = parsed.session_id;
+                console.log(`[ChatService] Session initialized: ${this.sessionId}`);
+                return;
+            }
+
+            // 오류 메시지 처리
+            if (parsed.type === 'error') {
+                console.error(`[ChatService] Server error: ${parsed.error}`);
+                return;
+            }
+
             const message: ChatMessage = {
                 id: this.generateId(),
                 role: 'assistant',
-                content: parsed.content || parsed.message || data,
+                content: parsed.response || parsed.content || parsed.message || data,
                 timestamp: new Date(),
             };
             this.notifyMessageHandlers(message);
