@@ -5,6 +5,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     showContextMenu: () => ipcRenderer.send('show-context-menu'),
     openSignin: () => ipcRenderer.send('open-signin'),
     openAvartarSelect: () => ipcRenderer.send('open-avartar-select'),
+    openAvatarSetting: () => ipcRenderer.send('open-avatar-setting'),
+    openRoadmapList: () => ipcRenderer.send('open-roadmap-list'),
     openFirstCreateLoadmap: () => ipcRenderer.send('open-first-create-loadmap'),
     openSignup: () => ipcRenderer.send('open-signup'),
     openDashboard: () => ipcRenderer.send('open-dashboard'),

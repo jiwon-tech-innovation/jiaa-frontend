@@ -22,7 +22,7 @@ const RoadmapList: React.FC = () => {
 
     const handleCardClick = () => {
         // Navigate to the detail view
-        window.location.href = './roadmap.html';
+        window.location.href = '../roadmap/roadmap.html';
     };
 
     return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import RoadmapList from './RoadmapList';
+import RoadmapList from '../roadmap_list/RoadmapList';
 import '../../styles/global.css';
 import { Provider } from 'react-redux';
 import { QueryClientProvider } from '@tanstack/react-query';

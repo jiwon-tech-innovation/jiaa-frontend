@@ -1,0 +1,167 @@
+@import '../../styles/variables.css';
+
+/* Main Container */
+.avatar-select-container {
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-xl);
+    width: 100%;
+    height: 100vh;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--text-primary);
+    background: transparent;
+    /* MainLayout handles background */
+    gap: 32px;
+}
+
+/* Search Area */
+.avatar-search-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.avatar-search-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-subtle);
+    padding: 12px 20px;
+    border-radius: 50px;
+    color: white;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+}
+
+.avatar-search-input:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(110, 142, 251, 0.2);
+}
+
+.avatar-search-input::placeholder {
+    color: var(--text-muted);
+}
+
+/* Content Layout */
+.avatar-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 20px;
+}
+
+/* Sections */
+.avatar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.avatar-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 8px;
+}
+
+.avatar-section-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+/* Scroll Button */
+.avatar-scroll-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.avatar-scroll-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+/* Horizontal Scroll Area */
+.avatar-horizontal-scroll {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding: 4px;
+    padding-bottom: 12px;
+    scrollbar-width: thin;
+    scroll-behavior: smooth;
+}
+
+.avatar-horizontal-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.avatar-horizontal-scroll::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+/* Avatar Cards */
+.avatar-card {
+    min-width: 140px;
+    height: 180px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.avatar-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    border-color: var(--accent-secondary);
+}
+
+.avatar-card-thumbnail {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #2a2d3e, #1a1b26);
+    /* Placeholder for actual image */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-card-thumbnail::after {
+    content: 'No Image';
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 12px;
+}
+
+/* Avatar Settings Box */
+.avatar-settings-box {
+    background: rgba(26, 26, 26, 0.6);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+}

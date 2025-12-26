@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MainLayout } from '../../components/MainLayout/MainLayout';
-import './avatar_select.css';
+import './Avatar_setting.css';
 
 interface AvatarItem {
     id: number;
@@ -8,7 +8,7 @@ interface AvatarItem {
     thumbnail: string;
 }
 
-const AvatarSelect: React.FC = () => {
+const AvatarSetting: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
     // Mock data for recommended avatars
@@ -21,7 +21,7 @@ const AvatarSelect: React.FC = () => {
     ];
 
     return (
-        <MainLayout activeTab="setting" hideAvatar>
+        <MainLayout activeTab="avatar" hideAvatar>
             <div className="avatar-select-container">
                 {/* Search Bar */}
                 <div className="avatar-search-container">
@@ -66,4 +66,4 @@ const AvatarSelect: React.FC = () => {
     );
 };
 
-export default AvatarSelect;
+export default AvatarSetting;

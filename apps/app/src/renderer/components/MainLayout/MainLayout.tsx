@@ -8,7 +8,7 @@ import './MainLayout.css';
 
 interface MainLayoutProps {
     children: React.ReactNode;
-    activeTab: 'home' | 'dashboard' | 'group' | 'setting' | 'roadmap';
+    activeTab: 'home' | 'dashboard' | 'group' | 'setting' | 'roadmap' | 'avatar';
     hideAvatar?: boolean;
 }
 
@@ -89,7 +89,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, hid
             label: '로드맵',
             active: activeTab === 'roadmap',
             onClick: () => {
-                navigate('../roadmap/roadmap.html');
+                navigate('../roadmap_list/roadmap_list.html');
             }
         },
         {
@@ -99,6 +99,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, hid
             active: activeTab === 'group',
             onClick: () => {
                 navigate('../social/social.html');
+            }
+        },
+        {
+            id: 'avatar',
+            icon: '/Avartar Icon 36px.svg',
+            label: '아바타',
+            active: activeTab === 'avatar',
+            onClick: () => {
+                window.electronAPI?.openAvatarSetting();
             }
         },
         {

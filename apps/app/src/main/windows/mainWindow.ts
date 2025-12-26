@@ -110,10 +110,42 @@ export const loadAvartarSelect = (): void => {
     const mainWindow = getMainWindow();
     if (mainWindow && !mainWindow.isDestroyed()) {
         const url = MAIN_WINDOW_VITE_DEV_SERVER_URL
-            ? `${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/avatar_select/avatar_select.html`
+            ? `${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/avatar_select/AvatarSelect.html`
             : path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/avatar_select/avatar_select.html`);
 
         console.log(`[Main] Navigating to First Create Loadmap: ${url}`);
+        if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+            mainWindow.loadURL(url);
+        } else {
+            mainWindow.loadFile(url);
+        }
+    }
+};
+
+export const loadAvatarSetting = (): void => {
+    const mainWindow = getMainWindow();
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        const url = MAIN_WINDOW_VITE_DEV_SERVER_URL
+            ? `${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/avatar_setting/Avatar_setting.html`
+            : path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/avatar_setting/Avatar_setting.html`);
+
+        console.log(`[Main] Navigating to Avatar Setting: ${url}`);
+        if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+            mainWindow.loadURL(url);
+        } else {
+            mainWindow.loadFile(url);
+        }
+    }
+};
+
+export const loadRoadmapList = (): void => {
+    const mainWindow = getMainWindow();
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        const url = MAIN_WINDOW_VITE_DEV_SERVER_URL
+            ? `${MAIN_WINDOW_VITE_DEV_SERVER_URL}/views/roadmap_list/roadmap_list.html`
+            : path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/views/roadmap_list/roadmap_list.html`);
+
+        console.log(`[Main] Navigating to Avatar Setting: ${url}`);
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
             mainWindow.loadURL(url);
         } else {
