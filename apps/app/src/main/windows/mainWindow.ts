@@ -1,6 +1,6 @@
 import { BrowserWindow } from 'electron';
 import path from 'node:path';
-import { getMainWindow, setMainWindow } from './manager';
+import { getMainWindow, setMainWindow, getAvatarWindow } from './manager';
 
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
 declare const MAIN_WINDOW_VITE_NAME: string;
@@ -38,6 +38,21 @@ export const createMainWindow = (): void => {
     }
 
     mainWindow.webContents.openDevTools({ mode: 'detach' });
+
+    // Handle minimize/restore events to toggle Avatar visibility
+    mainWindow.on('minimize', () => {
+        const avatarWindow = getAvatarWindow();
+        if (avatarWindow && !avatarWindow.isDestroyed()) {
+            avatarWindow.show();
+        }
+    });
+
+    mainWindow.on('restore', () => {
+        const avatarWindow = getAvatarWindow();
+        if (avatarWindow && !avatarWindow.isDestroyed()) {
+            avatarWindow.hide();
+        }
+    });
 
     mainWindow.on('closed', () => {
         setMainWindow(null);

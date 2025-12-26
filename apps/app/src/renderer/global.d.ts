@@ -23,6 +23,7 @@ export interface IElectronAPI {
     downloadModel: () => Promise<{ success: boolean; error?: string }>;
     getModelBasePath: () => Promise<string>;
     onModelDownloadProgress: (callback: (progress: number) => void) => () => void;
+    onOpenChat: (callback: () => void) => () => void;
 }
 
 declare global {
