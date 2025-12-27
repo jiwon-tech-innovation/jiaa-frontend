@@ -208,6 +208,23 @@
     background: rgba(109, 26, 219, 0.1);
 }
 
+.calendar-cell.clickable {
+    cursor: pointer;
+}
+
+.calendar-cell.clickable:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.calendar-cell.selected {
+    outline: 2px solid #7c5cdb;
+    background: rgba(124, 92, 219, 0.2);
+    border-color: #7c5cdb;
+    box-shadow: 0 0 12px rgba(124, 92, 219, 0.4);
+}
+
 /* Todo List Styles */
 .card-placeholder-content {
     display: flex;

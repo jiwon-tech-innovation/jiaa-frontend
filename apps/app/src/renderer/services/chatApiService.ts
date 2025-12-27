@@ -159,3 +159,30 @@ export async function getRoadmap(roadmapId: number): Promise<any | null> {
     }
 }
 
+/**
+ * 로드맵 항목의 완료 상태를 업데이트합니다.
+ */
+export async function updateRoadmapItem(roadmapItemId: number, isCompleted: boolean): Promise<any | null> {
+    try {
+        const response = await fetch(`${API_BASE_URL}/roadmaps/items/${roadmapItemId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                is_completed: isCompleted
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('로드맵 항목 업데이트 오류:', error);
+        return null;
+    }
+}
+

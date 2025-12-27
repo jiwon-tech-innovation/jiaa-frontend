@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { MainLayout } from '../../components/MainLayout/MainLayout';
-import { getRoadmap } from '../../services/chatApiService';
+import { getRoadmap, updateRoadmapItem } from '../../services/chatApiService';
 import './roadmap.css';
 
 interface RoadmapItem {
+    id: number;
     day: number;
     content: string;
     time: string;
@@ -31,6 +32,7 @@ const RoadmapView: React.FC = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [initialDateSet, setInitialDateSet] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null); // 선택된 날짜
 
     // URL에서 roadmap_id 가져오기
     useEffect(() => {
@@ -134,44 +136,72 @@ const RoadmapView: React.FC = () => {
     const calendarDays = getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth());
     const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
-    // 오늘 날짜에 해당하는 로드맵 항목 찾기 (useMemo로 최적화)
+    // 선택된 날짜(또는 오늘 날짜)에 해당하는 로드맵 항목 찾기 (useMemo로 최적화)
     const tasks = useMemo(() => {
         if (!roadmapData || !startDate) return [];
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        // 선택된 날짜가 있으면 그 날짜를, 없으면 오늘 날짜를 사용
+        const targetDate = selectedDate || new Date();
+        targetDate.setHours(0, 0, 0, 0);
         const start = new Date(startDate);
         start.setHours(0, 0, 0, 0);
         
-        const daysDiff = Math.floor((today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+        // 오늘 날짜인지 확인
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const isToday = targetDate.toDateString() === today.toDateString();
         
-        console.log('[RoadmapView] 오늘 할 일 계산:', {
-            today: today.toISOString(),
+        const daysDiff = Math.floor((targetDate.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+        
+        console.log('[RoadmapView] 할 일 계산:', {
+            targetDate: targetDate.toISOString(),
             start: start.toISOString(),
             daysDiff,
-            itemsLength: roadmapData.items.length
+            itemsLength: roadmapData.items.length,
+            isSelected: !!selectedDate,
+            isToday
         });
         
         if (daysDiff >= 0 && daysDiff < roadmapData.items.length) {
             const item = roadmapData.items[daysDiff];
             return [{
-                id: item.day,
+                id: item.id,
                 task: item.content,
                 time: item.time,
-                done: false
+                done: item.is_completed || false,
+                isToday: isToday
             }];
         }
         
         return [];
-    }, [roadmapData, startDate]);
+    }, [roadmapData, startDate, selectedDate]);
 
-    const [taskStates, setTaskStates] = useState<{ [key: number]: boolean }>({});
-
-    const toggleTask = (id: number) => {
-        setTaskStates(prev => ({
-            ...prev,
-            [id]: !prev[id]
-        }));
+    const toggleTask = async (itemId: number, currentStatus: boolean, isToday: boolean) => {
+        // 오늘 날짜가 아니면 체크 불가능
+        if (!isToday) {
+            return;
+        }
+        
+        try {
+            const newStatus = !currentStatus;
+            const result = await updateRoadmapItem(itemId, newStatus);
+            
+            if (result && roadmapData) {
+                // roadmapData의 해당 항목 업데이트
+                const updatedItems = roadmapData.items.map(item => 
+                    item.id === itemId 
+                        ? { ...item, is_completed: newStatus, completed_at: result.completed_at || item.completed_at }
+                        : item
+                );
+                
+                setRoadmapData({
+                    ...roadmapData,
+                    items: updatedItems
+                });
+            }
+        } catch (error) {
+            console.error('로드맵 항목 업데이트 오류:', error);
+        }
     };
 
     // 이전 달로 이동
@@ -236,44 +266,83 @@ const RoadmapView: React.FC = () => {
                                 {weekDays.map(day => <div key={day} className="weekday">{day}</div>)}
                             </div>
                             <div className="calendar-grid">
-                                {calendarDays.map((d, i) => (
-                                    <div key={i} className={`calendar-cell ${d.status}`} title={d.content}>
-                                        {d.day && <span className="day-number">{d.day}</span>}
-                                        {d.roadmapDay && (
-                                            <span className="roadmap-day-badge" style={{ 
-                                                fontSize: '0.7rem', 
-                                                color: '#888',
-                                                position: 'absolute',
-                                                bottom: '2px',
-                                                right: '2px'
-                                            }}>D{d.roadmapDay}</span>
-                                        )}
-                                        {d.status === 'active' && <div className="event-dot"></div>}
-                                        {d.status === 'completed' && <div className="completed-mark"></div>}
-                                    </div>
-                                ))}
+                                {calendarDays.map((d, i) => {
+                                    // 오늘 날짜인지 확인
+                                    const today = new Date();
+                                    const isToday = d.day !== null && 
+                                        new Date(currentDate.getFullYear(), currentDate.getMonth(), d.day).toDateString() === today.toDateString();
+                                    
+                                    // 날짜 클릭 핸들러
+                                    const handleDateClick = () => {
+                                        if (d.day !== null) {
+                                            const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), d.day);
+                                            clickedDate.setHours(0, 0, 0, 0);
+                                            
+                                            // 오늘 날짜를 클릭하면 선택 해제 (오늘로 돌아가기)
+                                            if (isToday) {
+                                                setSelectedDate(null);
+                                                return;
+                                            }
+                                            
+                                            // 로드맵 항목이 있는 날짜만 선택 가능
+                                            if (roadmapData && startDate) {
+                                                const daysDiff = Math.floor((clickedDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                                                if (daysDiff >= 0 && daysDiff < roadmapData.items.length) {
+                                                    setSelectedDate(clickedDate);
+                                                }
+                                            }
+                                        }
+                                    };
+                                    
+                                    // 선택된 날짜인지 확인
+                                    const isSelected = selectedDate && d.day !== null && 
+                                        selectedDate.getDate() === d.day &&
+                                        selectedDate.getMonth() === currentDate.getMonth() &&
+                                        selectedDate.getFullYear() === currentDate.getFullYear();
+                                    
+                                    // 클릭 가능한 날짜: 오늘 날짜이거나 로드맵 항목이 있는 날짜
+                                    const isClickable = isToday || !!d.roadmapDay;
+                                    
+                                    return (
+                                        <div 
+                                            key={i} 
+                                            className={`calendar-cell ${d.status} ${isSelected ? 'selected' : ''} ${isClickable ? 'clickable' : ''}`}
+                                            title={d.content}
+                                            onClick={isClickable ? handleDateClick : undefined}
+                                            style={isClickable ? { cursor: 'pointer' } : {}}
+                                        >
+                                            {d.day && <span className="day-number">{d.day}</span>}
+                                            {/* {d.status === 'completed' && <div className="completed-mark"></div>} */}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     </section>
 
                     {/* Right Section: Todo */}
                     <section className="section today-todo">
-                        <h2 className="section-label">오늘 할 일</h2>
+                        <h2 className="section-label">
+                            {selectedDate 
+                                ? `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일 할 일`
+                                : '오늘 할 일'
+                            }
+                        </h2>
                         <div className="content-card">
                             <div className="card-placeholder-content">
                                 {tasks.length > 0 ? (
                                     <ul className="todo-list">
                                         {tasks.map((item) => {
-                                            const isDone = taskStates[item.id] || false;
+                                            const isClickable = item.isToday === true; // 오늘 날짜만 클릭 가능
                                             return (
                                                 <li
                                                     key={item.id}
-                                                    className={isDone ? 'done' : ''}
-                                                    onClick={() => toggleTask(item.id)}
-                                                    style={{ cursor: 'pointer' }}
+                                                    className={item.done ? 'done' : ''}
+                                                    onClick={() => isClickable && toggleTask(item.id, item.done, item.isToday)}
+                                                    style={{ cursor: isClickable ? 'pointer' : 'not-allowed', opacity: isClickable ? 1 : 0.6 }}
                                                 >
                                                     <div className="checkbox">
-                                                        {isDone && (
+                                                        {item.done && (
                                                             <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4">
                                                                 <path d="M5 13l4 4L19 7" />
                                                             </svg>
@@ -293,7 +362,10 @@ const RoadmapView: React.FC = () => {
                                     </ul>
                                 ) : (
                                     <div style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>
-                                        오늘은 로드맵에 등록된 일정이 없습니다.
+                                        {selectedDate 
+                                            ? `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일에는 로드맵에 등록된 일정이 없습니다.`
+                                            : '오늘은 로드맵에 등록된 일정이 없습니다.'
+                                        }
                                     </div>
                                 )}
                             </div>

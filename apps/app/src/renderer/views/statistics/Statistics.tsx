@@ -1,9 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchDashboardStats, tryAutoLogin } from '../../services/api';
 import { MainLayout } from '../../components/MainLayout/MainLayout';
 import './statistics.css';
 
 export const Statistics: React.FC = () => {
     const [weekIndex, setWeekIndex] = useState(0); // 0: 이번 주, 1: 1주 전, 2: 2주 전, 3: 3주 전
+    const [isTokenReady, setIsTokenReady] = useState(false);
+
+    // 앱 시작 시 자동 로그인 시도 (토큰이 없을 경우)
+    useEffect(() => {
+        const attemptAutoLogin = async () => {
+            try {
+                const success = await tryAutoLogin();
+                if (success) {
+                    console.log('[Statistics] Auto-login successful, tokens refreshed');
+                } else {
+                    console.log('[Statistics] Auto-login failed or no refresh token');
+                }
+            } catch (error) {
+                console.error('[Statistics] Auto-login error:', error);
+            } finally {
+                // 토큰 준비 완료 (성공/실패 여부와 관계없이)
+                setIsTokenReady(true);
+            }
+        };
+
+        attemptAutoLogin();
+    }, []);
+
+    // Fetch Dashboard Stats (토큰 준비 완료 후 실행)
+    const { data: radarData = [] } = useQuery({
+        queryKey: ['dashboardStats'],
+        queryFn: fetchDashboardStats,
+        enabled: isTokenReady, // 토큰 준비 완료 후에만 실행
+        staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
+    });
 
     // Mock Data for 4 Weeks
     const allWeeksData = [
@@ -61,15 +93,7 @@ export const Statistics: React.FC = () => {
         }
     ];
 
-    // Radar Chart Data ( 육각형 스텟 )
-    const radarData = [
-        { subject: '코딩', value: 85, fullMark: 100 },
-        { subject: '운동', value: 65, fullMark: 100 },
-        { subject: '수학', value: 70, fullMark: 100 },
-        { subject: '관리', value: 90, fullMark: 100 },
-        { subject: '분석', value: 75, fullMark: 100 },
-        { subject: '테스팅', value: 80, fullMark: 100 },
-    ];
+    // Radar Chart Data는 API에서 받아옴 (radarData는 위에서 useQuery로 가져옴)
 
     // Monthly Record Data ( 월간 학습 기록 )
     const monthlyRecords = [
@@ -188,16 +212,25 @@ export const Statistics: React.FC = () => {
                             <h3>역량 다이어그램</h3>
                             <div className="radar-chart-container">
                                 <svg viewBox="0 0 200 200" className="radar-chart">
-                                    {/* Background Hexagons */}
-                                    {[1, 0.8, 0.6, 0.4, 0.2].map((scale) => (
-                                        <polygon
-                                            key={scale}
-                                            points={getRadarPoints(radarData.map(d => ({ ...d, value: 100 * scale })), 80, 100, 100)}
-                                            className="radar-grid"
-                                        />
-                                    ))}
-                                    {/* Axis Lines */}
-                                    {radarData.map((_, i) => {
+                                    {/* Background Hexagons - 항상 렌더링 (고정된 6개 점) */}
+                                    {[1, 0.8, 0.6, 0.4, 0.2].map((scale) => {
+                                        const points = Array.from({ length: 6 }, (_, i) => {
+                                            const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
+                                            const r = 80 * scale;
+                                            const x = 100 + r * Math.cos(angle);
+                                            const y = 100 + r * Math.sin(angle);
+                                            return `${x},${y}`;
+                                        }).join(' ');
+                                        return (
+                                            <polygon
+                                                key={scale}
+                                                points={points}
+                                                className="radar-grid"
+                                            />
+                                        );
+                                    })}
+                                    {/* Axis Lines - 항상 렌더링 (고정된 6개) */}
+                                    {Array.from({ length: 6 }, (_, i) => {
                                         const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
                                         return (
                                             <line
@@ -209,25 +242,27 @@ export const Statistics: React.FC = () => {
                                             />
                                         );
                                     })}
-                                    {/* Data Polygon */}
-                                    <polygon
-                                        points={getRadarPoints(radarData, 80, 100, 100)}
-                                        className="radar-data"
-                                    />
-                                    {/* Labels */}
+                                    {/* Data Polygon - 데이터가 있을 때만 렌더링 */}
+                                    {radarData.length > 0 && (
+                                        <polygon
+                                            points={getRadarPoints(radarData, 80, 100, 100)}
+                                            className="radar-data"
+                                        />
+                                    )}
+                                    {/* Labels - 데이터가 있을 때만 렌더링 */}
                                     {radarData.map((d, i) => {
                                         const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
                                         const x = 100 + 95 * Math.cos(angle);
                                         const y = 100 + 95 * Math.sin(angle);
                                         return (
                                             <text
-                                                key={d.subject}
+                                                key={d.label}
                                                 x={x} y={y}
                                                 textAnchor="middle"
                                                 className="radar-label"
                                                 alignmentBaseline="middle"
                                             >
-                                                {d.subject}
+                                                {d.label}
                                             </text>
                                         );
                                     })}

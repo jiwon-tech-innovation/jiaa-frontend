@@ -72,7 +72,48 @@ html {
     list-style: none;
     padding: 0;
     width: 100%;
-    color: #bbb;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.roadmap-item-box {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.roadmap-item-box:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.roadmap-item-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: 100%;
+}
+
+.roadmap-item-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.roadmap-item-period {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
 }
 
 .roadmap-item {

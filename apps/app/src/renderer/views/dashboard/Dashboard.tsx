@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchContributionData, fetchDashboardStats, tryAutoLogin } from '../../services/api';
 import { ContributionGraph } from '../../components/ContributionGraph';
 import { MainLayout } from '../../components/MainLayout/MainLayout';
-import { sendChatMessage, startRoadmapMode, parseRoadmapResponse, RoadmapResponse } from '../../services/chatApiService';
+import { sendChatMessage, startRoadmapMode, parseRoadmapResponse, RoadmapResponse, getRoadmaps } from '../../services/chatApiService';
 import './dashboard.css';
 
 interface Message {
@@ -14,6 +14,7 @@ interface Message {
 }
 
 const Dashboard: React.FC = () => {
+    const queryClient = useQueryClient();
     const [selectedYear, setSelectedYear] = useState(2025);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [inputValue, setInputValue] = useState('');
@@ -92,6 +93,69 @@ const Dashboard: React.FC = () => {
         queryFn: () => fetchContributionData(selectedYear)
     });
 
+    // Fetch Roadmaps
+    const { data: roadmapsData = [] } = useQuery({
+        queryKey: ['roadmaps'],
+        queryFn: () => getRoadmaps(),
+        enabled: isTokenReady,
+        staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
+    });
+
+    // 진행률 계산 함수
+    const calculateProgress = (roadmap: any): number => {
+        if (!roadmap.items || roadmap.items.length === 0) return 0;
+        const completedCount = roadmap.items.filter((item: any) => item.is_completed === true).length;
+        const totalCount = roadmap.items.length;
+        if (totalCount === 0) return 0;
+        return Math.round((completedCount / totalCount) * 100);
+    };
+
+    // 로드맵 상태 결정
+    const getRoadmapStatus = (roadmap: any): 'completed' | 'active' | 'pending' => {
+        const progress = calculateProgress(roadmap);
+        if (progress >= 100) return 'completed';
+        if (progress > 0) return 'active';
+        return 'pending';
+    };
+
+    // 로드맵 기간 계산 함수
+    const getRoadmapPeriod = (roadmap: any): string => {
+        if (!roadmap.items || roadmap.items.length === 0) return '';
+        
+        // 첫 번째 항목(day: 1)의 created_at을 시작 날짜로 사용
+        const firstItem = roadmap.items.find((item: any) => item.day === 1);
+        if (!firstItem || !firstItem.created_at) return '';
+        
+        const startDate = new Date(firstItem.created_at);
+        // 마지막 항목의 day를 기준으로 종료 날짜 계산
+        const lastDay = Math.max(...roadmap.items.map((item: any) => item.day));
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + (lastDay - 1));
+        
+        const formatDate = (date: Date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}.${month}.${day}`;
+        };
+        
+        return `${formatDate(startDate)} - ${formatDate(endDate)}`;
+    };
+
+    // 표시할 로드맵 목록 (최대 3개, 진행중인 것 우선)
+    const displayRoadmaps = roadmapsData
+        .sort((a: any, b: any) => {
+            const statusA = getRoadmapStatus(a);
+            const statusB = getRoadmapStatus(b);
+            const statusOrder: { [key: string]: number } = { 'active': 0, 'pending': 1, 'completed': 2 };
+            return statusOrder[statusA] - statusOrder[statusB];
+        })
+        .slice(0, 3);
+
+    const handleRoadmapClick = (roadmapId: number) => {
+        window.location.href = `../roadmap/roadmap.html?id=${roadmapId}`;
+    };
+
     const handleOpenRoadmap = () => {
         window.location.href = '../roadmap_list/roadmap_list.html';
     };
@@ -137,6 +201,9 @@ const Dashboard: React.FC = () => {
                 if (roadmap) {
                     setRoadmapData(roadmap);
                     console.log('[Dashboard] 로드맵 생성 완료:', roadmap);
+                    
+                    // 로드맵 목록 새로고침
+                    queryClient.invalidateQueries({ queryKey: ['roadmaps'] });
                     
                     // 로드맵 생성 완료 메시지 표시
                     const successMessage: Message = {
@@ -250,23 +317,34 @@ const Dashboard: React.FC = () => {
                     <div className="card roadmap-card">
                         <div className="card-header">
                             <span>로드맵</span>
-                            <span className="more" onClick={handleOpenRoadmap} style={{ cursor: 'pointer' }}>자세히 보기</span>
+                            <span className="more" onClick={handleOpenRoadmap} style={{ cursor: 'pointer' }}>전체 보기</span>
                         </div>
                         <div className="card-body">
-                            <ul className="roadmap-list">
-                                <li className="roadmap-item completed">
-                                    <span className="status-icon">✓</span>
-                                    <span>기초 다지기</span>
-                                </li>
-                                <li className="roadmap-item active">
-                                    <span className="status-icon">▶</span>
-                                    <span>심화 학습</span>
-                                </li>
-                                <li className="roadmap-item">
-                                    <span className="status-icon">○</span>
-                                    <span>실전 프로젝트</span>
-                                </li>
-                            </ul>
+                            {displayRoadmaps.length > 0 ? (
+                                <ul className="roadmap-list">
+                                    {displayRoadmaps.map((roadmap: any) => {
+                                        const period = getRoadmapPeriod(roadmap);
+                                        return (
+                                            <li 
+                                                key={roadmap.id}
+                                                className="roadmap-item-box"
+                                                onClick={() => handleRoadmapClick(roadmap.id)}
+                                            >
+                                                <div className="roadmap-item-content">
+                                                    <span className="roadmap-item-name">{roadmap.name}</span>
+                                                    {period && (
+                                                        <span className="roadmap-item-period">{period}</span>
+                                                    )}
+                                                </div>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            ) : (
+                                <div style={{ padding: '2rem', textAlign: 'center', color: '#888', fontSize: '14px' }}>
+                                    로드맵이 없습니다. 로드맵을 생성해주세요.
+                                </div>
+                            )}
                             <div className="roadmap-footer">
                                 <button className="create-btn" onClick={handleOpenCreateModal}>로드맵 생성</button>
                             </div>

@@ -8,10 +8,13 @@ interface RoadmapItem {
     name: string;
     created_at: string;
     items: Array<{
+        id: number;
         day: number;
         content: string;
         time: string;
-        timestamp?: string;
+        created_at?: string;
+        is_completed?: boolean;
+        completed_at?: string;
     }>;
 }
 
@@ -40,24 +43,13 @@ const RoadmapList: React.FC = () => {
     const calculateProgress = (roadmap: RoadmapItem): number => {
         if (!roadmap.items || roadmap.items.length === 0) return 0;
         
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        // 실제 완료된 항목 수를 기준으로 계산
+        const completedCount = roadmap.items.filter(item => item.is_completed === true).length;
+        const totalCount = roadmap.items.length;
         
-        // 첫 번째 항목의 timestamp를 기준으로 계산
-        if (roadmap.items[0].timestamp) {
-            const startDate = new Date(roadmap.items[0].timestamp);
-            startDate.setHours(0, 0, 0, 0);
-            
-            const daysDiff = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-            const totalDays = roadmap.items.length;
-            
-            if (daysDiff < 0) return 0; // 아직 시작 전
-            if (daysDiff >= totalDays) return 100; // 모두 완료
-            
-            return Math.round((daysDiff / totalDays) * 100);
-        }
+        if (totalCount === 0) return 0;
         
-        return 0;
+        return Math.round((completedCount / totalCount) * 100);
     };
 
     // 로드맵 상태 결정 (진행중/완료)
