@@ -1,3 +1,6 @@
+/* Pretendard Font */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
 :root {
     /* Light Mode (Default) */
     --bg-primary: #f8f9fa;
@@ -39,9 +42,9 @@
     --spacing-xl: 40px;
 
     /* Borders */
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 16px;
     --radius-full: 50%;
 }
 

@@ -3,16 +3,13 @@
 .roadmap-container {
     width: 100%;
     height: 100%;
-    background: var(--bg-primary);
-    background: var(--bg-gradient-main);
+    background: transparent;
     color: var(--text-primary);
     font-family: 'Inter', -apple-system, sans-serif;
-    padding: 32px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    /* 내부 스크롤로 변경 */
 }
 
 /* Header */
@@ -28,7 +25,7 @@
 
 .main-title {
     margin: 0;
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 800;
     display: flex;
     align-items: center;
@@ -85,7 +82,7 @@
 .content-card {
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-subtle);
-    border-radius: 20px;
+    border-radius: 16px;
     flex: 1;
     overflow: hidden;
     /* 카드 내부에서 스크롤 처리 */
@@ -133,7 +130,7 @@
 .calendar-cell {
     background: var(--input-bg);
     border: 1px solid var(--border-subtle);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 8px;
     position: relative;
     display: flex;
@@ -241,7 +238,7 @@
     color: var(--text-secondary);
     padding: 8px 12px;
     background: var(--input-bg);
-    border-radius: 8px;
+    border-radius: 16px;
     transition: background 0.2s;
 }
 
@@ -299,7 +296,7 @@
 
 .roadmap-modal-content {
     background-color: var(--card-bg);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 2rem;
     max-width: 600px;
     max-height: 80vh;
@@ -363,7 +360,7 @@
 .concept-tag {
     background-color: var(--input-bg);
     padding: 0.3rem 0.8rem;
-    border-radius: 20px;
+    border-radius: 16px;
     font-size: 0.9rem;
     color: var(--text-primary);
     border: 1px solid var(--border-subtle);
@@ -384,7 +381,7 @@
 .tip-box {
     background-color: var(--input-bg);
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: 16px;
     margin-top: 1rem;
     color: var(--text-secondary);
     border: 1px solid var(--border-subtle);
@@ -403,7 +400,7 @@
 
 .complete-btn {
     padding: 0.8rem 2rem;
-    border-radius: 8px;
+    border-radius: 16px;
     font-size: 1rem;
     cursor: pointer;
     border: none;

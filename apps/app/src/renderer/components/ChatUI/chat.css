@@ -24,7 +24,7 @@
     max-height: 50vh;
     /* 최대 높이 제한 (아바타가 가려지지 않도록) */
     padding: 12px 16px;
-    border-radius: 18px;
+    border-radius: 16px;
     font-size: 14px;
     line-height: 1.4;
     animation: bubble-appear 0.3s ease-out;
@@ -130,7 +130,7 @@
     gap: 8px;
     background: rgba(30, 30, 40, 0.95);
     backdrop-filter: blur(20px);
-    border-radius: 24px;
+    border-radius: 16px;
     padding: 8px 8px 8px 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -183,7 +183,7 @@
     padding: 8px 16px;
     background: rgba(30, 30, 40, 0.8);
     backdrop-filter: blur(10px);
-    border-radius: 20px;
+    border-radius: 16px;
     font-size: 12px;
     color: rgba(255, 255, 255, 0.6);
     pointer-events: auto;

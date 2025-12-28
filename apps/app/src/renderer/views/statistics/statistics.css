@@ -29,7 +29,6 @@ body {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 32px 40px 0 40px;
     box-sizing: border-box;
 }
 
@@ -44,7 +43,6 @@ body {
     flex: 1;
     width: 100%;
     overflow-y: auto;
-    padding: 0 40px 30px 40px;
     scrollbar-width: none;
     box-sizing: border-box;
 }
@@ -60,7 +58,6 @@ body {
     gap: 20px;
     width: 100%;
     max-width: 100%;
-    padding-top: 5px;
     box-sizing: border-box;
 }
 
@@ -76,7 +73,7 @@ body {
 .monthly-card {
     background: var(--card-bg);
     backdrop-filter: blur(10px);
-    border-radius: 20px;
+    border-radius: 16px;
     padding: 24px;
     box-shadow: var(--card-shadow);
     border: 1px solid var(--card-border);
@@ -108,11 +105,16 @@ body {
     margin-bottom: 25px;
 }
 
-.chart-title-row h3 {
+.chart-title-row h3,
+.statistics-content .radar-card h3,
+.statistics-content .monthly-card h3 {
     margin: 0;
+    padding: 0;
     font-size: 18px;
     color: var(--text-primary);
     font-weight: 600;
+    line-height: 1;
+    letter-spacing: normal;
 }
 
 .week-buttons {
@@ -208,7 +210,7 @@ body {
 
 .monthly-item {
     background: var(--input-bg);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 20px;
     display: flex;
     justify-content: space-between;
@@ -229,7 +231,7 @@ body {
 
 .month-badge {
     padding: 6px 12px;
-    border-radius: 20px;
+    border-radius: 16px;
     font-size: 12px;
     font-weight: 600;
     background: rgba(124, 92, 219, 0.2);
