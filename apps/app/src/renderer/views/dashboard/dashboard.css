@@ -24,7 +24,6 @@ html {
 
 .dashboard-container .header {
     box-sizing: border-box;
-    padding: 32px 40px 0 40px;
 }
 
 .dashboard-container .header h1 {
@@ -150,10 +149,18 @@ html {
 .card-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 15px;
-    font-size: 18px;
+    font-size: 32px;
     color: var(--text-secondary);
     font-weight: bold;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--text-secondary);
 }
 
 .card-header .more {

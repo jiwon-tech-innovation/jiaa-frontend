@@ -108,7 +108,9 @@ body {
     margin-bottom: 25px;
 }
 
-.chart-title-row h3 {
+.chart-title-row h3,
+.statistics-content .radar-card h3,
+.statistics-content .monthly-card h3 {
     margin: 0;
     font-size: 18px;
     color: var(--text-primary);

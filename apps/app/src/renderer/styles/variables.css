@@ -1,8 +1,21 @@
+/* Pretendard Font */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
 :root {
+<<<<<<< Updated upstream
     /* Light Mode (Default) */
     --bg-primary: #f8f9fa;
     --bg-secondary: #ffffff;
     --bg-tertiary: #f1f3f5;
+=======
+    /* Font */
+    --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+    /* Colors */
+    --bg-primary: #0f1014;
+    --bg-secondary: #1a1b26;
+    --bg-tertiary: rgba(0, 0, 0, 0.2);
+>>>>>>> Stashed changes
 
     --text-primary: #1a1b1e;
     --text-secondary: #495057;

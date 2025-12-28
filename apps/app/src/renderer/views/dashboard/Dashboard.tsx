@@ -277,7 +277,7 @@ const Dashboard: React.FC = () => {
                     {/* Radar Chart Panel */}
                     <div className="card radar-card">
                         <div className="card-header">
-                            <span>대시보드</span>
+                            <h3>대시보드</h3>
                             <span className="more" onClick={handleOpenStatistics} style={{ cursor: 'pointer' }}>자세히 보기</span>
                         </div>
                         <div className="card-body">
@@ -317,7 +317,7 @@ const Dashboard: React.FC = () => {
                     {/* Roadmap Panel */}
                     <div className="card roadmap-card">
                         <div className="card-header">
-                            <span>로드맵</span>
+                            <h3>로드맵</h3>
                             <span className="more" onClick={handleOpenRoadmap} style={{ cursor: 'pointer' }}>전체 보기</span>
                         </div>
                         <div className="card-body">
@@ -355,7 +355,7 @@ const Dashboard: React.FC = () => {
                     {/* Bottom Stats Panel */}
                     <div className="card bottom-card">
                         <div className="card-header">
-                            <span>활동기록</span>
+                            <h3>활동기록</h3>
                         </div>
                         <div className="card-body flex-row">
                             <div className="stat-box">
