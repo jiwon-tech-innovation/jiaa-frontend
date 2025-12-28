@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { MainLayout } from '../../components/MainLayout/MainLayout';
 import { getRoadmaps } from '../../services/chatApiService';
 import './roadmap_list.css';
 
@@ -68,22 +67,19 @@ const RoadmapList: React.FC = () => {
 
     if (loading) {
         return (
-            <MainLayout activeTab="roadmap" hideAvatar={true}>
-                <div className="roadmap-list-container">
-                    <header className="roadmap-page-header">
-                        <h1>로드맵</h1>
-                    </header>
-                    <div style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>
-                        로드맵을 불러오는 중...
-                    </div>
+            <div className="roadmap-list-container">
+                <header className="roadmap-page-header">
+                    <h1>로드맵</h1>
+                </header>
+                <div style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>
+                    로드맵을 불러오는 중...
                 </div>
-            </MainLayout>
+            </div>
         );
     }
 
     return (
-        <MainLayout activeTab="roadmap" hideAvatar={true}>
-            <div className="roadmap-list-container">
+        <div className="roadmap-list-container">
                 <header className="roadmap-page-header">
                     <button className="back-btn" onClick={() => window.history.back()} title="뒤로가기">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -152,7 +148,6 @@ const RoadmapList: React.FC = () => {
                     )}
                 </section>
             </div>
-        </MainLayout>
     );
 };
 

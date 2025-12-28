@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchDashboardStats, tryAutoLogin } from '../../services/api';
-import { MainLayout } from '../../components/MainLayout/MainLayout';
 import './statistics.css';
 
 export const Statistics: React.FC = () => {
@@ -147,8 +146,7 @@ export const Statistics: React.FC = () => {
     const avgY = padding + (chartHeight - (avgValue / maxScale) * chartHeight);
 
     return (
-        <MainLayout activeTab="home" hideAvatar={true}>
-            <div className="statistics-container">
+        <div className="statistics-container">
                 <header className="statistics-header">
                     <button className="back-btn" onClick={() => window.history.back()} title="뒤로가기">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -290,8 +288,5 @@ export const Statistics: React.FC = () => {
                     </div>
                 </div>
             </div>
-        </MainLayout>
     );
 };
-
-

@@ -23,6 +23,8 @@
     font-weight: bold;
     margin: 0;
     color: var(--text-primary);
+    line-height: 1.4;
+    position: relative;
 }
 
 /* Setting Content Card */
@@ -44,11 +46,14 @@
     font-weight: bold;
     color: var(--text-secondary);
     margin: 0 0 15px 0;
+    line-height: 1.4;
+    position: relative;
 }
 
 /* Setting Section */
 .setting-section {
     margin-bottom: 24px;
+    position: relative;
 }
 
 .setting-section:last-child {
@@ -61,12 +66,16 @@
     font-weight: 500;
     color: var(--text-secondary);
     margin-bottom: 12px;
+    line-height: 1.4;
+    position: relative;
 }
 
 .setting-description {
     font-size: 14px;
     color: #bbb;
     margin: 8px 0 0 0;
+    line-height: 1.5;
+    position: relative;
 }
 
 /* Mode Buttons */

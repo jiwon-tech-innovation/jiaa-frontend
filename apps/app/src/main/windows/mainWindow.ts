@@ -24,15 +24,13 @@ export const createMainWindow = (): void => {
         }
     });
 
-    const startPage = process.env.START_PAGE || 'signin';
-    const targetPath = `/views/${startPage}/${startPage === 'avatar' || startPage === 'avatar_select' ? 'index' : startPage}.html`;
-
+    // SPA: 항상 index.html 로드 (라우팅은 React Router가 처리)
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-        const url = `${MAIN_WINDOW_VITE_DEV_SERVER_URL}${targetPath}`;
+        const url = `${MAIN_WINDOW_VITE_DEV_SERVER_URL}/index.html`;
         console.log(`[Main] Loading URL: ${url}`);
         mainWindow.loadURL(url);
     } else {
-        const filePath = path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}${targetPath}`);
+        const filePath = path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`);
         console.log(`[Main] Loading File: ${filePath}`);
         mainWindow.loadFile(filePath);
     }

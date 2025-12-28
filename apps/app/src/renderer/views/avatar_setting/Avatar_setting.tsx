@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { MainLayout } from '../../components/MainLayout/MainLayout';
 import './Avatar_setting.css';
 
 interface AvatarItem {
@@ -21,8 +20,7 @@ const AvatarSetting: React.FC = () => {
     ];
 
     return (
-        <MainLayout activeTab="avatar" hideAvatar>
-            <div className="avatar-select-container">
+        <div className="avatar-select-container">
                 {/* Search Bar */}
                 <div className="avatar-search-container">
                     <input
@@ -62,7 +60,6 @@ const AvatarSetting: React.FC = () => {
                     </section>
                 </div>
             </div>
-        </MainLayout>
     );
 };
 

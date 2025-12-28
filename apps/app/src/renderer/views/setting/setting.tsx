@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useAppDispatch } from '../../store/hooks';
 import { signout as signoutAction } from '../../store/slices/authSlice';
 import { signout } from '../../services/api';
-import { MainLayout } from '../../components/MainLayout/MainLayout';
 import './setting.css';
 
 const Setting: React.FC = () => {
@@ -31,8 +30,7 @@ const Setting: React.FC = () => {
     };
 
     return (
-        <MainLayout activeTab="setting" hideAvatar={true}>
-            <div className="setting-container">
+        <div className="setting-container">
                 <header className="header">
                     <h1>설정</h1>
                 </header>
@@ -64,16 +62,9 @@ const Setting: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* 아바타 섹션 */}
-                    <div className="setting-section">
-                        <label className="setting-label">아바타</label>
-                        <p className="setting-description">아바타에 대한 세부설명</p>
-                    </div>
-
                     {/* 계정 섹션 */}
                     <h2 className="setting-subtitle">계정</h2>
                     <div className="setting-section">
-                        <label className="setting-label">로그아웃</label>
                         <p className="setting-description">현재 계정에서 로그아웃합니다.</p>
                         <button
                             className="logout-button"
@@ -85,7 +76,6 @@ const Setting: React.FC = () => {
                     </div>
                 </div>
             </div>
-        </MainLayout>
     );
 };
 

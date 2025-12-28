@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { MainLayout } from '../../components/MainLayout/MainLayout';
 import { getRoadmap, updateRoadmapItem } from '../../services/chatApiService';
 import './roadmap.css';
 
@@ -216,29 +215,24 @@ const RoadmapView: React.FC = () => {
 
     if (loading) {
         return (
-            <MainLayout activeTab="roadmap" hideAvatar={true}>
-                <div className="roadmap-container">
-                    <div style={{ padding: '2rem', textAlign: 'center' }}>로드맵을 불러오는 중...</div>
-                </div>
-            </MainLayout>
+            <div className="roadmap-container">
+                <div style={{ padding: '2rem', textAlign: 'center' }}>로드맵을 불러오는 중...</div>
+            </div>
         );
     }
 
     if (!roadmapData) {
         return (
-            <MainLayout activeTab="roadmap" hideAvatar={true}>
-                <div className="roadmap-container">
-                    <div style={{ padding: '2rem', textAlign: 'center' }}>로드맵을 찾을 수 없습니다.</div>
-                </div>
-            </MainLayout>
+            <div className="roadmap-container">
+                <div style={{ padding: '2rem', textAlign: 'center' }}>로드맵을 찾을 수 없습니다.</div>
+            </div>
         );
     }
 
     const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
 
     return (
-        <MainLayout activeTab="roadmap" hideAvatar={true}>
-            <div className="roadmap-container">
+        <div className="roadmap-container">
                 <header className="roadmap-page-header">
                     <button className="back-btn" onClick={() => window.history.back()} title="뒤로가기">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -373,7 +367,6 @@ const RoadmapView: React.FC = () => {
                     </section>
                 </main>
             </div>
-        </MainLayout>
     );
 };
 

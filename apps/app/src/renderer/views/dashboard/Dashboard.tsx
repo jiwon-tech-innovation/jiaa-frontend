@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchContributionData, fetchDashboardStats, tryAutoLogin } from '../../services/api';
 import { ContributionGraph } from '../../components/ContributionGraph';
-import { MainLayout } from '../../components/MainLayout/MainLayout';
 import { sendChatMessage, startRoadmapMode, parseRoadmapResponse, RoadmapResponse, getRoadmaps } from '../../services/chatApiService';
 import './dashboard.css';
+import { useNavigate } from 'react-router-dom';
 
 interface Message {
     id: number;
@@ -14,6 +14,7 @@ interface Message {
 }
 
 const Dashboard: React.FC = () => {
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [selectedYear, setSelectedYear] = useState(2025);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -157,11 +158,11 @@ const Dashboard: React.FC = () => {
     };
 
     const handleOpenRoadmap = () => {
-        window.location.href = '../roadmap_list/roadmap_list.html';
+        navigate('/roadmap-list');
     };
 
     const handleOpenStatistics = () => {
-        window.location.href = '../statistics/statistics.html';
+        navigate('/statistics');
     };
 
     const scrollToBottom = () => {
@@ -266,7 +267,7 @@ const Dashboard: React.FC = () => {
     };
 
     return (
-        <MainLayout activeTab="home">
+        <>
             <div className="dashboard-container">
                 <header className="header">
                     <h1>홈</h1>
@@ -449,7 +450,7 @@ const Dashboard: React.FC = () => {
                     </div>
                 </div>
             )}
-        </MainLayout>
+        </>
     );
 };
 

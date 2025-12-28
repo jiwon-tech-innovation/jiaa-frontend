@@ -2,14 +2,11 @@
 
 /* Roadmap List Page Styles */
 .roadmap-list-container {
-    padding: var(--spacing-xl);
     height: 100vh;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xl);
-    background: var(--bg-primary);
-    background: var(--bg-gradient-main);
     color: var(--text-primary);
     overflow-y: auto;
     font-family: 'Inter', -apple-system, sans-serif;

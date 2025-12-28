@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { Sidebar, type SidebarItem } from '@repo/ui';
 import { useAppDispatch } from '../../store/hooks';
 import { signout as signoutAction } from '../../store/slices/authSlice';
@@ -6,15 +7,30 @@ import { signout } from '../../services/api';
 import { Live2DManager } from '../../managers/Live2DManager';
 import './MainLayout.css';
 
-interface MainLayoutProps {
-    children: React.ReactNode;
-    activeTab: 'home' | 'dashboard' | 'group' | 'setting' | 'roadmap' | 'avatar';
-    hideAvatar?: boolean;
-}
-
-export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, hideAvatar = false }) => {
+export const MainLayout: React.FC = () => {
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
     const [isMaximized, setIsMaximized] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Determine active tab based on current path
+    const getActiveTab = (): 'home' | 'dashboard' | 'group' | 'setting' | 'roadmap' | 'avatar' | 'profile' | null => {
+        const path = location.pathname;
+        if (path === '/profile') return 'profile';
+        if (path === '/') return 'home';
+        if (path === '/statistics') return 'dashboard';
+        if (path.startsWith('/roadmap')) return 'roadmap';
+        if (path === '/social') return 'group';
+        if (path.startsWith('/avatar')) return 'avatar';
+        if (path === '/setting') return 'setting';
+        return 'home';
+    };
+
+    const activeTab = getActiveTab();
+    const isProfileActive = activeTab === 'profile';
+
+    // 대시보드(홈)에서만 아바타 표시
+    const shouldShowAvatar = location.pathname === '/';
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const dispatch = useAppDispatch();
 
@@ -24,13 +40,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, hid
             await signout(); // API 호출 및 토큰 삭제
             dispatch(signoutAction());
             console.log('[MainLayout] Logout successful, redirecting to signin...');
-            // 로그인 페이지로 이동 (아바타 모드가 아님)
-            window.electronAPI.openSignin();
+            navigate('/signin');
         } catch (error) {
             console.error('[MainLayout] Logout error:', error);
             // 에러가 발생해도 로컬 토큰은 이미 삭제됨
             dispatch(signoutAction());
-            window.electronAPI.openSignin();
+            navigate('/signin');
         }
     };
 
@@ -52,10 +67,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, hid
         setIsMaximized(state);
     };
 
-    const navigate = (path: string) => {
-        window.location.href = path;
-    };
-
     // Track window maximized state
     useEffect(() => {
         const checkMaximized = async () => {
@@ -69,25 +80,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, hid
         return () => window.removeEventListener('resize', checkMaximized);
     }, []);
 
-    // Live2D Init
+    // Live2D Init - 아바타가 표시될 때만 초기화
     useEffect(() => {
-        if (!canvasRef.current) return;
+        if (!shouldShowAvatar || !canvasRef.current) return;
 
-        const init = async () => {
-            if (!canvasRef.current) return;
-            const manager = Live2DManager.getInstance();
-            manager.initialize(canvasRef.current);
-            manager.enableSync();
-        };
-
-        init();
+        const manager = Live2DManager.getInstance();
+        manager.initialize(canvasRef.current);
+        manager.enableSync();
 
         return () => {
-            const manager = Live2DManager.getInstance();
             manager.disableSync();
-            Live2DManager.releaseInstance();
         };
-    }, []);
+    }, [shouldShowAvatar]);
 
     const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
         const canvas = canvasRef.current;
@@ -107,59 +111,55 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, hid
             icon: '/Home Icon 16px.svg',
             label: '홈',
             active: activeTab === 'home',
-            onClick: () => {
-                navigate('../dashboard/dashboard.html');
-            }
+            onClick: () => navigate('/')
+        },
+        {
+            id: 'dashboard',
+            icon: '/DashBoard Icon 24px.svg',
+            label: '대시보드',
+            active: activeTab === 'dashboard',
+            onClick: () => navigate('/statistics')
         },
         {
             id: 'roadmap',
-            icon: '/DashBoard Icon 24px.svg',
+            icon: '/Roadmap Icon 24px.svg',
             label: '로드맵',
             active: activeTab === 'roadmap',
-            onClick: () => {
-                navigate('../roadmap_list/roadmap_list.html');
-            }
+            onClick: () => navigate('/roadmap-list')
         },
         {
             id: 'group',
             icon: '/Group Icon 24px.svg',
             label: '그룹',
             active: activeTab === 'group',
-            onClick: () => {
-                navigate('../social/social.html');
-            }
+            onClick: () => navigate('/social')
         },
         {
             id: 'avatar',
             icon: '/Avartar Icon 36px.svg',
             label: '아바타',
             active: activeTab === 'avatar',
-            onClick: () => {
-                window.electronAPI?.openAvatarSetting();
-            }
+            onClick: () => navigate('/avatar-setting')
         },
         {
             id: 'setting',
             icon: '/Setting Icon 24px.svg',
             label: '설정',
             active: activeTab === 'setting',
-            onClick: () => {
-                window.electronAPI?.openSetting();
-            }
+            onClick: () => navigate('/setting')
         }
     ];
 
     return (
-        <div className="main-layout">
+        <div className={`main-layout ${!shouldShowAvatar ? 'no-avatar' : ''}`}>
             <div className="title-bar-drag-area"></div>
             <Sidebar
                 items={sidebarItems}
                 isProfileDropdownOpen={isProfileDropdownOpen}
+                isProfileActive={isProfileActive}
                 onProfileClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                 onSignout={handleSignout}
-                onProfileDetail={() => {
-                    window.electronAPI?.openProfile();
-                }}
+                onProfileDetail={() => navigate('/profile')}
             />
 
             <main className="main-content">
@@ -187,18 +187,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, activeTab, hid
                         </svg>
                     </button>
                 </div>
-                {children}
+                <Outlet />
             </main>
 
-            {!hideAvatar && (
-                <div className="avatar-sidebar-container">
-                    <canvas
-                        ref={canvasRef}
-                        id="live2d-sidebar-canvas"
-                        onMouseMove={handleMouseMove}
-                    ></canvas>
-                </div>
-            )}
+            <div className={`avatar-sidebar-container ${!shouldShowAvatar ? 'hidden' : ''}`}>
+                <canvas
+                    ref={canvasRef}
+                    id="live2d-sidebar-canvas"
+                    onMouseMove={handleMouseMove}
+                ></canvas>
+            </div>
         </div>
     );
 };

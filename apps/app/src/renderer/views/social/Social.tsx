@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { MainLayout } from '../../components/MainLayout/MainLayout';
 import './social.css';
 
 const Social: React.FC = () => {
@@ -33,7 +32,7 @@ const Social: React.FC = () => {
     ];
 
     return (
-        <MainLayout activeTab="group" hideAvatar={true}>
+        <>
             <div className="social-main-container">
                 {/* Search Bar */}
                 <div className="search-container">
@@ -187,7 +186,7 @@ const Social: React.FC = () => {
                     </div>
                 </div>
             )}
-        </MainLayout>
+        </>
     );
 };
 
