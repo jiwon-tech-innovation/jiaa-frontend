@@ -21,7 +21,8 @@
     transform: translateX(-50%);
     max-width: 280px;
     min-width: 100px;
-    max-height: 50vh; /* 최대 높이 제한 (아바타가 가려지지 않도록) */
+    max-height: 50vh;
+    /* 최대 높이 제한 (아바타가 가려지지 않도록) */
     padding: 12px 16px;
     border-radius: 18px;
     font-size: 14px;
@@ -29,9 +30,11 @@
     animation: bubble-appear 0.3s ease-out;
     pointer-events: auto;
     word-wrap: break-word;
-    overflow-y: auto; /* 내용이 길면 스크롤 */
+    overflow-y: auto;
+    /* 내용이 길면 스크롤 */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    will-change: contents; /* 성능 최적화 */
+    will-change: contents;
+    /* 성능 최적화 */
 }
 
 .speech-bubble.assistant {
@@ -47,8 +50,10 @@
 .bubble-content {
     position: relative;
     z-index: 1;
-    white-space: pre-wrap; /* 줄바꿈 유지 */
-    overflow-wrap: break-word; /* 긴 단어 줄바꿈 */
+    white-space: pre-wrap;
+    /* 줄바꿈 유지 */
+    overflow-wrap: break-word;
+    /* 긴 단어 줄바꿈 */
 }
 
 .streaming-cursor {
@@ -58,8 +63,16 @@
 }
 
 @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
+
+    0%,
+    50% {
+        opacity: 1;
+    }
+
+    51%,
+    100% {
+        opacity: 0;
+    }
 }
 
 .bubble-tail {
@@ -208,4 +221,44 @@
 .connection-status.disconnected,
 .connection-status.error {
     color: #ff6b6b;
+}
+
+/* ==================== Mode Badge ==================== */
+.chat-hint-container {
+    position: absolute;
+    bottom: 80px;
+    /* 위치 상향 조정 */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    /* 간격 증가 */
+    pointer-events: auto;
+    width: 100%;
+    /* 너비 확보 */
+    z-index: 10;
+}
+
+.mode-badge {
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    /* 줄바꿈 방지 */
+}
+
+.mode-badge.chat {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+    color: white;
+}
+
+.mode-badge.roadmap {
+    background: linear-gradient(135deg, rgba(0, 184, 148, 0.8), rgba(0, 206, 201, 0.8));
+    color: white;
 }

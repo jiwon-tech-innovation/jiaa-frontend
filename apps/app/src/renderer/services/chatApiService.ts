@@ -1,5 +1,6 @@
 // Chat API 서비스 - FastAPI 채팅 서버와 통신
 import { CHAT_API_URL } from '../../common/constants';
+import { tokenService } from './tokenService';
 
 // API Base URL (CHAT_API_URL에서 /chat 제거)
 const API_BASE_URL = CHAT_API_URL.replace('/chat', '');
@@ -32,11 +33,20 @@ export async function sendChatMessage(
     sessionId: string
 ): Promise<ChatResponse> {
     try {
+        // JWT 토큰 가져오기
+        const accessToken = tokenService.getAccessToken();
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+        
+        // Authorization 헤더 추가 (토큰이 있는 경우)
+        if (accessToken) {
+            headers['Authorization'] = `Bearer ${accessToken}`;
+        }
+        
         const response = await fetch(CHAT_API_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify({
                 message,
                 session_id: sessionId,
@@ -44,7 +54,25 @@ export async function sendChatMessage(
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            // 에러 응답의 상세 내용을 가져오기
+            let errorMessage = `HTTP error! status: ${response.status}`;
+            try {
+                const errorData = await response.json();
+                if (errorData.detail) {
+                    errorMessage = errorData.detail;
+                } else if (errorData.error) {
+                    errorMessage = errorData.error;
+                } else if (errorData.message) {
+                    errorMessage = errorData.message;
+                }
+            } catch (e) {
+                // JSON 파싱 실패 시 기본 메시지 사용
+                const text = await response.text().catch(() => '');
+                if (text) {
+                    errorMessage = `${errorMessage}: ${text}`;
+                }
+            }
+            throw new Error(errorMessage);
         }
 
         const data = await response.json();
@@ -138,7 +166,7 @@ export async function getRoadmaps(userId?: string): Promise<any[]> {
 /**
  * 특정 로드맵을 조회합니다.
  */
-export async function getRoadmap(roadmapId: number): Promise<any | null> {
+export async function getRoadmap(roadmapId: string): Promise<any | null> {
     try {
         const response = await fetch(`${API_BASE_URL}/roadmaps/${roadmapId}`, {
             method: 'GET',
@@ -162,8 +190,9 @@ export async function getRoadmap(roadmapId: number): Promise<any | null> {
 /**
  * 로드맵 항목의 완료 상태를 업데이트합니다.
  */
-export async function updateRoadmapItem(roadmapItemId: number, isCompleted: boolean): Promise<any | null> {
+export async function updateRoadmapItem(roadmapItemId: string, isCompleted: boolean): Promise<any | null> {
     try {
+        // roadmapItemId 형식: "roadmap_id:item_index" (예: "507f1f77bcf86cd799439011:0")
         const response = await fetch(`${API_BASE_URL}/roadmaps/items/${roadmapItemId}`, {
             method: 'PATCH',
             headers: {

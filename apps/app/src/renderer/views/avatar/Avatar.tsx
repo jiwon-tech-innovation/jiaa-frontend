@@ -1,15 +1,72 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Live2DManager } from '../../managers/Live2DManager';
-import { ChatUI } from '../../components/ChatUI';
-import { CHAT_WS_URL } from '../../../common/constants';
+import { ChatUI, ChatMode } from '../../components/ChatUI';
+import { CHAT_WS_URL, AI_CHAT_API_BASE_URL } from '../../../common/constants';
+
+import { tokenService } from '../../services/tokenService';
+import ChatService from '../../services/ChatService';
 
 import './avatar.css';
+
+interface TodayRoadmap {
+    name: string;
+    day: number;
+    tasks: { content: string; time: string }[];
+}
 
 const Avatar: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [downloadProgress, setDownloadProgress] = useState<number | null>(null);
     const [isDownloading, setIsDownloading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [chatMode, setChatMode] = useState<ChatMode>('chat');
+    const [todayRoadmap, setTodayRoadmap] = useState<TodayRoadmap | null>(null);
+
+    // 오늘 로드맵 가져오기
+    const fetchTodayRoadmap = useCallback(async () => {
+        try {
+            const response = await fetch(`${AI_CHAT_API_BASE_URL}/roadmaps`);
+            if (!response.ok) return;
+
+            const roadmaps = await response.json();
+            if (!roadmaps || roadmaps.length === 0) return;
+
+            // 가장 최근 로드맵에서 오늘 일차 찾기
+            const latestRoadmap = roadmaps[0];
+            const items = latestRoadmap.items || [];
+            if (items.length === 0) return;
+
+            // 시작일 기준 오늘 일차 계산
+            const firstItem = items[0];
+            const startDate = new Date(firstItem.created_at);
+            const today = new Date();
+            startDate.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+
+            const daysDiff = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+            if (daysDiff >= 0 && daysDiff < items.length) {
+                const todayItem = items[daysDiff];
+                setTodayRoadmap({
+                    name: latestRoadmap.name,
+                    day: todayItem.day || daysDiff + 1,
+                    tasks: (todayItem.tasks || []).map((t: any) => ({
+                        content: t.content,
+                        time: t.time
+                    }))
+                });
+                console.log('[Avatar] 오늘 로드맵 로드:', todayItem);
+            }
+        } catch (err) {
+            console.error('[Avatar] 로드맵 로드 실패:', err);
+        }
+    }, []);
+
+    // 로드맵 컨텍스트 문자열 생성
+    const roadmapContext = todayRoadmap ?
+        `로드맵: ${todayRoadmap.name}\nDay ${todayRoadmap.day} 오늘 할 일:\n${todayRoadmap.tasks.map((t, i) => `${i + 1}. ${t.content} (${t.time})`).join('\n')}`
+        : '';
+
 
     useEffect(() => {
         if (!canvasRef.current) return;
@@ -18,6 +75,13 @@ const Avatar: React.FC = () => {
             if (!canvasRef.current) return;
 
             try {
+                // 아바타 윈도우에서 토큰 자동 로그인 시도
+                // 메인 윈도우에서 로그인한 refreshToken으로 accessToken을 발급받음
+                const isLoggedIn = await tokenService.tryAutoLogin();
+                console.log(`[Avatar] Token auto-login: ${isLoggedIn ? '성공' : '실패 또는 미로그인'}`);
+                if (isLoggedIn) {
+                    console.log(`[Avatar] Access token available: ${!!tokenService.getAccessToken()}`);
+                }
                 const exists = await window.electronAPI.checkModelExists();
                 if (!exists) {
                     setIsDownloading(true);
@@ -54,6 +118,7 @@ const Avatar: React.FC = () => {
         };
 
         init();
+        fetchTodayRoadmap(); // 오늘 로드맵 로드
 
         const handleResize = () => {
             const manager = Live2DManager.getInstance();
@@ -126,6 +191,13 @@ const Avatar: React.FC = () => {
             <ChatUI
                 bubbleDuration={5000}
                 websocketUrl={CHAT_WS_URL}
+                chatMode={chatMode}
+                todayRoadmapContext={roadmapContext}
+                onModeChange={(mode) => {
+                    setChatMode(mode);
+                    // 백엔드 세션 모드 업데이트
+                    ChatService.getInstance().updateChatMode(mode);
+                }}
             />
         </>
     );

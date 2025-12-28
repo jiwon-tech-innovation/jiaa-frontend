@@ -3,11 +3,11 @@ import { getRoadmaps } from '../../services/chatApiService';
 import './roadmap_list.css';
 
 interface RoadmapItem {
-    id: number;
+    id: string;  // MongoDB ObjectId는 문자열
     name: string;
     created_at: string;
     items: Array<{
-        id: number;
+        id: number;  // item의 id는 인덱스 (number 유지)
         day: number;
         content: string;
         time: string;
@@ -60,7 +60,7 @@ const RoadmapList: React.FC = () => {
     const inProgressItems = roadmaps.filter(item => getRoadmapStatus(item) === 'in-progress');
     const completedItems = roadmaps.filter(item => getRoadmapStatus(item) === 'completed');
 
-    const handleCardClick = (roadmapId: number) => {
+    const handleCardClick = (roadmapId: string) => {
         // Navigate to the detail view with roadmap ID
         window.location.href = `../roadmap/roadmap.html?id=${roadmapId}`;
     };

@@ -2,16 +2,27 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ChatService, { ChatMessage, ConnectionStatus } from '../../services/ChatService';
 import './chat.css';
 
+export type ChatMode = 'chat' | 'roadmap';
+
 interface ChatUIProps {
     /** WebSocket 서버 URL (선택사항 - 없으면 로컬 모드) */
     websocketUrl?: string;
     /** 말풍선 표시 시간 (ms) - 기본값 5000ms */
     bubbleDuration?: number;
+    /** 채팅 모드: 'chat' (기본) 또는 'roadmap' (오늘 로드맵 질문) */
+    chatMode?: ChatMode;
+    /** 오늘 로드맵 컨텍스트 (질문 모드에서 사용) */
+    todayRoadmapContext?: string;
+    /** 모드 변경 콜백 */
+    onModeChange?: (mode: ChatMode) => void;
 }
 
 const ChatUI: React.FC<ChatUIProps> = ({
     websocketUrl,
-    bubbleDuration = 5000
+    bubbleDuration = 5000,
+    chatMode = 'chat',
+    todayRoadmapContext,
+    onModeChange
 }) => {
     const [inputValue, setInputValue] = useState('');
     const [isInputVisible, setIsInputVisible] = useState(false);
@@ -31,7 +42,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
             if (!streamingMessageIdRef.current) {
                 streamingMessageIdRef.current = message.id;
             }
-            
+
             // 즉시 상태 업데이트 - 스트리밍 메시지는 실시간으로 표시되어야 함
             setCurrentBubble(prev => {
                 // 같은 메시지 ID면 내용만 업데이트, 아니면 새 메시지로 설정
@@ -49,7 +60,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
                     isStreaming: true,
                 };
             });
-            
+
             // 스트리밍 중에는 타이머를 설정하지 않음
             return;
         }
@@ -64,7 +75,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
         if (bubbleTimeoutRef.current) {
             clearTimeout(bubbleTimeoutRef.current);
         }
-        
+
         setCurrentBubble({
             ...message,
             isStreaming: false,
@@ -113,6 +124,12 @@ const ChatUI: React.FC<ChatUIProps> = ({
     // 키보드 단축키 핸들러
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
+            // Tab 키로 모드 전환
+            if (e.key === 'Tab' && !isInputVisible) {
+                e.preventDefault();
+                const newMode = chatMode === 'chat' ? 'roadmap' : 'chat';
+                onModeChange?.(newMode);
+            }
             // Enter 키로 입력창 토글 (입력창이 닫혀있을 때)
             if (e.key === 'Enter' && !isInputVisible) {
                 e.preventDefault();
@@ -128,7 +145,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isInputVisible, toggleInput]);
+    }, [isInputVisible, toggleInput, chatMode, onModeChange]);
 
     // Global Shortcut Listener (IPC)
     useEffect(() => {
@@ -151,10 +168,19 @@ const ChatUI: React.FC<ChatUIProps> = ({
 
         if (!inputValue.trim()) return;
 
-        const userMessage = chatService.current.sendMessage(inputValue);
+        // 로드맵 모드일 때 컨텍스트 추가
+        let messageToSend = inputValue;
+        if (chatMode === 'roadmap' && todayRoadmapContext) {
+            messageToSend = `[오늘 로드맵 질문]\n${todayRoadmapContext}\n\n질문: ${inputValue}`;
+        }
 
-        // 사용자 메시지도 말풍선에 잠깐 표시
-        showBubble(userMessage);
+        const userMessage = chatService.current.sendMessage(messageToSend);
+
+        // 사용자 메시지도 말풍선에 잠깐 표시 (원본 질문만)
+        showBubble({
+            ...userMessage,
+            content: inputValue  // 원본 질문만 표시
+        });
 
         setInputValue('');
 
@@ -199,8 +225,8 @@ const ChatUI: React.FC<ChatUIProps> = ({
         <div className="chat-container">
             {/* 말풍선 */}
             {currentBubble && (
-                <div 
-                    className={`speech-bubble ${currentBubble.role}`} 
+                <div
+                    className={`speech-bubble ${currentBubble.role}`}
                     key={`bubble-${currentBubble.id}-${bubbleUpdateKey}-${currentBubble.content.length}`}
                 >
                     <div className="bubble-content">
@@ -247,8 +273,14 @@ const ChatUI: React.FC<ChatUIProps> = ({
 
             {/* 입력창 열기 힌트 */}
             {!isInputVisible && !currentBubble && (
-                <div className="chat-hint" onClick={toggleInput}>
-                    <span>Enter를 눌러 대화하기</span>
+                <div className="chat-hint-container">
+                    {/* 모드 표시 */}
+                    <div className={`mode-badge ${chatMode}`}>
+                        {chatMode === 'chat' ? '💬 채팅 모드' : '📚 로드맵 질문 모드'}
+                    </div>
+                    <div className="chat-hint" onClick={toggleInput}>
+                        <span>Enter로 대화 | Tab으로 모드 전환</span>
+                    </div>
                 </div>
             )}
         </div>
