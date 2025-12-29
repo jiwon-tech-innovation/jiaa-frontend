@@ -1,8 +1,7 @@
 // API Service - Auth Service Integration
 
+import { API_BASE_URL, API_ENDPOINTS } from '../../common/constants';
 import { tokenService } from './tokenService';
-
-const API_BASE_URL = 'http://localhost:8080';
 
 // API Response wrapper
 interface ApiResponse<T> {
@@ -59,11 +58,11 @@ export class ApiError extends Error {
 
 // 인증이 필요 없는 엔드포인트 목록
 const PUBLIC_ENDPOINTS = [
-    '/api/v1/auth/signin',
-    '/api/v1/auth/signup',
-    '/api/v1/auth/refresh',
-    '/api/v1/auth/send-verification-code',
-    '/api/v1/auth/verify-email',
+    API_ENDPOINTS.AUTH_SIGNIN,
+    API_ENDPOINTS.AUTH_SIGNUP,
+    API_ENDPOINTS.AUTH_REFRESH,
+    API_ENDPOINTS.AUTH_SEND_VERIFICATION_CODE,
+    API_ENDPOINTS.AUTH_VERIFY_EMAIL,
 ];
 
 // Generic fetch wrapper with token handling
@@ -219,7 +218,7 @@ export const signin = async ({
     const requestBody = { usernameOrEmail, password };
     console.log('[Signin API] Request body:', JSON.stringify(requestBody));
 
-    const response = await apiRequest<AuthResponse>('/api/v1/auth/signin', {
+    const response = await apiRequest<AuthResponse>(API_ENDPOINTS.AUTH_SIGNIN, {
         method: 'POST',
         body: JSON.stringify(requestBody),
     });
@@ -232,7 +231,7 @@ export const signin = async ({
 
 // 회원가입
 export const signup = async (data: SignUpRequest): Promise<SignUpResponse> => {
-    return apiRequest<SignUpResponse>('/api/v1/auth/signup', {
+    return apiRequest<SignUpResponse>(API_ENDPOINTS.AUTH_SIGNUP, {
         method: 'POST',
         body: JSON.stringify(data),
     });
@@ -240,7 +239,7 @@ export const signup = async (data: SignUpRequest): Promise<SignUpResponse> => {
 
 // 이메일 인증 코드 전송
 export const sendVerificationCode = async ({ email }: SendVerificationCodeRequest): Promise<void> => {
-    return apiRequest<void>('/api/v1/auth/send-verification-code', {
+    return apiRequest<void>(API_ENDPOINTS.AUTH_SEND_VERIFICATION_CODE, {
         method: 'POST',
         body: JSON.stringify({ email }),
     });
@@ -248,7 +247,7 @@ export const sendVerificationCode = async ({ email }: SendVerificationCodeReques
 
 // 이메일 인증
 export const verifyEmail = async ({ email, code }: VerifyEmailRequest): Promise<boolean> => {
-    return apiRequest<boolean>('/api/v1/auth/verify-email', {
+    return apiRequest<boolean>(API_ENDPOINTS.AUTH_VERIFY_EMAIL, {
         method: 'POST',
         body: JSON.stringify({ email, code }),
     });
@@ -257,7 +256,7 @@ export const verifyEmail = async ({ email, code }: VerifyEmailRequest): Promise<
 // 로그아웃
 export const signout = async (): Promise<void> => {
     try {
-        await apiRequest<void>('/api/v1/auth/signout', {
+        await apiRequest<void>(API_ENDPOINTS.AUTH_SIGNOUT, {
             method: 'POST',
         });
     } finally {
@@ -293,7 +292,7 @@ export interface UserInfo {
 
 // 현재 사용자 정보 조회
 export const getCurrentUser = async (): Promise<UserInfo> => {
-    return apiRequest<UserInfo>('/api/v1/users/me', {
+    return apiRequest<UserInfo>(API_ENDPOINTS.USER_ME, {
         method: 'GET',
     });
 };
@@ -304,7 +303,7 @@ export interface UpdateProfileRequest {
 }
 
 export const updateProfile = async (data: UpdateProfileRequest): Promise<UserInfo> => {
-    return apiRequest<UserInfo>('/api/v1/users/me/profile', {
+    return apiRequest<UserInfo>(API_ENDPOINTS.USER_PROFILE, {
         method: 'PATCH',
         body: JSON.stringify(data),
     });
@@ -382,7 +381,7 @@ export interface DashboardStatsResponse {
 
 // 대시보드 통계 조회 (레이더 데이터만)
 export const fetchDashboardStats = async (): Promise<RadarStat[]> => {
-    const response = await apiRequest<DashboardStatsResponse>('/api/analysis/stats', {
+    const response = await apiRequest<DashboardStatsResponse>(API_ENDPOINTS.ANALYSIS_STATS, {
         method: 'GET',
     });
     return response.radarData;
@@ -390,7 +389,7 @@ export const fetchDashboardStats = async (): Promise<RadarStat[]> => {
 
 // 대시보드 전체 통계 조회 (스트릭, 컨트리뷰션 포함)
 export const fetchDashboardFullStats = async (year?: number): Promise<DashboardStatsResponse> => {
-    const url = year ? `/api/analysis/stats?year=${year}` : '/api/analysis/stats';
+    const url = year ? `${API_ENDPOINTS.ANALYSIS_STATS}?year=${year}` : API_ENDPOINTS.ANALYSIS_STATS;
     const response = await apiRequest<DashboardStatsResponse>(url, {
         method: 'GET',
     });

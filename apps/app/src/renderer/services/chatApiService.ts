@@ -1,9 +1,6 @@
 // Chat API 서비스 - FastAPI 채팅 서버와 통신
-import { CHAT_API_URL } from '../../common/constants';
+import { AI_CHAT_API_BASE_URL, AI_CHAT_ENDPOINTS, CHAT_API_URL } from '../../common/constants';
 import { tokenService } from './tokenService';
-
-// API Base URL (CHAT_API_URL에서 /chat 제거)
-const API_BASE_URL = CHAT_API_URL.replace('/chat', '');
 
 export interface ChatMessage {
     role: 'user' | 'assistant';
@@ -93,7 +90,7 @@ export async function sendChatMessage(
  */
 export async function startRoadmapMode(sessionId: string): Promise<string | null> {
     try {
-        const response = await fetch(`${CHAT_API_URL}/roadmap/start`, {
+        const response = await fetch(`${CHAT_API_URL}${AI_CHAT_ENDPOINTS.ROADMAP_START}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -141,8 +138,8 @@ export function parseRoadmapResponse(text: string): RoadmapResponse | null {
 export async function getRoadmaps(userId?: string): Promise<any[]> {
     try {
         const url = userId
-            ? `${API_BASE_URL}/roadmaps?user_id=${userId}`
-            : `${API_BASE_URL}/roadmaps`;
+            ? `${AI_CHAT_API_BASE_URL}${AI_CHAT_ENDPOINTS.ROADMAPS}?user_id=${userId}`
+            : `${AI_CHAT_API_BASE_URL}${AI_CHAT_ENDPOINTS.ROADMAPS}`;
 
         const response = await fetch(url, {
             method: 'GET',
@@ -168,7 +165,7 @@ export async function getRoadmaps(userId?: string): Promise<any[]> {
  */
 export async function getRoadmap(roadmapId: string): Promise<any | null> {
     try {
-        const response = await fetch(`${API_BASE_URL}/roadmaps/${roadmapId}`, {
+        const response = await fetch(`${AI_CHAT_API_BASE_URL}${AI_CHAT_ENDPOINTS.ROADMAPS}/${roadmapId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -193,7 +190,7 @@ export async function getRoadmap(roadmapId: string): Promise<any | null> {
 export async function updateRoadmapItem(roadmapItemId: string, isCompleted: boolean): Promise<any | null> {
     try {
         // roadmapItemId 형식: "roadmap_id:item_index" (예: "507f1f77bcf86cd799439011:0")
-        const response = await fetch(`${API_BASE_URL}/roadmaps/items/${roadmapItemId}`, {
+        const response = await fetch(`${AI_CHAT_API_BASE_URL}${AI_CHAT_ENDPOINTS.ROADMAPS}/items/${roadmapItemId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -235,7 +232,7 @@ export interface ActivityStats {
  */
 export async function getActivityStats(userId?: string, year?: number): Promise<ActivityStats> {
     try {
-        let url = `${API_BASE_URL}/stats`;
+        let url = `${AI_CHAT_API_BASE_URL}${AI_CHAT_ENDPOINTS.STATS}`;
         const params = new URLSearchParams();
 
         if (userId) {

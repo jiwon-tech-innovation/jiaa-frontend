@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Live2DManager } from '../../managers/Live2DManager';
 import { ChatUI, ChatMode } from '../../components/ChatUI';
-import { CHAT_WS_URL, AI_CHAT_API_BASE_URL } from '../../../common/constants';
+import { CHAT_WS_URL } from '../../../common/constants';
 
 import { tokenService } from '../../services/tokenService';
 import ChatService from '../../services/ChatService';
+import { getRoadmaps } from '../../services/chatApiService';
 
 import './avatar.css';
 
@@ -58,9 +59,7 @@ const Avatar: React.FC = () => {
     const { data: roadmapsData } = useQuery({
         queryKey: ['roadmaps'],
         queryFn: async () => {
-            const response = await fetch(`${AI_CHAT_API_BASE_URL}/roadmaps`);
-            if (!response.ok) return [];
-            return response.json();
+            return await getRoadmaps();
         },
         staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
     });

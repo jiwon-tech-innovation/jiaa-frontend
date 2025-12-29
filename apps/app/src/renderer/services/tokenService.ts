@@ -1,5 +1,7 @@
 // Token Service - 토큰 관리 서비스
 
+import { AUTH_REFRESH_URL } from '../../common/constants';
+
 type TokenChangeCallback = (accessToken: string | null) => void;
 
 class TokenService {
@@ -56,7 +58,7 @@ class TokenService {
             console.log('[TokenService] Refreshing access token...');
 
             // 리프레시 API 직접 호출 (apiRequest 사용하면 무한 루프 가능)
-            const response = await fetch('http://localhost:8080/api/v1/auth/refresh', {
+            const response = await fetch(AUTH_REFRESH_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
