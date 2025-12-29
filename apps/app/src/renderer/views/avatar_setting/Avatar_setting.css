@@ -146,8 +146,7 @@
 }
 
 .avatar-card:hover {
-    box-shadow: var(--card-shadow);
-    border-color: var(--accent-secondary);
+    background: var(--hover-bg);
 }
 
 .avatar-card-thumbnail {

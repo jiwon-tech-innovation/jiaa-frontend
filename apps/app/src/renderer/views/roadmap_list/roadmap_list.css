@@ -79,7 +79,6 @@
 
 .roadmap-card-item:hover {
     box-shadow: var(--card-shadow);
-    border-color: var(--accent-primary);
 }
 
 .roadmap-card-item:hover::before {
@@ -129,7 +128,6 @@
 
 .roadmap-card-item.completed:hover {
     opacity: 1;
-    border-color: #10b981;
 }
 
 .roadmap-card-item.completed .card-progress-bar {

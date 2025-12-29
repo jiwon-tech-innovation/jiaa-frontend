@@ -9,7 +9,15 @@
 
     --text-primary: #1a1b1e;
     --text-secondary: #495057;
+    --text-tertiary: #adb5bd;
     --text-muted: #868e96;
+
+    /* Message Bubbles */
+    --message-user-bg: linear-gradient(135deg, #9E73FF 0%, #8B5CF6 100%);
+    --message-user-text: #ffffff;
+    --message-ai-bg: #f0f1f3;
+    --message-ai-text: #1a1b1e;
+    --message-ai-border: #e0e2e6;
 
     --accent-primary: #9E73FF;
     --accent-secondary: #9E73FF;
@@ -93,7 +101,15 @@
 
     --text-primary: #ffffff;
     --text-secondary: #cccccc;
-    --text-muted: #888888;
+    --text-tertiary: #888888;
+    --text-muted: #666666;
+
+    /* Message Bubbles */
+    --message-user-bg: linear-gradient(135deg, #9E73FF 0%, #8B5CF6 100%);
+    --message-user-text: #ffffff;
+    --message-ai-bg: #2a2b36;
+    --message-ai-text: #ffffff;
+    --message-ai-border: rgba(255, 255, 255, 0.1);
 
     --border-subtle: rgba(255, 255, 255, 0.1);
 

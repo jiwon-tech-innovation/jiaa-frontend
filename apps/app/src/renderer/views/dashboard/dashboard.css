@@ -65,7 +65,6 @@ html {
 
 .dashboard-container .card:hover {
     box-shadow: var(--card-shadow);
-    border-color: var(--accent-primary);
 }
 
 .dashboard-container .radar-card {
@@ -304,6 +303,7 @@ html {
     flex-direction: row;
     gap: 15px;
     width: 100%;
+    min-height: 0;
 }
 
 .stat-box {
@@ -351,8 +351,9 @@ html {
 .contribution-container {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    overflow-x: auto;
+    flex: 1;
+    min-width: 0;
+    overflow: auto;
 }
 
 .months-label {
@@ -495,7 +496,7 @@ html {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -517,7 +518,7 @@ html {
     position: relative;
     padding: 30px;
     box-sizing: border-box;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--card-shadow);
 }
 
 .create-roadmap-modal-gradient {
@@ -571,19 +572,18 @@ html {
 }
 
 .create-roadmap-modal-content .messages-container::-webkit-scrollbar-thumb {
-    background: rgba(138, 0, 196, 0.5);
+    background: rgba(158, 115, 255, 0.5);
     border-radius: 3px;
 }
 
 .create-roadmap-modal-content .messages-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(138, 0, 196, 0.7);
+    background: rgba(158, 115, 255, 0.7);
 }
 
 .create-roadmap-modal-content .message-item {
     display: flex;
     flex-direction: row;
     animation: slideIn 0.3s ease-out;
-    /* Removed width: 100% to allow align-self to work */
 }
 
 .create-roadmap-modal-content .user-message {
@@ -675,6 +675,8 @@ html {
 
 .create-roadmap-modal-content .input-form {
     width: 100%;
+    margin-top: auto;
+    flex-shrink: 0;
 }
 
 .create-roadmap-modal-content .input-wrapper {
@@ -682,8 +684,7 @@ html {
     display: flex;
     align-items: center;
     background: var(--input-bg);
-    border: 1px solid var(--input-border);
-    border-radius: 16px;
+    border-radius: 12px;
     padding: 0;
     transition: all 0.3s ease;
 }

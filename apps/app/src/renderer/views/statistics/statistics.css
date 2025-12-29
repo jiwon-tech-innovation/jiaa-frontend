@@ -89,7 +89,6 @@ body {
 .radar-card:hover,
 .monthly-card:hover {
     box-shadow: var(--card-shadow);
-    border-color: var(--accent-primary);
 }
 
 
@@ -163,6 +162,27 @@ body {
 .bar-group:hover .bar-rect {
     filter: drop-shadow(0 0 8px rgba(159, 122, 234, 0.5));
     cursor: pointer;
+}
+
+/* Bar Chart Theme Support */
+.bar-chart .grid-line {
+    stroke: var(--border-subtle);
+}
+
+.bar-chart .grid-label {
+    fill: var(--text-muted);
+}
+
+.bar-chart .bar-bg {
+    fill: var(--hover-bg);
+}
+
+.bar-chart .bar-label {
+    fill: var(--text-secondary);
+}
+
+.bar-chart .bar-value {
+    fill: var(--text-primary);
 }
 
 /* Radar Chart Specific */

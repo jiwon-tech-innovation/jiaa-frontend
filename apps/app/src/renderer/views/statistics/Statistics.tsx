@@ -338,8 +338,8 @@ export const Statistics: React.FC = () => {
                                     const y = padding + chartHeight * (1 - ratio);
                                     return (
                                         <g key={ratio}>
-                                            <line x1={padding} y1={y} x2={svgWidth - padding} y2={y} stroke="rgba(255,255,255,0.05)" strokeDasharray="4" />
-                                            <text x={padding - 10} y={y + 4} fill="rgba(255,255,255,0.3)" fontSize="10" textAnchor="end">{Math.round(maxScale * ratio)}h</text>
+                                            <line className="grid-line" x1={padding} y1={y} x2={svgWidth - padding} y2={y} strokeDasharray="4" />
+                                            <text className="grid-label" x={padding - 10} y={y + 4} fontSize="10" textAnchor="end">{Math.round(maxScale * ratio)}h</text>
                                         </g>
                                     );
                                 })}
@@ -374,16 +374,16 @@ export const Statistics: React.FC = () => {
                                     const barHeight = (data.hours / maxScale) * chartHeight;
                                     const x = padding + index * (barWidth + gap) + gap / 2;
                                     const y = padding + (chartHeight - barHeight);
-                                    let barColor = "rgba(124, 92, 219, 0.6)";
-                                    if (data.hours === maxDataValue && data.hours > 0) barColor = "rgba(16, 185, 129, 0.7)";
-                                    if (data.hours === minDataValue && data.hours > 0) barColor = "rgba(239, 68, 68, 0.7)";
+                                    let barColor = "rgba(124, 92, 219, 0.8)";
+                                    if (data.hours === maxDataValue && data.hours > 0) barColor = "rgba(16, 185, 129, 0.9)";
+                                    if (data.hours === minDataValue && data.hours > 0) barColor = "rgba(239, 68, 68, 0.9)";
 
                                     return (
                                         <g key={data.day} className="bar-group">
-                                            <rect x={x} y={padding} width={barWidth} height={chartHeight} fill="rgba(255,255,255,0.02)" rx="6" />
+                                            <rect className="bar-bg" x={x} y={padding} width={barWidth} height={chartHeight} rx="6" />
                                             <rect className="bar-rect" x={x} y={y} width={barWidth} height={barHeight} fill={barColor} rx="6" />
-                                            <text x={x + barWidth / 2} y={svgHeight - padding + 20} fill="rgba(255,255,255,0.6)" fontSize="12" textAnchor="middle">{data.day}</text>
-                                            {data.hours > 0 && <text x={x + barWidth / 2} y={y - 8} fill="white" fontSize="10" fontWeight="bold" textAnchor="middle">{data.hours}h</text>}
+                                            <text className="bar-label" x={x + barWidth / 2} y={svgHeight - padding + 20} fontSize="12" textAnchor="middle">{data.day}</text>
+                                            {data.hours > 0 && <text className="bar-value" x={x + barWidth / 2} y={y - 8} fontSize="10" fontWeight="bold" textAnchor="middle">{data.hours}h</text>}
                                         </g>
                                     );
                                 })}

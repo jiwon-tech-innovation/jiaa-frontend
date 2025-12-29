@@ -144,8 +144,7 @@
 }
 
 .user-card:hover {
-    box-shadow: var(--card-shadow);
-    border-color: var(--accent-primary);
+    background: var(--hover-bg);
 }
 
 .user-card-avatar {
@@ -190,8 +189,7 @@
 }
 
 .group-card:hover {
-    box-shadow: var(--card-shadow);
-    border-color: var(--accent-primary);
+    background: var(--hover-bg);
 }
 
 .group-card-avatar {
@@ -242,8 +240,7 @@
 }
 
 .create-group-btn:hover {
-    box-shadow: var(--card-shadow);
-    border-color: var(--accent-primary);
+    background: var(--hover-bg);
 }
 
 /* Scrollbar for content wrapper */
