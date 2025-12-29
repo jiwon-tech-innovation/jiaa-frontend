@@ -76,6 +76,7 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -131,10 +132,14 @@
 }
 
 @keyframes dotPulse {
-    0%, 60%, 100% {
+
+    0%,
+    60%,
+    100% {
         transform: scale(0.8);
         opacity: 0.5;
     }
+
     30% {
         transform: scale(1.2);
         opacity: 1;
@@ -157,11 +162,9 @@
     left: 0;
     width: 50%;
     height: 50%;
-    background: radial-gradient(
-        circle at top left,
-        rgba(30, 32, 74, 0.6) 0%,
-        rgba(10, 10, 10, 0) 70%
-    );
+    background: radial-gradient(circle at top left,
+            rgba(30, 32, 74, 0.6) 0%,
+            rgba(10, 10, 10, 0) 70%);
     filter: blur(60px);
 }
 
@@ -171,11 +174,9 @@
     right: 0;
     width: 50%;
     height: 50%;
-    background: radial-gradient(
-        circle at top right,
-        rgba(138, 0, 196, 0.5) 0%,
-        rgba(10, 10, 10, 0) 70%
-    );
+    background: radial-gradient(circle at top right,
+            rgba(138, 0, 196, 0.5) 0%,
+            rgba(10, 10, 10, 0) 70%);
     filter: blur(60px);
 }
 
@@ -195,15 +196,15 @@
     border-radius: 12px;
     padding: 0;
     box-shadow: 0 0 0 2px rgba(138, 0, 196, 1),
-                0 0 20px rgba(138, 0, 196, 0.6),
-                0 0 40px rgba(138, 0, 196, 0.4);
+        0 0 20px rgba(138, 0, 196, 0.6),
+        0 0 40px rgba(138, 0, 196, 0.4);
     transition: box-shadow 0.3s ease;
 }
 
 .input-wrapper:focus-within {
     box-shadow: 0 0 0 2px rgba(138, 0, 196, 1),
-                0 0 30px rgba(138, 0, 196, 0.8),
-                0 0 60px rgba(138, 0, 196, 0.5);
+        0 0 30px rgba(138, 0, 196, 0.8),
+        0 0 60px rgba(138, 0, 196, 0.5);
 }
 
 .loadmap-input {
@@ -249,4 +250,3 @@
     width: 20px;
     height: 20px;
 }
-

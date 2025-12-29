@@ -37,4 +37,8 @@ declare global {
         electronAPI: IElectronAPI;
     }
     const electronAPI: IElectronAPI;
+
+    namespace Live2DCubismCore {
+        type csmLogFunction = (message: string) => void;
+    }
 }

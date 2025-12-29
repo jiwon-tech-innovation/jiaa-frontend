@@ -309,13 +309,11 @@ const RoadmapView: React.FC = () => {
                                     return (
                                         <div
                                             key={i}
-                                            className={`calendar-cell ${d.status} ${isSelected ? 'selected' : ''} ${isClickable ? 'clickable' : ''}`}
+                                            className={`calendar-cell ${d.status} ${isSelected ? 'selected' : ''} ${isClickable ? 'clickable' : ''} ${isToday ? 'is-today' : ''}`}
                                             title={d.taskCount ? `${d.taskCount}개 과업` : undefined}
                                             onClick={isClickable ? handleDateClick : undefined}
-                                            style={isClickable ? { cursor: 'pointer' } : {}}
                                         >
                                             {d.day && <span className="day-number">{d.day}</span>}
-                                            {/* {d.status === 'completed' && <div className="completed-mark"></div>} */}
                                         </div>
                                     );
                                 })}
@@ -323,74 +321,71 @@ const RoadmapView: React.FC = () => {
                         </div>
                     </section>
 
-                    {/* Right Section: Todo */}
+                    {/* Right Section: Timeline */}
                     <section className="section today-todo">
                         <h2 className="section-label">
                             {selectedDate
-                                ? `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일 할 일`
-                                : '오늘 할 일'
+                                ? `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일 타임라인`
+                                : '오늘 타임라인'
                             }
                         </h2>
                         <div className="content-card">
                             <div className="card-placeholder-content">
                                 {dayTasks.length > 0 ? (
-                                    <ul className="todo-list">
+                                    <div className="timeline-container">
                                         {dayTasks.map((item, idx) => {
                                             const isClickable = item.isToday === true;
                                             return (
-                                                <li
+                                                <div
                                                     key={`${item.dayIndex}-${item.taskIndex}`}
-                                                    className={item.done ? 'done' : ''}
+                                                    className={`timeline-item ${item.done ? 'completed' : ''}`}
                                                     style={{ opacity: isClickable ? 1 : 0.6 }}
                                                 >
-                                                    {/* 체크박스: 클릭 시 완료 토글 */}
-                                                    <div
-                                                        className="checkbox"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            if (isClickable) {
-                                                                toggleTask(item.dayIndex, item.taskIndex, item.done, item.isToday);
-                                                            }
-                                                        }}
-                                                        style={{ cursor: isClickable ? 'pointer' : 'not-allowed' }}
-                                                    >
-                                                        {item.done && (
-                                                            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4">
-                                                                <path d="M5 13l4 4L19 7" />
-                                                            </svg>
-                                                        )}
+                                                    {/* 번호 원형 마커 */}
+                                                    <div className="timeline-number">
+                                                        {String(idx + 1).padStart(2, '0')}
                                                     </div>
-                                                    {/* 과업 내용: 클릭 시 모달 오픈 (오늘만) */}
-                                                    <div
-                                                        style={{
-                                                            flex: 1,
-                                                            cursor: isClickable ? 'pointer' : 'default',
-                                                            padding: '0.5rem 0'
-                                                        }}
-                                                        onClick={() => {
-                                                            if (isClickable) {
-                                                                setSelectedTask(item);
-                                                            }
-                                                        }}
-                                                    >
-                                                        <span>{item.task}</span>
-                                                        {item.time && (
-                                                            <span style={{ display: 'block', fontSize: '0.85rem', color: '#888', marginTop: '0.25rem' }}>
-                                                                예상 시간: {item.time}
-                                                            </span>
-                                                        )}
-                                                        {item.details && (
-                                                            <span style={{ display: 'block', fontSize: '0.75rem', color: '#6c5ce7', marginTop: '0.25rem' }}>
-                                                                📝 상세 내용 보기
-                                                            </span>
-                                                        )}
+
+                                                    {/* 타임라인 내용 */}
+                                                    <div className="timeline-content">
+                                                        <div className="timeline-info">
+                                                            <h4 className="timeline-title">{item.task}</h4>
+                                                            <button
+                                                                className="timeline-detail-btn"
+                                                                onClick={() => {
+                                                                    if (isClickable) {
+                                                                        setSelectedTask(item);
+                                                                    }
+                                                                }}
+                                                                disabled={!isClickable}
+                                                            >
+                                                                상세보기
+                                                            </button>
+                                                        </div>
+
+                                                        {/* 체크박스 */}
+                                                        <div
+                                                            className={`timeline-checkbox ${item.done ? 'checked' : ''} ${!isClickable ? 'disabled' : ''}`}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (isClickable) {
+                                                                    toggleTask(item.dayIndex, item.taskIndex, item.done, item.isToday);
+                                                                }
+                                                            }}
+                                                        >
+                                                            {item.done && (
+                                                                <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                                                                    <path d="M5 13l4 4L19 7" />
+                                                                </svg>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                </li>
+                                                </div>
                                             );
                                         })}
-                                    </ul>
+                                    </div>
                                 ) : (
-                                    <div style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>
+                                    <div className="timeline-empty">
                                         {selectedDate
                                             ? `${selectedDate.getMonth() + 1}월 ${selectedDate.getDate()}일에는 로드맵에 등록된 일정이 없습니다.`
                                             : '오늘은 로드맵에 등록된 일정이 없습니다.'
@@ -429,82 +424,84 @@ const RoadmapView: React.FC = () => {
                                 예상 시간: {selectedTask.time}
                             </p>
 
-                            {selectedTask.details ? (
-                                <div>
-                                    {/* 학습 목표 */}
-                                    {selectedTask.details.objectives && selectedTask.details.objectives.length > 0 && (
-                                        <div className="roadmap-modal-section">
-                                            <h3 className="roadmap-modal-section-title objectives">🎯 학습 목표</h3>
-                                            <ul className="roadmap-modal-list">
-                                                {selectedTask.details.objectives.map((obj, i) => (
-                                                    <li key={i}>{obj}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-
-                                    {/* 핵심 개념 */}
-                                    {selectedTask.details.key_concepts && selectedTask.details.key_concepts.length > 0 && (
-                                        <div className="roadmap-modal-section">
-                                            <h3 className="roadmap-modal-section-title concepts">💡 핵심 개념</h3>
-                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                                                {selectedTask.details.key_concepts.map((concept, i) => (
-                                                    <span
-                                                        key={i}
-                                                        className="concept-tag"
-                                                    >
-                                                        {concept}
-                                                    </span>
-                                                ))}
+                            <div className="roadmap-modal-body">
+                                {selectedTask.details ? (
+                                    <>
+                                        {/* 학습 목표 */}
+                                        {selectedTask.details.objectives && selectedTask.details.objectives.length > 0 && (
+                                            <div className="roadmap-modal-section">
+                                                <h3 className="roadmap-modal-section-title objectives">🎯 학습 목표</h3>
+                                                <ul className="roadmap-modal-list">
+                                                    {selectedTask.details.objectives.map((obj, i) => (
+                                                        <li key={i}>{obj}</li>
+                                                    ))}
+                                                </ul>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
 
-                                    {/* 학습 단계 */}
-                                    {selectedTask.details.steps && selectedTask.details.steps.length > 0 && (
-                                        <div className="roadmap-modal-section">
-                                            <h3 className="roadmap-modal-section-title steps">📚 학습 단계</h3>
-                                            <ol style={{ marginLeft: '1.5rem' }}>
-                                                {selectedTask.details.steps.map((step, i) => (
-                                                    <li key={i} style={{ marginBottom: '0.8rem' }}>
-                                                        <strong style={{ color: 'var(--text-primary)' }}>{step.title}</strong>
-                                                        <span className="step-duration">
-                                                            ({step.duration})
+                                        {/* 핵심 개념 */}
+                                        {selectedTask.details.key_concepts && selectedTask.details.key_concepts.length > 0 && (
+                                            <div className="roadmap-modal-section">
+                                                <h3 className="roadmap-modal-section-title concepts">💡 핵심 개념</h3>
+                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                                    {selectedTask.details.key_concepts.map((concept, i) => (
+                                                        <span
+                                                            key={i}
+                                                            className="concept-tag"
+                                                        >
+                                                            {concept}
                                                         </span>
-                                                        <p className="step-description">
-                                                            {step.description}
-                                                        </p>
-                                                    </li>
-                                                ))}
-                                            </ol>
-                                        </div>
-                                    )}
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
 
-                                    {/* 추천 자료 */}
-                                    {selectedTask.details.resources && selectedTask.details.resources.length > 0 && (
-                                        <div className="roadmap-modal-section">
-                                            <h3 className="roadmap-modal-section-title resources">📖 추천 자료</h3>
-                                            <ul className="roadmap-modal-list">
-                                                {selectedTask.details.resources.map((res, i) => (
-                                                    <li key={i}>{res}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
+                                        {/* 학습 단계 */}
+                                        {selectedTask.details.steps && selectedTask.details.steps.length > 0 && (
+                                            <div className="roadmap-modal-section">
+                                                <h3 className="roadmap-modal-section-title steps">📚 학습 단계</h3>
+                                                <ol style={{ marginLeft: '1.5rem' }}>
+                                                    {selectedTask.details.steps.map((step, i) => (
+                                                        <li key={i} style={{ marginBottom: '0.8rem' }}>
+                                                            <strong style={{ color: 'var(--text-primary)' }}>{step.title}</strong>
+                                                            <span className="step-duration">
+                                                                ({step.duration})
+                                                            </span>
+                                                            <p className="step-description">
+                                                                {step.description}
+                                                            </p>
+                                                        </li>
+                                                    ))}
+                                                </ol>
+                                            </div>
+                                        )}
 
-                                    {/* 팁 */}
-                                    {selectedTask.details.tips && (
-                                        <div className="tip-box">
-                                            <strong>💭 팁:</strong> {selectedTask.details.tips}
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="empty-message">
-                                    <p>아직 상세 내용이 생성되지 않았습니다.</p>
-                                    <p style={{ fontSize: '0.9rem' }}>매일 자정에 자동으로 생성됩니다.</p>
-                                </div>
-                            )}
+                                        {/* 추천 자료 */}
+                                        {selectedTask.details.resources && selectedTask.details.resources.length > 0 && (
+                                            <div className="roadmap-modal-section">
+                                                <h3 className="roadmap-modal-section-title resources">📖 추천 자료</h3>
+                                                <ul className="roadmap-modal-list">
+                                                    {selectedTask.details.resources.map((res, i) => (
+                                                        <li key={i}>{res}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+
+                                        {/* 팁 */}
+                                        {selectedTask.details.tips && (
+                                            <div className="tip-box">
+                                                <strong>💭 팁:</strong> {selectedTask.details.tips}
+                                            </div>
+                                        )}
+                                    </>
+                                ) : (
+                                    <div className="empty-message">
+                                        <p>아직 상세 내용이 생성되지 않았습니다.</p>
+                                        <p style={{ fontSize: '0.9rem' }}>매일 자정에 자동으로 생성됩니다.</p>
+                                    </div>
+                                )}
+                            </div>
 
                             {/* 완료 버튼 */}
                             <div className="roadmap-modal-footer">

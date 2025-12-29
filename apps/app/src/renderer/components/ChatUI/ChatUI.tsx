@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ChatService, { ChatMessage, ConnectionStatus } from '../../services/ChatService';
 import './chat.css';
 
-export type ChatMode = 'chat' | 'mode';
+export type ChatMode = 'chat' | 'roadmap';
 
 interface ChatUIProps {
     /** WebSocket 서버 URL (선택사항 - 없으면 로컬 모드) */

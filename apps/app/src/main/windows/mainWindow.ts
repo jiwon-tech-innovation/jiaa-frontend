@@ -25,15 +25,25 @@ export const createMainWindow = (): void => {
         }
     });
 
+    // START_PAGE handling
+    let startPage = process.env.START_PAGE || '';
+    if (startPage && !startPage.startsWith('/')) {
+        startPage = `/${startPage}`;
+    }
+    const hash = startPage ? `#${startPage}` : '';
+
     // SPA: 항상 index.html 로드 (라우팅은 React Router가 처리)
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-        const url = `${MAIN_WINDOW_VITE_DEV_SERVER_URL}/index.html`;
+        const url = `${MAIN_WINDOW_VITE_DEV_SERVER_URL}/index.html${hash}`;
         console.log(`[Main] Loading URL: ${url}`);
         mainWindow.loadURL(url);
     } else {
         const filePath = path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`);
         console.log(`[Main] Loading File: ${filePath}`);
-        mainWindow.loadFile(filePath);
+        // hash option includes the # character? No, usually just the string. 
+        // Electron docs: hash String (optional) - The hash to load on the page.
+        // It should be the string AFTER #. So if we want #/dashboard, hash should be "/dashboard".
+        mainWindow.loadFile(filePath, { hash: startPage });
     }
 
     mainWindow.webContents.openDevTools({ mode: 'detach' });

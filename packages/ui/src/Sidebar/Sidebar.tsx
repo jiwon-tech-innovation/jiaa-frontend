@@ -12,6 +12,7 @@ export interface SidebarItem {
 export interface SidebarProps {
     items: SidebarItem[];
     isProfileDropdownOpen: boolean;
+    isProfileActive?: boolean;
     onProfileClick: () => void;
     onSignout: () => void;
     onProfileDetail?: () => void;
@@ -20,6 +21,7 @@ export interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
     items,
     isProfileDropdownOpen,
+    isProfileActive,
     onProfileClick,
     onSignout,
     onProfileDetail,
@@ -44,7 +46,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     return (
         <nav className="sidebar">
             <div
-                className="nav-item profile"
+                className={`nav-item profile ${isProfileActive ? 'active' : ''}`}
                 onClick={onProfileClick}
                 ref={dropdownRef}
             >

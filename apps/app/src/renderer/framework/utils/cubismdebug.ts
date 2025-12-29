@@ -114,7 +114,7 @@ export class CubismDebug {
       return;
     }
 
-    const logPrint: Live2DCubismCore.csmLogFunction =
+    const logPrint: any =
       CubismFramework.coreLogFunction;
 
     if (!logPrint) return;
@@ -150,7 +150,7 @@ export class CubismDebug {
   /**
    * private コンストラクタ
    */
-  private constructor() {}
+  private constructor() { }
 }
 
 // Namespace definition for compatibility.

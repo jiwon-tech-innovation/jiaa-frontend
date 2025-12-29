@@ -534,14 +534,18 @@ html {
 
 .create-roadmap-modal-content .message-item {
     display: flex;
+    flex-direction: row;
     animation: slideIn 0.3s ease-out;
+    /* Removed width: 100% to allow align-self to work */
 }
 
 .create-roadmap-modal-content .user-message {
+    align-self: flex-end;
     justify-content: flex-end;
 }
 
 .create-roadmap-modal-content .ai-message {
+    align-self: flex-start;
     justify-content: flex-start;
 }
 
@@ -570,12 +574,14 @@ html {
 .create-roadmap-modal-content .user-message .message-text {
     background: var(--accent-purple);
     color: #ffffff;
+    border-bottom-right-radius: 7px;
 }
 
 .create-roadmap-modal-content .ai-message .message-text {
     background: var(--input-bg);
     color: var(--text-primary);
     border: 1px solid var(--input-border);
+    border-top-left-radius: 4px;
 }
 
 .create-roadmap-modal-content .loading-message {
