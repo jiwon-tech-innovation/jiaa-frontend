@@ -1,0 +1,99 @@
+pipeline {
+    agent any
+    
+    parameters {
+        choice(name: 'PLATFORM', 
+               choices: ['macos', 'windows', 'all'], 
+               description: '빌드할 플랫폼을 선택하세요')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build Native Monitors') {
+            parallel {
+                stage('macOS') {
+                    when {
+                        anyOf {
+                            params.PLATFORM == 'all'
+                            params.PLATFORM == 'macos'
+                        }
+                    }
+                    agent {
+                        label 'macos' // Jenkins에 macOS 에이전트가 있어야 함
+                    }
+                    steps {
+                        dir('apps/app') {
+                            sh '''
+                                chmod +x scripts/build-native.sh
+                                ./scripts/build-native.sh
+                            '''
+                            archiveArtifacts 'build/native/monitor_mac'
+                        }
+                    }
+                }
+                
+                stage('Windows') {
+                    when {
+                        anyOf {
+                            params.PLATFORM == 'all'
+                            params.PLATFORM == 'windows'
+                        }
+                    }
+                    agent {
+                        label 'windows' // Jenkins에 Windows 에이전트가 있어야 함
+                    }
+                    steps {
+                        dir('apps/app') {
+                            bat '''
+                                cd scripts
+                                build-native.bat
+                            '''
+                            archiveArtifacts 'build/native/monitor_win.exe'
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Build Electron App') {
+            agent any
+            steps {
+                dir('apps/app') {
+                    sh 'npm install -g pnpm'
+                    sh 'pnpm install'
+                    sh 'pnpm run build:native || true' // 네이티브 빌드는 위에서 했으므로 실패해도 계속
+                    sh 'pnpm run package'
+                }
+            }
+        }
+        
+        stage('Package') {
+            agent any
+            steps {
+                dir('apps/app') {
+                    script {
+                        if (params.PLATFORM == 'all' || params.PLATFORM == 'macos') {
+                            sh 'pnpm run make:mac-arm || pnpm run make:mac-x64 || true'
+                        }
+                        if (params.PLATFORM == 'all' || params.PLATFORM == 'windows') {
+                            sh 'pnpm run make:win-x64 || true'
+                        }
+                    }
+                    archiveArtifacts 'out/**'
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
+
