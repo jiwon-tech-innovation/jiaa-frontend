@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchDashboardStats, tryAutoLogin } from '../../services/api';
+import { getRoadmaps } from '../../services/chatApiService';
 import './statistics.css';
 
 export const Statistics: React.FC = () => {
@@ -36,73 +37,211 @@ export const Statistics: React.FC = () => {
         staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
     });
 
-    // Mock Data for 4 Weeks
-    const allWeeksData = [
-        {
-            label: "이번 주",
-            dateRange: "12/22 - 12/28",
-            data: [
-                { day: '월', hours: 3, date: '12/22' },
-                { day: '화', hours: 5, date: '12/23' },
-                { day: '수', hours: 2, date: '12/24' },
-                { day: '목', hours: 7, date: '12/25' },
-                { day: '금', hours: 4, date: '12/26' },
-                { day: '토', hours: 0, date: '12/27' },
-                { day: '일', hours: 0, date: '12/28' },
-            ]
-        },
-        {
-            label: "지난 주",
-            dateRange: "12/15 - 12/21",
-            data: [
-                { day: '월', hours: 2, date: '12/15' },
-                { day: '화', hours: 4.5, date: '12/16' },
-                { day: '수', hours: 3, date: '12/17' },
-                { day: '목', hours: 6, date: '12/18' },
-                { day: '금', hours: 5, date: '12/19' },
-                { day: '토', hours: 8, date: '12/20' },
-                { day: '일', hours: 4, date: '12/21' },
-            ]
-        },
-        {
-            label: "2주 전",
-            dateRange: "12/08 - 12/14",
-            data: [
-                { day: '월', hours: 4, date: '12/08' },
-                { day: '화', hours: 4, date: '12/09' },
-                { day: '수', hours: 5, date: '12/10' },
-                { day: '목', hours: 3, date: '12/11' },
-                { day: '금', hours: 6, date: '12/12' },
-                { day: '토', hours: 5, date: '12/13' },
-                { day: '일', hours: 2, date: '12/14' },
-            ]
-        },
-        {
-            label: "3주 전",
-            dateRange: "12/01 - 12/07",
-            data: [
-                { day: '월', hours: 6, date: '12/01' },
-                { day: '화', hours: 2, date: '12/02' },
-                { day: '수', hours: 4, date: '12/03' },
-                { day: '목', hours: 5, date: '12/04' },
-                { day: '금', hours: 3, date: '12/05' },
-                { day: '토', hours: 4, date: '12/06' },
-                { day: '일', hours: 1, date: '12/07' },
-            ]
+    // Fetch Roadmaps (토큰 준비 완료 후 실행)
+    const { data: roadmapsData = [] } = useQuery({
+        queryKey: ['roadmaps'],
+        queryFn: () => getRoadmaps(),
+        enabled: isTokenReady,
+        staleTime: 5 * 60 * 1000,
+    });
+
+    // 시간 문자열을 시간(숫자)로 변환하는 함수
+    const parseTimeToHours = (timeStr: string): number => {
+        if (!timeStr) return 0;
+        
+        let totalHours = 0;
+        
+        // "시간" 단위 추출
+        const hourMatch = timeStr.match(/(\d+)\s*시간/);
+        if (hourMatch) {
+            totalHours += parseInt(hourMatch[1], 10);
         }
-    ];
+        
+        // "분" 단위 추출
+        const minuteMatch = timeStr.match(/(\d+)\s*분/);
+        if (minuteMatch) {
+            totalHours += parseInt(minuteMatch[1], 10) / 60;
+        }
+        
+        // "시간"이나 "분"이 없으면 숫자만 있는 경우 처리
+        if (!hourMatch && !minuteMatch) {
+            const numMatch = timeStr.match(/(\d+)/);
+            if (numMatch) {
+                // 기본적으로 분으로 간주
+                totalHours = parseInt(numMatch[1], 10) / 60;
+            }
+        }
+        
+        return totalHours;
+    };
 
-    // Radar Chart Data는 API에서 받아옴 (radarData는 위에서 useQuery로 가져옴)
+    // 주간 활동량 데이터 계산
+    const allWeeksData = useMemo(() => {
+        const weeks: Array<{
+            label: string;
+            dateRange: string;
+            data: Array<{ day: string; hours: number; date: string }>;
+        }> = [];
 
-    // Monthly Record Data ( 월간 학습 기록 )
-    const monthlyRecords = [
-        { month: '12월', hours: 142, goal: '달성', status: 'high' },
-        { month: '11월', hours: 128, goal: '달성', status: 'high' },
-        { month: '10월', hours: 95, goal: '미달', status: 'normal' },
-        { month: '9월', hours: 110, goal: '달성', status: 'normal' },
-    ];
+        const today = new Date();
+        const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
-    const currentWeek = allWeeksData[weekIndex];
+        // 최근 4주 데이터 생성
+        for (let weekOffset = 0; weekOffset < 4; weekOffset++) {
+            // 주의 시작일 계산 (일요일 = 0, 월요일 = 1, ...)
+            const dayOfWeek = today.getDay(); // 0 = 일요일, 1 = 월요일, ...
+            const weekStart = new Date(today);
+            // 이번 주 일요일로 이동 후, weekOffset만큼 주를 빼기
+            weekStart.setDate(today.getDate() - dayOfWeek - (weekOffset * 7));
+            weekStart.setHours(0, 0, 0, 0);
+
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            weekEnd.setHours(23, 59, 59, 999);
+
+            const weekData: Array<{ day: string; hours: number; date: string }> = [];
+
+            // 각 요일별로 데이터 계산
+            for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+                const currentDate = new Date(weekStart);
+                currentDate.setDate(weekStart.getDate() + dayOffset);
+                
+                let dayHours = 0;
+
+                // 모든 로드맵에서 완료된 태스크 찾기
+                roadmapsData.forEach((roadmap: any) => {
+                    if (!roadmap.items) return;
+
+                    roadmap.items.forEach((item: any) => {
+                        // 새 구조 (tasks 배열)
+                        if (item.tasks && item.tasks.length > 0) {
+                            item.tasks.forEach((task: any) => {
+                                if (task.is_completed === 1 && task.completed_at) {
+                                    const completedDate = new Date(task.completed_at);
+                                    completedDate.setHours(0, 0, 0, 0);
+                                    
+                                    if (completedDate.getTime() === currentDate.getTime()) {
+                                        dayHours += parseTimeToHours(task.time || '0분');
+                                    }
+                                }
+                            });
+                        } else {
+                            // 레거시 구조
+                            if (item.is_completed === 1 && item.completed_at) {
+                                const completedDate = new Date(item.completed_at);
+                                completedDate.setHours(0, 0, 0, 0);
+                                
+                                if (completedDate.getTime() === currentDate.getTime()) {
+                                    dayHours += parseTimeToHours(item.time || '0분');
+                                }
+                            }
+                        }
+                    });
+                });
+
+                const dayName = weekDays[currentDate.getDay()];
+                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const day = String(currentDate.getDate()).padStart(2, '0');
+                const dateStr = `${month}/${day}`;
+
+                weekData.push({
+                    day: dayName,
+                    hours: Math.round(dayHours * 10) / 10, // 소수점 첫째자리까지
+                    date: dateStr
+                });
+            }
+
+            const monthStart = String(weekStart.getMonth() + 1).padStart(2, '0');
+            const dayStart = String(weekStart.getDate()).padStart(2, '0');
+            const monthEnd = String(weekEnd.getMonth() + 1).padStart(2, '0');
+            const dayEnd = String(weekEnd.getDate()).padStart(2, '0');
+            const dateRange = `${monthStart}/${dayStart} - ${monthEnd}/${dayEnd}`;
+
+            const labels = ['이번 주', '지난 주', '2주 전', '3주 전'];
+            weeks.push({
+                label: labels[weekOffset],
+                dateRange,
+                data: weekData
+            });
+        }
+
+        return weeks;
+    }, [roadmapsData]);
+
+    // 월간 학습 기록 데이터 계산
+    const monthlyRecords = useMemo(() => {
+        const records: Array<{ month: string; hours: number; goal: string; status: string }> = [];
+        const today = new Date();
+        
+        // 가장 오래된 로드맵의 생성일 찾기 (가입일 기준)
+        let earliestRoadmapDate: Date | null = null;
+        roadmapsData.forEach((roadmap: any) => {
+            if (roadmap.created_at) {
+                const roadmapDate = new Date(roadmap.created_at);
+                if (!earliestRoadmapDate || roadmapDate < earliestRoadmapDate) {
+                    earliestRoadmapDate = roadmapDate;
+                }
+            }
+        });
+
+        // 가입일이 없으면 오늘 날짜를 기준으로 함
+        const startDate = earliestRoadmapDate || today;
+        const startMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+        
+        // 최근 4개월 데이터 생성 (가입일 이후만)
+        for (let monthOffset = 0; monthOffset < 4; monthOffset++) {
+            const targetDate = new Date(today.getFullYear(), today.getMonth() - monthOffset, 1);
+            const monthStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+            const monthEnd = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0, 23, 59, 59, 999);
+
+            // 가입일 이전 월은 제외
+            if (monthStart < startMonth) {
+                continue;
+            }
+
+            let totalHours = 0;
+
+            // 모든 로드맵에서 완료된 태스크 찾기
+            roadmapsData.forEach((roadmap: any) => {
+                if (!roadmap.items) return;
+
+                roadmap.items.forEach((item: any) => {
+                    // 새 구조 (tasks 배열)
+                    if (item.tasks && item.tasks.length > 0) {
+                        item.tasks.forEach((task: any) => {
+                            if (task.is_completed === 1 && task.completed_at) {
+                                const completedDate = new Date(task.completed_at);
+                                
+                                if (completedDate >= monthStart && completedDate <= monthEnd) {
+                                    totalHours += parseTimeToHours(task.time || '0분');
+                                }
+                            }
+                        });
+                    } else {
+                        // 레거시 구조
+                        if (item.is_completed === 1 && item.completed_at) {
+                            const completedDate = new Date(item.completed_at);
+                            
+                            if (completedDate >= monthStart && completedDate <= monthEnd) {
+                                totalHours += parseTimeToHours(item.time || '0분');
+                            }
+                        }
+                    }
+                });
+            });
+
+            const monthName = `${targetDate.getMonth() + 1}월`;
+            const hours = Math.round(totalHours);
+            const goal = hours >= 100 ? '달성' : '미달';
+            const status = hours >= 100 ? 'high' : hours >= 50 ? 'normal' : 'low';
+
+            records.push({ month: monthName, hours, goal, status });
+        }
+
+        return records;
+    }, [roadmapsData]);
+
+    const currentWeek = allWeeksData[weekIndex] || allWeeksData[0] || { label: '이번 주', dateRange: '', data: [] };
     const weeklyData = currentWeek.data;
 
     const handlePrevWeek = () => {
@@ -117,21 +256,48 @@ export const Statistics: React.FC = () => {
         }
     };
 
-    // Helper to calculate radar chart points
-    const getRadarPoints = (data: any[], radius: number, centerX: number, centerY: number) => {
-        return data.map((d, i) => {
-            const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
-            const r = (d.value / 100) * radius;
+    // Calculate hexagon points for radar chart (대시보드와 동일한 방식)
+    const generateGridHexagon = (centerX: number, centerY: number, radius: number) => {
+        const points = [];
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i - Math.PI / 2;
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+            points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+        }
+        return points.join(' ');
+    };
+
+    // Calculate radar data points
+    const calculateRadarPoints = (centerX: number, centerY: number, radius: number, values: number[]) => {
+        const points = values.map((value, index) => {
+            const angle = (Math.PI / 3) * index - Math.PI / 2;
+            const r = (value / 100) * radius;
             const x = centerX + r * Math.cos(angle);
             const y = centerY + r * Math.sin(angle);
-            return `${x},${y}`;
-        }).join(' ');
+            return `${x.toFixed(1)},${y.toFixed(1)}`;
+        });
+        return points.join(' ');
+    };
+
+    // Calculate label positions
+    const getLabelPosition = (centerX: number, centerY: number, radius: number, index: number) => {
+        const angle = (Math.PI / 3) * index - Math.PI / 2;
+        const labelRadius = radius + 15;
+        const x = centerX + labelRadius * Math.cos(angle);
+        const y = centerY + labelRadius * Math.sin(angle);
+        return { x: x.toFixed(1), y: y.toFixed(1) };
     };
 
     const hoursList = weeklyData.map(d => d.hours);
-    const maxDataValue = Math.max(...hoursList);
-    const minDataValue = Math.min(...hoursList);
-    const avgValue = hoursList.reduce((sum, current) => sum + current, 0) / hoursList.length;
+    const maxDataValue = hoursList.length > 0 ? Math.max(...hoursList) : 0;
+    const minDataValue = hoursList.length > 0 ? Math.min(...hoursList) : 0;
+    
+    // 실제 학습한 일수만으로 평균 계산 (0시간인 날 제외)
+    const completedDays = hoursList.filter(hours => hours > 0);
+    const avgValue = completedDays.length > 0
+        ? completedDays.reduce((sum, current) => sum + current, 0) / completedDays.length
+        : 0;
 
     // Y축 스케일을 위해 최대값 조정 (여유 공간 확보)
     const maxScale = Math.ceil(maxDataValue * 1.1) || 10;
@@ -143,7 +309,10 @@ export const Statistics: React.FC = () => {
     const svgWidth = (barWidth + gap) * 7 + padding * 2;
     const svgHeight = chartHeight + padding * 2;
 
-    const avgY = padding + (chartHeight - (avgValue / maxScale) * chartHeight);
+    // 평균선 Y 좌표 계산 (평균값이 0보다 클 때만 표시)
+    const avgY = avgValue > 0 && maxScale > 0
+        ? padding + (chartHeight - (avgValue / maxScale) * chartHeight)
+        : null;
 
     return (
         <div className="statistics-container">
@@ -175,8 +344,30 @@ export const Statistics: React.FC = () => {
                                     );
                                 })}
 
-                                {/* Average Line */}
-                                <line x1={padding} y1={avgY} x2={svgWidth - padding} y2={avgY} stroke="#7c5cdb" strokeWidth="1.5" strokeDasharray="5,5" opacity="0.6" />
+                                {/* Average Line - 실제 데이터 기반 평균선 */}
+                                {avgY !== null && avgValue > 0 && (
+                                    <g>
+                                        <line 
+                                            x1={padding} 
+                                            y1={avgY} 
+                                            x2={svgWidth - padding} 
+                                            y2={avgY} 
+                                            stroke="#7c5cdb" 
+                                            strokeWidth="1.5" 
+                                            strokeDasharray="5,5" 
+                                            opacity="0.6" 
+                                        />
+                                        <text 
+                                            x={svgWidth - padding + 5} 
+                                            y={avgY + 4} 
+                                            fill="#7c5cdb" 
+                                            fontSize="10" 
+                                            fontWeight="500"
+                                        >
+                                            평균 {avgValue.toFixed(1)}h
+                                        </text>
+                                    </g>
+                                )}
 
                                 {/* Bars */}
                                 {weeklyData.map((data, index) => {
@@ -204,58 +395,35 @@ export const Statistics: React.FC = () => {
                     <div className="radar-card">
                         <h3>역량 다이어그램</h3>
                         <div className="radar-chart-container">
-                            <svg viewBox="0 0 200 200" className="radar-chart">
-                                {/* Background Hexagons - 항상 렌더링 (고정된 6개 점) */}
-                                {[1, 0.8, 0.6, 0.4, 0.2].map((scale) => {
-                                    const points = Array.from({ length: 6 }, (_, i) => {
-                                        const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
-                                        const r = 80 * scale;
-                                        const x = 100 + r * Math.cos(angle);
-                                        const y = 100 + r * Math.sin(angle);
-                                        return `${x},${y}`;
-                                    }).join(' ');
-                                    return (
-                                        <polygon
-                                            key={scale}
-                                            points={points}
-                                            className="radar-grid"
-                                        />
-                                    );
-                                })}
-                                {/* Axis Lines - 항상 렌더링 (고정된 6개) */}
-                                {Array.from({ length: 6 }, (_, i) => {
-                                    const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
-                                    return (
-                                        <line
-                                            key={i}
-                                            x1="100" y1="100"
-                                            x2={100 + 80 * Math.cos(angle)}
-                                            y2={100 + 80 * Math.sin(angle)}
-                                            stroke="rgba(255,255,255,0.1)"
-                                        />
-                                    );
-                                })}
-                                {/* Data Polygon - 데이터가 있을 때만 렌더링 */}
+                            <svg viewBox="0 0 200 200" className="radar-chart" preserveAspectRatio="xMidYMid meet">
+                                {/* Background hexagon */}
+                                <polygon points={generateGridHexagon(100, 100, 80)} className="radar-bg" />
+                                {/* Grid lines - inner hexagons (더 많은 그리드 선) */}
+                                <polygon points={generateGridHexagon(100, 100, 68)} className="radar-grid" />
+                                <polygon points={generateGridHexagon(100, 100, 56)} className="radar-grid" />
+                                <polygon points={generateGridHexagon(100, 100, 44)} className="radar-grid" />
+                                <polygon points={generateGridHexagon(100, 100, 32)} className="radar-grid" />
+                                <polygon points={generateGridHexagon(100, 100, 20)} className="radar-grid" />
+                                <polygon points={generateGridHexagon(100, 100, 8)} className="radar-grid" />
+                                {/* Data polygon */}
                                 {radarData.length > 0 && (
                                     <polygon
-                                        points={getRadarPoints(radarData, 80, 100, 100)}
+                                        points={calculateRadarPoints(100, 100, 80, radarData.map(d => d.value))}
                                         className="radar-data"
                                     />
                                 )}
-                                {/* Labels - 데이터가 있을 때만 렌더링 */}
-                                {radarData.map((d, i) => {
-                                    const angle = (Math.PI * 2 / 6) * i - Math.PI / 2;
-                                    const x = 100 + 95 * Math.cos(angle);
-                                    const y = 100 + 95 * Math.sin(angle);
+                                {/* Labels */}
+                                {radarData.map((item, index) => {
+                                    const pos = getLabelPosition(100, 100, 80, index);
                                     return (
                                         <text
-                                            key={d.label}
-                                            x={x} y={y}
+                                            key={index}
+                                            x={pos.x}
+                                            y={pos.y}
                                             textAnchor="middle"
                                             className="radar-label"
-                                            alignmentBaseline="middle"
                                         >
-                                            {d.label}
+                                            {item.label}
                                         </text>
                                     );
                                 })}

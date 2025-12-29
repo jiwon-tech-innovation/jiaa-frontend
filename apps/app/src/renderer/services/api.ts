@@ -279,6 +279,37 @@ export const isAuthenticated = (): boolean => {
 // 토큰 서비스 export (필요한 경우 직접 접근용)
 export { tokenService };
 
+// ============ User APIs ============
+
+export interface UserInfo {
+    id: string;
+    username: string;
+    email: string;
+    name: string;
+    avatarId: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+// 현재 사용자 정보 조회
+export const getCurrentUser = async (): Promise<UserInfo> => {
+    return apiRequest<UserInfo>('/api/v1/users/me', {
+        method: 'GET',
+    });
+};
+
+// 프로필 수정
+export interface UpdateProfileRequest {
+    name: string;
+}
+
+export const updateProfile = async (data: UpdateProfileRequest): Promise<UserInfo> => {
+    return apiRequest<UserInfo>('/api/v1/users/me/profile', {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+    });
+};
+
 export const fetchContributionData = async (year: number): Promise<number[][]> => {
     // Simulate API call for dashboard data
     return new Promise((resolve) => {

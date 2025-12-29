@@ -11,11 +11,19 @@ interface RoadmapItem {
     items: Array<{
         id: number;  // item의 id는 인덱스 (number 유지)
         day: number;
-        content: string;
-        time: string;
+        content?: string;
+        time?: string;
         created_at?: string;
-        is_completed?: boolean;
+        is_completed?: boolean | number;
         completed_at?: string;
+        tasks?: Array<{
+            rank: number;
+            content: string;
+            time: string;
+            is_completed?: number;
+            completed_at?: string;
+            details?: any;
+        }>;
     }>;
 }
 
@@ -31,10 +39,27 @@ const RoadmapList: React.FC = () => {
     const calculateProgress = (roadmap: RoadmapItem): number => {
         if (!roadmap.items || roadmap.items.length === 0) return 0;
 
-        // 실제 완료된 항목 수를 기준으로 계산
-        const completedCount = roadmap.items.filter(item => item.is_completed === true).length;
-        const totalCount = roadmap.items.length;
+        let completedCount = 0;
 
+        roadmap.items.forEach(item => {
+            // 새 구조: tasks 배열이 있는 경우
+            if (item.tasks && item.tasks.length > 0) {
+                // 모든 task가 완료되었는지 확인
+                const allTasksCompleted = item.tasks.every(task => 
+                    task.is_completed === 1 || task.is_completed === true
+                );
+                if (allTasksCompleted && item.tasks.length > 0) {
+                    completedCount++;
+                }
+            } else {
+                // 레거시 구조: item 자체에 is_completed가 있는 경우
+                if (item.is_completed === true || item.is_completed === 1) {
+                    completedCount++;
+                }
+            }
+        });
+
+        const totalCount = roadmap.items.length;
         if (totalCount === 0) return 0;
 
         return Math.round((completedCount / totalCount) * 100);
