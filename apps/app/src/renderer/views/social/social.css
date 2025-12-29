@@ -291,7 +291,6 @@
 
 .modal-header {
     padding: 24px 30px;
-    border-bottom: 1px solid var(--border-subtle);
 }
 
 .modal-header h2 {

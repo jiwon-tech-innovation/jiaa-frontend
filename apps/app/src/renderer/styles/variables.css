@@ -114,7 +114,7 @@
     --border-subtle: rgba(255, 255, 255, 0.1);
 
     /* Semantic Variables */
-    --card-bg: rgba(26, 26, 26, 0.8);
+    --card-bg: #1a1a1a;
     --card-border: #333;
     --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 

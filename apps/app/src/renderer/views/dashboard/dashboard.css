@@ -175,14 +175,21 @@ html {
 /* Bottom card */
 .bottom-card {
     grid-column: 1 / -1;
-    min-height: 240px;
+    min-height: auto;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 16px 24px !important;
 }
 
 .dashboard-container .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 16px;
+}
+
+.bottom-card .card-header {
+    margin-bottom: 12px;
 }
 
 .dashboard-container .card-header h3 {
@@ -228,7 +235,7 @@ html {
     border: 1px dashed var(--border-subtle);
     padding: 10px 0;
     width: 100%;
-    border-radius: 16px;
+    border-radius: 10px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
@@ -301,20 +308,26 @@ html {
 .flex-row {
     display: flex;
     flex-direction: row;
-    gap: 15px;
+    gap: 12px;
     width: 100%;
     min-height: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .stat-box {
-    background: #4a3b89;
+    background: #AF80FF !important;
     border-radius: var(--radius-md);
-    width: 130px;
+    width: 12%;
+    min-width: 100px;
+    max-width: 130px;
+    height: auto;
+    min-height: 80px;
     padding: 12px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    flex-shrink: 0;
+    flex-shrink: 1;
 }
 
 .stat-value {
@@ -324,9 +337,9 @@ html {
 }
 
 .streak-info {
-    font-size: 12px;
-    color: #ff9d00;
-    font-weight: 600;
+    font-size: 18px;
+    color: #fdd05f;
+    font-weight: 700;
     margin: 4px 0;
 }
 
@@ -353,6 +366,7 @@ html {
     flex-direction: column;
     flex: 1;
     min-width: 0;
+    max-width: 100%;
     overflow: auto;
 }
 
@@ -395,7 +409,7 @@ html {
 }
 
 .days-label li {
-    height: 13px;
+    height: 14px;
     /* Match grid cell height */
     display: flex;
     align-items: center;
@@ -416,19 +430,20 @@ html {
 }
 
 .grid-cell {
-    width: 13px;
-    height: 13px;
+    width: 14px !important;
+    height: 14px !important;
+    min-width: 14px !important;
+    min-height: 14px !important;
     background-color: var(--input-bg);
-    border-radius: 2px;
+    border-radius: 3px;
     border: 1px solid var(--border-subtle);
     box-sizing: border-box;
-    /* Include border in size */
 }
 
 /* Contribution Levels */
 .grid-cell.level-0 {
-    background-color: transparent;
-    border-color: transparent;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-subtle);
 }
 
 .grid-cell.level-1 {
@@ -450,10 +465,11 @@ html {
 /* Appending to dashboard.css for Year Selector styles */
 .contribution-wrapper {
     display: flex;
-    gap: 20px;
+    gap: 12px;
     flex: 1;
     /* Take remaining space */
     min-width: 0;
+    max-width: 100%;
     /* Allow shrinking below content size for scroll */
     overflow: hidden;
     /* Ensure clean bound */
@@ -462,8 +478,8 @@ html {
 .year-list {
     display: flex;
     flex-direction: column;
-    padding-top: 30px;
-    gap: 8px;
+    padding-top: 15px;
+    gap: 6px;
 }
 
 .year-item {
@@ -505,8 +521,8 @@ html {
 }
 
 .create-roadmap-modal-content {
-    width: 85%;
-    max-width: 600px;
+    width: 70%;
+    max-width: 500px;
     height: 70vh;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
@@ -515,9 +531,8 @@ html {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     position: relative;
-    padding: 30px 0 0 0;
     box-sizing: border-box;
     box-shadow: var(--card-shadow);
 }
@@ -538,13 +553,13 @@ html {
     justify-content: center;
     align-items: center;
     text-align: center;
-    color: white;
+    color: var(--text-primary);
     min-height: 0;
 }
 
 .create-roadmap-modal-content .text-title {
-    font-size: 28px;
-    font-weight: 700;
+    font-size: 22px !important;
+    font-weight: 700 !important;
     margin-bottom: 30px;
     color: var(--text-primary);
 }
@@ -715,7 +730,7 @@ html {
     background: transparent;
     color: var(--text-primary);
     font-size: 14px;
-    padding: 12px 16px;
+    padding: 14px 18px;
     border-radius: 16px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
@@ -725,7 +740,7 @@ html {
 }
 
 .create-roadmap-modal-content .send-button {
-    background: var(--text-secondary) !important;
+    background: transparent !important;
     border: none;
     outline: none;
     cursor: pointer;
@@ -733,14 +748,15 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--text-secondary);
     transition: all 0.2s ease;
     margin-right: 4px;
     border-radius: 6px;
 }
 
 .create-roadmap-modal-content .send-button:hover:not(:disabled) {
-    background: var(--text-primary) !important;
+    background: transparent !important;
+    color: var(--text-primary);
 }
 
 .create-roadmap-modal-content .send-button:disabled {
@@ -751,4 +767,71 @@ html {
 .create-roadmap-modal-content .send-button svg {
     width: 20px;
     height: 20px;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .flex-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .stat-box {
+        width: 100%;
+        max-width: 100%;
+        min-width: unset;
+        flex-direction: row;
+        align-items: center;
+        min-height: 60px;
+        padding: 10px 16px;
+    }
+
+    .contribution-wrapper {
+        flex-direction: column;
+    }
+
+    .year-list {
+        flex-direction: row;
+        padding-top: 10px;
+        justify-content: center;
+    }
+
+    .contribution-container {
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+    .graph-area {
+        min-width: max-content;
+    }
+
+    .contribution-grid {
+        min-width: max-content;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .dashboard-container .header h1 {
+        font-size: 22px;
+    }
+
+    .dashboard-container .card {
+        padding: 16px;
+    }
+
+    .dashboard-container .card-header h3 {
+        font-size: 16px;
+    }
+
+    .stat-value {
+        font-size: 14px;
+    }
+
+    .streak-info {
+        font-size: 14px;
+    }
 }

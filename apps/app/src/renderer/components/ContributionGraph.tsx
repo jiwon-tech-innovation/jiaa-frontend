@@ -42,7 +42,7 @@ export const ContributionGraph: React.FC<ContributionGraphProps> = ({ data, year
                             key={m.name}
                             style={{
                                 position: 'absolute',
-                                left: `${m.weekIndex * 16}px`, // 13px cell + 3px gap
+                                left: `${m.weekIndex * 17}px`, // 14px cell + 3px gap
                                 fontSize: '10px'
                             }}
                         >
@@ -67,7 +67,7 @@ export const ContributionGraph: React.FC<ContributionGraphProps> = ({ data, year
                                     <div
                                         key={`${wIndex}-${dIndex}`}
                                         className={`grid-cell level-${level}`}
-                                        style={level === -1 ? { backgroundColor: 'transparent', border: '1px solid transparent' } : {}}
+                                        style={level === -1 ? { visibility: 'hidden' } : {}}
                                     ></div>
                                 ))}
                             </div>
