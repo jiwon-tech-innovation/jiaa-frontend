@@ -76,9 +76,9 @@ body {
     backdrop-filter: blur(10px);
     border-radius: 16px;
     padding: 24px;
-    box-shadow: var(--card-shadow);
+    box-shadow: none;
     border: 1px solid var(--card-border);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease;
     min-width: 0;
     box-sizing: border-box;
     position: relative;
@@ -88,7 +88,7 @@ body {
 .chart-card:hover,
 .radar-card:hover,
 .monthly-card:hover {
-    box-shadow: var(--card-shadow);
+    box-shadow: none;
 }
 
 

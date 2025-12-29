@@ -61,7 +61,7 @@
     flex-direction: column;
     justify-content: flex-end;
     padding: 20px;
-    box-shadow: var(--card-shadow);
+    box-shadow: none;
 }
 
 /* Gradient overlay for better text readability if we add images later */
@@ -78,7 +78,7 @@
 }
 
 .roadmap-card-item:hover {
-    box-shadow: var(--card-shadow);
+    box-shadow: none;
 }
 
 .roadmap-card-item:hover::before {

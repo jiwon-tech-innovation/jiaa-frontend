@@ -162,8 +162,8 @@ const ChatView: React.FC = () => {
                             >
                                 <div className="message-content">
                                     <p className="message-text">{message.content}</p>
-                                    <span className="message-time">{formatTime(message.timestamp)}</span>
                                 </div>
+                                    <span className="message-time">{formatTime(message.timestamp)}</span>
                             </div>
                         ))}
                         {isLoading && (

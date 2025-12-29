@@ -37,7 +37,7 @@
     width: 100%;
     max-width: 800px;
     box-sizing: border-box;
-    box-shadow: var(--card-shadow);
+    box-shadow: none;
     display: flex;
     flex-direction: column;
 }

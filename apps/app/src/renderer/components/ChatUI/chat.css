@@ -32,7 +32,7 @@
     word-wrap: break-word;
     overflow-y: auto;
     /* 내용이 길면 스크롤 */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: none;
     will-change: contents;
     /* 성능 최적화 */
 }
@@ -133,7 +133,7 @@
     border-radius: 16px;
     padding: 8px 8px 8px 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: none;
 }
 
 .chat-input {
@@ -162,12 +162,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s;
 }
 
 .chat-send-btn:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(158, 115, 255, 0.4);
+    box-shadow: none;
 }
 
 .chat-send-btn:active {

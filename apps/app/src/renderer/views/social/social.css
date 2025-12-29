@@ -140,7 +140,7 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: var(--card-shadow);
+    box-shadow: none;
 }
 
 .user-card:hover {
@@ -185,7 +185,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     min-height: 220px;
-    box-shadow: var(--card-shadow);
+    box-shadow: none;
 }
 
 .group-card:hover {
@@ -235,7 +235,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: var(--card-shadow);
+    box-shadow: none;
     z-index: 10;
 }
 
@@ -452,7 +452,7 @@
 
 .modal-submit-btn:hover {
     background: #8A5FEB;
-    box-shadow: 0 6px 20px rgba(158, 115, 255, 0.4);
+    box-shadow: none;
 }
 
 /* Join Content */
@@ -555,7 +555,7 @@
     align-items: center;
     justify-content: center;
     font-size: 3rem;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: none;
 }
 
 .info-text h1 {
@@ -625,7 +625,7 @@
 
 .enter-chat-btn:hover {
     background: #8A5FEB;
-    box-shadow: 0 6px 20px rgba(158, 115, 255, 0.4);
+    box-shadow: none;
 }
 
 .roadmap-sync-btn {
@@ -672,12 +672,12 @@
 
 .roadmap-status-dot.completed {
     background: #4ade80;
-    box-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+    box-shadow: none;
 }
 
 .roadmap-status-dot.active {
     background: #9E73FF;
-    box-shadow: 0 0 10px rgba(158, 115, 255, 0.4);
+    box-shadow: none;
     animation: pulse 2s infinite;
 }
 
@@ -902,7 +902,7 @@
     height: 6px;
     background: #4ade80;
     border-radius: 50%;
-    box-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+    box-shadow: none;
 }
 
 /* User Panel Bottom */
@@ -1052,7 +1052,7 @@
 .own .message-bubble {
     background: linear-gradient(135deg, #9E73FF 0%, #9E73FF 100%);
     border: none;
-    box-shadow: 0 4px 15px rgba(158, 115, 255, 0.3);
+    box-shadow: none;
 }
 
 .message-bubble p {
@@ -1136,7 +1136,7 @@
 
 .voice-user-card.own {
     border: 2px solid #9E73FF;
-    box-shadow: 0 0 20px rgba(158, 115, 255, 0.2);
+    box-shadow: none;
 }
 
 .voice-avatar-large {

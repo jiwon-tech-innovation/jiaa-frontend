@@ -23,36 +23,6 @@ html {
   /* Dashboard UI above background */
 }
 
-/* Sidebar */
-.sidebar {
-  width: 60px;
-  background-color: var(--bg-secondary);
-  border-right: 1px solid var(--border-subtle);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 20px;
-}
-
-.nav-item {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  color: var(--text-muted);
-  transition: all 0.2s;
-}
-
-.nav-item.active,
-.nav-item:hover {
-  background-color: var(--hover-bg);
-  color: var(--text-primary);
-}
-
 /* Main Content Area */
 .main-content {
   flex: 1;
@@ -86,7 +56,7 @@ html {
   min-height: 250px;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--card-shadow);
+  box-shadow: none;
 }
 
 .card-header {

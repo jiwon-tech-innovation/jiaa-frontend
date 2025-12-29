@@ -139,7 +139,7 @@
     position: relative;
     overflow: hidden;
     flex-shrink: 0;
-    box-shadow: var(--card-shadow);
+    box-shadow: none;
 }
 
 .avatar-card:hover {
@@ -172,5 +172,5 @@
     align-items: center;
     justify-content: center;
     color: var(--text-muted);
-    box-shadow: var(--card-shadow);
+    box-shadow: none;
 }
