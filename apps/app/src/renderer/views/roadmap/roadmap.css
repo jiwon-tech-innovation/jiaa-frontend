@@ -12,7 +12,7 @@
     height: 100%;
     background: transparent;
     color: var(--text-primary);
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: var(--font-family);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -21,26 +21,30 @@
 
 /* Header Styles */
 .roadmap-page-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
     margin-bottom: 30px;
+    flex-shrink: 0;
 }
+
+
 
 .main-title {
     margin: 0;
-    font-size: 32px;
-    font-weight: 800;
+    font-family: var(--font-family);
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-title);
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
 .title-text {
-    font-size: 28px;
-    font-weight: 700;
+    font-family: var(--font-family);
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-title);
     color: var(--text-primary);
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
 }
 
 /* Main Layout - Side by Side */
@@ -67,18 +71,21 @@
 }
 
 .section-label {
-    font-size: 18px;
-    font-weight: 600;
+    margin-bottom: 30;
+    font-family: var(--font-family);
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-medium);
     color: var(--text-primary);
-    margin: 0;
 }
 
 .calendar-controls {
     display: flex;
     align-items: center;
     gap: 8px;
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-small);
     color: var(--text-secondary);
-    font-size: 14px;
 }
 
 /* Content Card */
@@ -94,13 +101,19 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    color: var(--text-primary);
     box-shadow: var(--card-shadow);
 }
 
+/* Calendar Specific Styles */
+.today-todo .content-card {
+    padding: 0;
+}
+
 .calendar-card {
-    background: rgba(255, 255, 255, 0.03);
-    /* Subtle backdrop */
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    flex: none;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
 }
 
 /* Calendar Grid Header */
@@ -114,6 +127,7 @@
 
 .weekday {
     text-align: center;
+    font-family: var(--font-family);
     font-size: 13px;
     font-weight: 600;
     color: var(--text-secondary);
@@ -134,28 +148,31 @@
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    grid-auto-rows: 1fr;
-    gap: 8px;
-    /* Distinct gap for separation */
+    grid-auto-rows: minmax(90px, auto);
+    gap: 10px;
     background: transparent;
     border: none;
-    flex: 1;
     padding: 0 8px;
 }
 
 .calendar-cell {
-    aspect-ratio: 0.85;
     background: var(--input-bg);
     border: 1px solid var(--border-subtle);
-    border-radius: 16px;
+    border-radius: 10px;
     padding: 8px;
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 4px;
-    background: rgba(255, 255, 255, 0.03);
+    transition: all 0.2s ease;
+}
+
+.calendar-cell:hover {
+    background: var(--active-bg);
+    border-color: #544186;
+}
+
+.calendar-cell.empty {
+    background: transparent;
     border: none;
     /* Removed border as requested */
     border-radius: 16px;
@@ -169,18 +186,46 @@
 }
 
 .calendar-cell.clickable:hover {
-    background: rgba(255, 255, 255, 0.08);
-    /* Brighter on hover */
-    transform: translateY(-2px);
+    background: var(--active-bg);
+    border-color: var(--text-muted);
 }
 
-.day-number {
-    font-size: 18px;
-    /* Larger numbers as requested */
-    font-weight: 600;
-    color: var(--text-secondary);
-    width: 32px;
-    height: 32px;
+.calendar-cell.selected {
+    outline: 2px solid #9E73FF;
+    background: rgba(158, 115, 255, 0.2);
+    border-color: #9E73FF;
+    box-shadow: 0 0 12px rgba(158, 115, 255, 0.4);
+}
+
+/* Todo List Styles */
+.card-placeholder-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.card-placeholder-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.card-placeholder-content::-webkit-scrollbar-thumb {
+    background: var(--border-subtle);
+    border-radius: 4px;
+}
+
+.todo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.todo-list li {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -197,22 +242,22 @@
 
 /* Today State - Highlight background slightly */
 .calendar-cell.is-today {
-    background: rgba(110, 142, 251, 0.1);
+    background: rgba(158, 115, 255, 0.1);
 }
 
 .calendar-cell.is-today .day-number {
-    color: #6e8efb;
+    color: var(--accent-primary);
 }
 
 /* Selected State - Outline the whole cell or highlight the number more strongly */
 .calendar-cell.selected {
-    background: rgba(110, 142, 251, 0.12);
-    box-shadow: 0 4px 12px rgba(110, 142, 251, 0.15);
+    background: rgba(158, 115, 255, 0.12);
+    box-shadow: 0 4px 12px rgba(158, 115, 255, 0.15);
 }
 
 .calendar-cell.selected .day-number {
     background: transparent;
-    color: #667eea !important;
+    color: var(--accent-primary) !important;
     box-shadow: none;
 }
 
@@ -252,7 +297,7 @@
 }
 
 .calendar-cell.clickable:not(.is-today):not(.completed)::after {
-    background: #6e8efb;
+    background: var(--accent-primary);
     opacity: 0.8;
 }
 
@@ -322,38 +367,39 @@
     height: 50px;
     min-width: 50px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--accent-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
-    font-weight: 700;
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-title);
     color: white;
     z-index: 1;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(158, 115, 255, 0.4);
     transition: all 0.3s ease;
 }
 
 /* Completed State for Timeline Number */
 .timeline-item.completed .timeline-number {
-    background: linear-gradient(135deg, #a8a8a8 0%, #767676 100%);
+    background: var(--text-muted);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Cycle of colors for active timeline numbers (Repeating 3-step pattern) */
+/* Cycle of colors for active timeline numbers (progressively darker) */
 .timeline-item:not(.completed):nth-child(3n+1) .timeline-number {
-    background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    background: #9E73FF;
+    box-shadow: 0 4px 12px rgba(158, 115, 255, 0.4);
 }
 
 .timeline-item:not(.completed):nth-child(3n+2) .timeline-number {
-    background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
-    box-shadow: 0 4px 12px rgba(55, 48, 163, 0.4);
+    background: #7C4FD6;
+    box-shadow: 0 4px 12px rgba(124, 79, 214, 0.4);
 }
 
 .timeline-item:not(.completed):nth-child(3n) .timeline-number {
-    background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%);
-    box-shadow: 0 4px 12px rgba(30, 27, 75, 0.5);
+    background: #5A2BA8;
+    box-shadow: 0 4px 12px rgba(90, 43, 168, 0.4);
 }
 
 /* Timeline Content */
@@ -373,17 +419,12 @@
 }
 
 .timeline-title {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0 0 4px 0;
-    transition: color 0.3s ease;
-    font-weight: 500;
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
     color: var(--text-secondary);
-    padding: 8px 12px;
-    background: var(--input-bg);
-    border-radius: 16px;
-    transition: background 0.2s;
+    margin: 0;
+    transition: color 0.3s ease;
 }
 
 .timeline-item.completed .timeline-title {
@@ -392,8 +433,10 @@
 }
 
 .timeline-detail-btn {
-    font-size: 13px;
-    color: #667eea;
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: var(--font-weight-small);
+    color: var(--accent-primary);
     cursor: pointer;
     background: none;
     border: none;
@@ -403,8 +446,8 @@
 }
 
 .timeline-detail-btn:hover {
-    background: rgba(102, 126, 234, 0.1);
-    color: #764ba2;
+    background: rgba(158, 115, 255, 0.1);
+    color: var(--accent-primary);
 }
 
 /* Timeline Checkbox */
@@ -423,12 +466,12 @@
 }
 
 .timeline-checkbox:hover {
-    border-color: #667eea;
-    background: rgba(102, 126, 234, 0.1);
+    border-color: var(--accent-primary);
+    background: rgba(158, 115, 255, 0.1);
 }
 
 .timeline-checkbox.checked {
-    background: linear-gradient(135deg, #a8a8a8 0%, #767676 100%);
+    background: var(--text-muted);
     border-color: transparent;
 }
 
@@ -451,8 +494,10 @@
 .timeline-empty {
     padding: 40px 24px;
     text-align: center;
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-small);
     color: var(--text-muted);
-    font-size: 14px;
 }
 
 
@@ -523,8 +568,9 @@
 
 .roadmap-modal-title {
     margin: 0;
-    font-size: 20px;
-    font-weight: 600;
+    font-family: var(--font-family);
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-medium);
     color: var(--text-primary);
 }
 
@@ -535,7 +581,8 @@
     border: none;
     background: var(--input-bg);
     color: var(--text-secondary);
-    font-size: 16px;
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -551,7 +598,9 @@
 .roadmap-modal-subtitle {
     margin: 0;
     padding: 12px 30px;
-    font-size: 14px;
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-small);
     color: var(--text-muted);
     background: var(--input-bg);
     border-bottom: 1px solid var(--border-subtle);
@@ -573,8 +622,9 @@
 }
 
 .roadmap-modal-section-title {
-    font-size: 16px;
-    font-weight: 600;
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
     color: var(--text-primary);
     margin: 0 0 12px 0;
     display: flex;
@@ -583,7 +633,7 @@
 }
 
 .roadmap-modal-section-title.objectives {
-    color: #667eea;
+    color: var(--accent-primary);
 }
 
 .roadmap-modal-section-title.concepts {
@@ -601,6 +651,9 @@
 .roadmap-modal-list {
     margin: 0;
     padding-left: 20px;
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-small);
     color: var(--text-secondary);
     line-height: 1.8;
 }
@@ -612,59 +665,59 @@
 /* Concept Tags */
 .concept-tag {
     display: inline-block;
-    padding: 6px 14px;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.08));
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    border-radius: 20px;
-    font-size: 13px;
-    color: #f59e0b;
-    font-weight: 500;
-    background-color: var(--input-bg);
-    padding: 0.3rem 0.8rem;
-    border-radius: 16px;
-    font-size: 0.9rem;
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: var(--font-weight-medium);
     color: var(--text-primary);
+    background-color: var(--input-bg);
+    padding: 6px 14px;
+    border-radius: 16px;
     border: 1px solid var(--border-subtle);
 }
 
 /* Step Duration */
 .step-duration {
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: var(--font-weight-small);
     color: var(--text-muted);
-    font-size: 13px;
-    font-weight: 400;
     margin-left: 8px;
 }
 
 .step-description {
     margin: 8px 0 0 0;
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-small);
     color: var(--text-secondary);
-    font-size: 14px;
     line-height: 1.6;
 }
 
 /* Tip Box */
 .tip-box {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.08));
-    border: 1px solid rgba(102, 126, 234, 0.2);
-    border-radius: 12px;
-    padding: 16px 20px;
     background-color: var(--input-bg);
-    padding: 1rem;
+    border: 1px solid var(--border-subtle);
     border-radius: 16px;
-    margin-top: 1rem;
+    padding: 16px 20px;
+    margin-top: 16px;
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-small);
     color: var(--text-secondary);
-    font-size: 14px;
     line-height: 1.6;
 }
 
 .tip-box strong {
-    color: #667eea;
+    color: var(--accent-primary);
 }
 
 /* Empty Message */
 .empty-message {
     text-align: center;
     padding: 40px 20px;
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-small);
     color: var(--text-muted);
 }
 
@@ -682,26 +735,24 @@
 
 .complete-btn {
     flex: 1;
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-medium);
     padding: 14px 24px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    padding: 0.8rem 2rem;
     border-radius: 16px;
-    font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
     border: none;
 }
 
 .complete-btn.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--accent-primary);
     color: white;
 }
 
 .complete-btn.active:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 6px 20px rgba(158, 115, 255, 0.4);
 }
 
 .complete-btn.inactive {
@@ -780,10 +831,10 @@
 }
 
 .checkbox:hover {
-    border-color: #667eea;
+    border-color: var(--accent-primary);
 }
 
 .todo-list li.done .checkbox {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--accent-primary);
     border-color: transparent;
 }

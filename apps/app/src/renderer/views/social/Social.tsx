@@ -247,15 +247,18 @@ const Social: React.FC = () => {
             <div className="social-main-container">
                 {currentView === 'list' ? (
                     <>
-                        {/* Search Bar */}
-                        <div className="search-container">
-                            <input
-                                type="text"
-                                className="search-input"
-                                placeholder="검색"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
+                        {/* Header Row with Title and Search */}
+                        <div className="social-header-row">
+                            <h1 className="main-title">소셜</h1>
+                            <div className="search-container">
+                                <input
+                                    type="text"
+                                    className="search-input"
+                                    placeholder="검색"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
                         </div>
 
                         {/* Content Area */}

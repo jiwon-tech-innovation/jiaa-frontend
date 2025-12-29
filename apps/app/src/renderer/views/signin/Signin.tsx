@@ -83,7 +83,7 @@ const Signin: React.FC = () => {
             <div className="auth-wrapper">
                 <div className="signin-container">
                     <h1>로그인 중...</h1>
-                    <p style={{ textAlign: 'center', color: '#666' }}>자동 로그인을 시도하고 있습니다.</p>
+                    <p className="loading-message">자동 로그인을 시도하고 있습니다.</p>
                 </div>
             </div>
         );

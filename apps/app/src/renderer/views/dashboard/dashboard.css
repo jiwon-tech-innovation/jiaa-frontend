@@ -27,8 +27,9 @@ html {
 }
 
 .dashboard-container .header h1 {
-    font-size: 28px;
-    font-weight: 800;
+    font-family: var(--font-family);
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-title);
     margin: 0 0 30px 0;
     text-align: left;
     color: var(--text-primary);
@@ -63,10 +64,8 @@ html {
 }
 
 .dashboard-container .card:hover {
-    transform: translateY(-5px);
     box-shadow: var(--card-shadow);
     border-color: var(--accent-primary);
-    z-index: 10;
 }
 
 .dashboard-container .radar-card {
@@ -125,7 +124,6 @@ html {
 
 .roadmap-item-box:hover {
     background: var(--active-bg);
-    transform: translateY(-2px);
 }
 
 .roadmap-item-content {
@@ -190,9 +188,10 @@ html {
 .dashboard-container .card-header h3 {
     margin: 0;
     padding: 0;
-    font-size: 18px;
+    font-family: var(--font-family);
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-medium);
     color: var(--text-primary);
-    font-weight: 600;
     line-height: 1;
     letter-spacing: normal;
 }
@@ -244,7 +243,6 @@ html {
     background: rgba(84, 65, 134, 0.6);
     color: var(--text-primary);
     border-color: var(--accent-purple);
-    transform: translateY(-2px);
 }
 
 .create-btn::before {
@@ -265,6 +263,8 @@ html {
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
+    overflow: hidden;
+    min-height: 0;
 }
 
 /* Radar Chart SVG Styles */
@@ -287,8 +287,8 @@ html {
 }
 
 .radar-data {
-    fill: rgba(124, 92, 219, 0.3);
-    stroke: #7c5cdb;
+    fill: rgba(158, 115, 255, 0.3);
+    stroke: #9E73FF;
     stroke-width: 2;
 }
 
@@ -724,8 +724,7 @@ html {
 }
 
 .create-roadmap-modal-content .send-button:hover:not(:disabled) {
-    background: #6b4bc9;
-    transform: translateY(-1px);
+    background: #8A5FEB;
 }
 
 .create-roadmap-modal-content .send-button:disabled {

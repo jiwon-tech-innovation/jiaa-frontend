@@ -6,7 +6,6 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xl);
     color: var(--text-primary);
     overflow-y: auto;
     font-family: 'Inter', -apple-system, sans-serif;
@@ -16,26 +15,29 @@
     display: flex;
     align-items: center;
     gap: 16px;
+    margin-bottom: 30px;
 }
 
 .roadmap-page-header h1 {
-    font-size: 32px;
-    font-weight: 800;
+    font-family: var(--font-family);
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-title);
     margin: 0;
     color: var(--text-primary);
-    letter-spacing: -0.5px;
 }
 
 .roadmap-section {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
+    margin-bottom: 40px;
 }
 
 .section-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-secondary);
+    font-family: var(--font-family);
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
     margin: 0;
     padding-left: 4px;
 }
@@ -76,7 +78,6 @@
 }
 
 .roadmap-card-item:hover {
-    transform: translateY(-6px);
     box-shadow: var(--card-shadow);
     border-color: var(--accent-primary);
 }
@@ -146,10 +147,10 @@
 }
 
 .roadmap-list-container::-webkit-scrollbar-thumb {
-    background: var(--border-subtle);
+    background: var(--scrollbar-thumb);
     border-radius: 4px;
 }
 
 .roadmap-list-container::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
+    background: var(--scrollbar-thumb-hover);
 }

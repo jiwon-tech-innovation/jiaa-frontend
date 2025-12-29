@@ -38,7 +38,7 @@
 }
 
 .speech-bubble.assistant {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #9E73FF 0%, #9E73FF 100%);
     color: white;
 }
 
@@ -87,7 +87,7 @@
 }
 
 .speech-bubble.assistant .bubble-tail {
-    border-top: 10px solid #764ba2;
+    border-top: 10px solid #9E73FF;
 }
 
 .speech-bubble.user .bubble-tail {
@@ -156,7 +156,7 @@
     height: 36px;
     border-radius: 50%;
     border: none;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #9E73FF 0%, #9E73FF 100%);
     color: white;
     cursor: pointer;
     display: flex;
@@ -167,7 +167,7 @@
 
 .chat-send-btn:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 15px rgba(158, 115, 255, 0.4);
 }
 
 .chat-send-btn:active {
@@ -254,7 +254,7 @@
 }
 
 .mode-badge.chat {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+    background: linear-gradient(135deg, rgba(158, 115, 255, 0.8), rgba(158, 115, 255, 0.8));
     color: white;
 }
 

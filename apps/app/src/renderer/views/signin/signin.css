@@ -23,6 +23,7 @@ h1 {
     font-size: 24px;
     font-weight: bold;
     letter-spacing: 1px;
+    color: var(--text-primary);
 }
 
 .input-group {
@@ -33,13 +34,15 @@ h1 {
     flex-direction: column;
 }
 
-input {
+input,
+.form-input,
+.input-group .form-input {
     width: 100%;
     padding: 12px 15px;
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    background: var(--bg-secondary);
-    color: var(--text-primary);
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-sm) !important;
+    background: var(--input-bg) !important;
+    color: var(--text-primary) !important;
     font-size: 16px;
     outline: none;
     box-sizing: border-box;
@@ -47,7 +50,8 @@ input {
     transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-input:focus {
+input:focus,
+.form-input:focus {
     box-shadow: inset 0 0 0 2px var(--accent-primary);
 }
 
@@ -77,8 +81,8 @@ button.signin-btn {
     width: 100%;
     padding: 12px;
     border: none;
-    border-radius: var(--radius-md);
-    background: var(--text-muted);
+    border-radius: var(--radius-sm);
+    background: var(--accent-primary);
     color: var(--text-primary);
     font-size: 18px;
     font-weight: bold;
@@ -96,6 +100,16 @@ button.signin-btn:hover {
     display: flex;
     justify-content: flex-end;
     font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: var(--accent-primary);
 }
 
 .error-message {
@@ -108,7 +122,16 @@ button.signin-btn:hover {
     border-left: 3px solid #ff6b6b;
 }
 
+[data-theme='dark'] .error-message {
+    background: rgba(255, 107, 107, 0.15);
+}
+
 button.signin-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+.loading-message {
+    text-align: center;
+    color: var(--text-muted);
 }

@@ -3,7 +3,7 @@
 
 :root {
     /* Light Mode (Default) */
-    --bg-primary: #f8f9fa;
+    --bg-primary: #F3F4F6;
     --bg-secondary: #ffffff;
     --bg-tertiary: #f1f3f5;
 
@@ -11,9 +11,9 @@
     --text-secondary: #495057;
     --text-muted: #868e96;
 
-    --accent-primary: #6e8efb;
-    --accent-secondary: #a777e3;
-    --accent-purple: #8A00C4;
+    --accent-primary: #9E73FF;
+    --accent-secondary: #9E73FF;
+    --accent-purple: #9E73FF;
 
     --border-subtle: rgba(0, 0, 0, 0.1);
 
@@ -22,17 +22,20 @@
     --card-border: #e9ecef;
     --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 
-    --input-bg: #f1f3f5;
-    --input-border: #dee2e6;
+    --input-bg: #ffffff;
+    --input-border: #d1d5db;
 
     --hover-bg: rgba(0, 0, 0, 0.04);
     --active-bg: rgba(0, 0, 0, 0.08);
+
+    --scrollbar-thumb: #6b7280;
+    --scrollbar-thumb-hover: #4b5563;
 
     --icon-filter: invert(1) brightness(0.2);
     /* Make white icons dark */
 
     /* Gradients */
-    --bg-gradient-main: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --bg-gradient-main: none;
 
     /* Spacing */
     --spacing-xs: 4px;
@@ -46,6 +49,40 @@
     --radius-md: 16px;
     --radius-lg: 16px;
     --radius-full: 50%;
+
+    /* Typography */
+    --font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    --font-size-title: 28px;
+    --font-weight-title: 800;
+
+    --font-size-medium: 20px;
+    --font-weight-medium: 500;
+
+    --font-size-small: 16px;
+    --font-weight-small: 400;
+}
+
+/* Typography Utility Classes */
+.text-title {
+    font-family: var(--font-family);
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-title);
+    color: var(--text-primary);
+}
+
+.text-medium {
+    font-family: var(--font-family);
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+}
+
+.text-small {
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-small);
+    color: var(--text-secondary);
 }
 
 [data-theme='dark'] {
@@ -70,6 +107,9 @@
 
     --hover-bg: rgba(255, 255, 255, 0.05);
     --active-bg: rgba(255, 255, 255, 0.1);
+
+    --scrollbar-thumb: rgba(255, 255, 255, 0.3);
+    --scrollbar-thumb-hover: rgba(255, 255, 255, 0.5);
 
     --icon-filter: none;
 

@@ -33,8 +33,9 @@ body {
 }
 
 .statistics-header h1 {
-    font-size: 28px;
-    font-weight: 800;
+    font-family: var(--font-family);
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-title);
     margin: 0;
     color: var(--text-primary);
 }
@@ -87,10 +88,8 @@ body {
 .chart-card:hover,
 .radar-card:hover,
 .monthly-card:hover {
-    transform: translateY(-5px);
     box-shadow: var(--card-shadow);
     border-color: var(--accent-primary);
-    z-index: 10;
 }
 
 
@@ -110,9 +109,10 @@ body {
 .statistics-content .monthly-card h3 {
     margin: 0;
     padding: 0;
-    font-size: 18px;
+    font-family: var(--font-family);
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-medium);
     color: var(--text-primary);
-    font-weight: 600;
     line-height: 1;
     letter-spacing: normal;
 }
@@ -140,7 +140,6 @@ body {
 
 .nav-btn:hover:not(:disabled) {
     background: var(--hover-bg);
-    transform: translateY(-2px);
 }
 
 .nav-btn:disabled {
@@ -194,9 +193,9 @@ body {
     stroke-width: 2.5;
 }
 
-.radar-data {
-    fill: rgba(124, 92, 219, 0.3);
-    stroke: #7c5cdb;
+.radar-chart .radar-data {
+    fill: rgba(158, 115, 255, 0.3);
+    stroke: #9E73FF;
     stroke-width: 2;
 }
 
@@ -239,8 +238,8 @@ body {
     border-radius: 16px;
     font-size: 12px;
     font-weight: 600;
-    background: rgba(124, 92, 219, 0.2);
-    color: #a78bfa;
+    background: rgba(158, 115, 255, 0.2);
+    color: #9E73FF;
 }
 
 .month-badge.high {

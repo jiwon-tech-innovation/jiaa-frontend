@@ -165,7 +165,7 @@ const Signup: React.FC = () => {
                 {/* Step 1: 이메일 입력 */}
                 {step === 'email' && (
                     <form id="email-form" onSubmit={handleSendCode} noValidate>
-                        <p className="step-info">이메일 인증을 진행해주세요.</p>
+
                         <InputGroup
                             label="이메일"
                             id="email"

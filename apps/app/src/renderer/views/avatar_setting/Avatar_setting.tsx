@@ -21,15 +21,18 @@ const AvatarSetting: React.FC = () => {
 
     return (
         <div className="avatar-select-container">
-                {/* Search Bar */}
-                <div className="avatar-search-container">
-                    <input
-                        type="text"
-                        className="avatar-search-input"
-                        placeholder="검색"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+                {/* Header Row with Title and Search */}
+                <div className="avatar-header-row">
+                    <h1 className="main-title">아바타</h1>
+                    <div className="avatar-search-container">
+                        <input
+                            type="text"
+                            className="avatar-search-input"
+                            placeholder="검색"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
                 </div>
 
                 {/* Content Area */}

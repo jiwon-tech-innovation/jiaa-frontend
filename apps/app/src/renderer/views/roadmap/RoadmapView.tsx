@@ -259,9 +259,9 @@ const RoadmapView: React.FC = () => {
                         <div className="section-header-row">
                             <h2 className="section-label">로드맵</h2>
                             <div className="calendar-controls">
-                                <button onClick={goToPreviousMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'white', fontSize: '1.2rem', padding: '0 0.5rem' }}>‹</button>
+                                <button onClick={goToPreviousMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '1.2rem', padding: '0 0.5rem' }}>‹</button>
                                 <span>{currentDate.getFullYear()}년 {monthNames[currentDate.getMonth()]}</span>
-                                <button onClick={goToNextMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'white', fontSize: '1.2rem', padding: '0 0.5rem' }}>›</button>
+                                <button onClick={goToNextMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '1.2rem', padding: '0 0.5rem' }}>›</button>
                             </div>
                         </div>
                         <div className="content-card calendar-card">
