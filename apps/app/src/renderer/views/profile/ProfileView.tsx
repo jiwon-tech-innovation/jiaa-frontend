@@ -1,45 +1,83 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { signout as signoutAction, updateUser } from '../../store/slices/authSlice';
-import { signout, getCurrentUser, updateProfile, UserInfo } from '../../services/api';
+import { signout, getCurrentUser, updateProfile, UserInfo, tokenService, fetchDashboardFullStats, DashboardStatsResponse } from '../../services/api';
+import { ContributionGraph } from '../../components/ContributionGraph';
 import './profile.css';
 
 const ProfileView: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const user = useAppSelector((state) => state.auth.user);
     const [isEditing, setIsEditing] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
-    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [formData, setFormData] = useState({
         name: '',
     });
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
+    // 토큰이 있는지 확인
+    const hasToken = tokenService.isAuthenticated();
+    
+    // React Query로 사용자 정보 가져오기 (토큰이 있을 때만 실행)
+    const { data: userInfo, isLoading, error, isError } = useQuery<UserInfo>({
+        queryKey: ['user', 'current'],
+        queryFn: async () => {
+            console.log('[ProfileView] Fetching user info...');
+            try {
+                const data = await getCurrentUser();
+                console.log('[ProfileView] User info loaded:', data);
+                return data;
+            } catch (err) {
+                console.error('[ProfileView] Error fetching user info:', err);
+                throw err;
+            }
+        },
+        enabled: hasToken, // 토큰이 있을 때만 API 호출
+        staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
+        retry: (failureCount, error: any) => {
+            // 403 에러는 재시도하지 않음 (인증 문제)
+            if (error?.statusCode === 403 || error?.statusCode === 401) {
+                return false;
+            }
+            return failureCount < 2;
+        },
+        retryDelay: 1000, // 재시도 간격
+    });
+
+    // 활동 통계 데이터 가져오기
+    const { data: fullStats } = useQuery<DashboardStatsResponse>({
+        queryKey: ['dashboardFullStats', selectedYear],
+        queryFn: () => fetchDashboardFullStats(selectedYear),
+        enabled: hasToken,
+        staleTime: 5 * 60 * 1000,
+    });
+
+    // 사용 가능한 년도 목록 생성 (현재 년도부터 2022까지)
+    const availableYears = [];
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear; year >= 2022; year--) {
+        availableYears.push(year);
+    }
+
+    // userInfo가 로드되면 Redux store와 formData 업데이트
     useEffect(() => {
-        loadUserInfo();
-    }, []);
-
-    const loadUserInfo = async () => {
-        try {
-            setIsLoading(true);
-            const info = await getCurrentUser();
-            setUserInfo(info);
-            setFormData({ name: info.name || '' });
+        if (userInfo) {
             dispatch(updateUser({ 
-                email: info.email, 
-                name: info.name,
-                id: info.id,
-                username: info.username,
-                avatarId: info.avatarId
+                email: userInfo.email, 
+                name: userInfo.name,
+                id: userInfo.id,
+                username: userInfo.username,
+                avatarId: userInfo.avatarId
             }));
-        } catch (error) {
-            console.error('[ProfileView] Failed to load user info:', error);
-        } finally {
-            setIsLoading(false);
+            if (!isEditing) {
+                setFormData({ name: userInfo.name || '' });
+            }
         }
-    };
+    }, [userInfo, dispatch, isEditing]);
 
     const handleEdit = () => {
         setIsEditing(true);
@@ -64,7 +102,8 @@ const ProfileView: React.FC = () => {
         try {
             setIsSaving(true);
             const updatedInfo = await updateProfile({ name: formData.name.trim() });
-            setUserInfo(updatedInfo);
+            // React Query 캐시 업데이트
+            queryClient.setQueryData(['user', 'current'], updatedInfo);
             dispatch(updateUser({ 
                 email: updatedInfo.email, 
                 name: updatedInfo.name,
@@ -93,7 +132,23 @@ const ProfileView: React.FC = () => {
         }
     };
 
-    if (isLoading) {
+    // 에러가 발생했거나 로딩 중일 때도 Redux store의 user 정보를 사용할 수 있도록 함
+    const displayName = userInfo?.name || user?.name || '사용자';
+    const displayEmail = userInfo?.email || user?.email || 'user@example.com';
+
+    // formData 초기화 (Redux store의 user 정보 사용)
+    useEffect(() => {
+        if (!isEditing) {
+            if (userInfo?.name) {
+                setFormData({ name: userInfo.name });
+            } else if (user?.name) {
+                setFormData({ name: user.name });
+            }
+        }
+    }, [user, isEditing, userInfo]);
+
+    // 로딩 중이고 사용자 정보가 전혀 없을 때만 로딩 화면 표시
+    if (isLoading && hasToken && !user && !userInfo) {
         return (
             <div className="profile-view-container">
                 <div className="profile-content">
@@ -103,8 +158,31 @@ const ProfileView: React.FC = () => {
         );
     }
 
-    const displayName = userInfo?.name || user?.name || '사용자';
-    const displayEmail = userInfo?.email || user?.email || 'user@example.com';
+    // 에러가 발생했고 사용자 정보가 전혀 없을 때만 에러 화면 표시
+    if (isError && error && !user && !userInfo) {
+        return (
+            <div className="profile-view-container">
+                <div className="profile-content">
+                    <div style={{ textAlign: 'center', padding: '2rem' }}>
+                        <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                            사용자 정보를 불러오는데 실패했습니다.
+                        </p>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '1rem' }}>
+                            {error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'}
+                        </p>
+                        {hasToken && (
+                            <button 
+                                className="btn-primary" 
+                                onClick={() => queryClient.invalidateQueries({ queryKey: ['user', 'current'] })}
+                            >
+                                다시 시도
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="profile-view-container">
@@ -184,6 +262,50 @@ const ProfileView: React.FC = () => {
                     <div className="stat-card">
                         <span className="stat-label">활동 일수</span>
                         <span className="stat-number">12일</span>
+                    </div>
+                </div>
+
+                {/* 활동기록 섹션 */}
+                <div className="activity-log-section">
+                    <h2 className="activity-log-title">활동기록</h2>
+                    <div className="activity-log-content">
+                        {/* 왼쪽: 스트릭 카드 */}
+                        <div className="streak-card">
+                            <div className="streak-text">
+                                {fullStats?.currentStreak || 0}일 연속 🔥
+                            </div>
+                            <div className="streak-progress">
+                                {fullStats?.completedDays || 0}/{fullStats?.totalDays || 0}
+                            </div>
+                            <div className="progress-bars">
+                                <div className="progress-bar">
+                                    <div 
+                                        className="progress-fill" 
+                                        style={{ 
+                                            width: `${fullStats?.totalDays ? ((fullStats.completedDays / fullStats.totalDays) * 100) : 0}%` 
+                                        }}
+                                    ></div>
+                                </div>
+                                <div className="progress-bar secondary">
+                                    <div 
+                                        className="progress-fill" 
+                                        style={{ 
+                                            width: `${fullStats?.totalDays ? ((fullStats.completedDays / fullStats.totalDays) * 100) : 0}%` 
+                                        }}
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 오른쪽: 활동 그리드 */}
+                        <div className="activity-graph-wrapper">
+                            <ContributionGraph
+                                data={fullStats?.contributionData || []}
+                                years={availableYears}
+                                selectedYear={selectedYear}
+                                onSelectYear={setSelectedYear}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

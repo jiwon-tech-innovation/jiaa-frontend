@@ -21,6 +21,7 @@ export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'er
 
 export type MessageHandler = (message: ChatMessage) => void;
 export type StatusHandler = (status: ConnectionStatus) => void;
+export type SessionIdHandler = (sessionId: string) => void;
 
 class ChatService {
     private static instance: ChatService | null = null;
@@ -28,6 +29,7 @@ class ChatService {
     private status: ConnectionStatus = 'disconnected';
     private messageHandlers: Set<MessageHandler> = new Set();
     private statusHandlers: Set<StatusHandler> = new Set();
+    private sessionIdHandlers: Set<SessionIdHandler> = new Set();
     private reconnectAttempts = 0;
     private maxReconnectAttempts = 5;
     private reconnectDelay = 3000;
@@ -187,6 +189,18 @@ class ChatService {
     }
 
     /**
+     * 세션 ID 변경 핸들러 등록
+     */
+    public onSessionIdChange(handler: SessionIdHandler): () => void {
+        this.sessionIdHandlers.add(handler);
+        // 현재 세션 ID가 있으면 즉시 전달
+        if (this.sessionId) {
+            handler(this.sessionId);
+        }
+        return () => this.sessionIdHandlers.delete(handler);
+    }
+
+    /**
      * 현재 연결 상태 반환
      */
     public getStatus(): ConnectionStatus {
@@ -257,6 +271,8 @@ class ChatService {
             if (parsed.type === 'session' && parsed.session_id) {
                 this.sessionId = parsed.session_id;
                 console.log(`[ChatService] Session initialized: ${this.sessionId}`);
+                // 세션 ID 변경 이벤트 발생 (옵저버 패턴)
+                this.notifySessionIdHandlers(this.sessionId);
                 return;
             }
 
@@ -336,6 +352,10 @@ class ChatService {
 
     private notifyMessageHandlers(message: ChatMessage): void {
         this.messageHandlers.forEach(handler => handler(message));
+    }
+
+    private notifySessionIdHandlers(sessionId: string): void {
+        this.sessionIdHandlers.forEach(handler => handler(sessionId));
     }
 
     /**

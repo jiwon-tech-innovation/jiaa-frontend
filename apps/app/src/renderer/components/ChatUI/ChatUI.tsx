@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ChatService, { ChatMessage, ConnectionStatus } from '../../services/ChatService';
+import chatHistoryService from '../../services/ChatHistoryService';
 import './chat.css';
 
 export type ChatMode = 'chat' | 'roadmap';
@@ -33,6 +34,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
     const bubbleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const streamingMessageIdRef = useRef<string | null>(null); // 스트리밍 중인 메시지 ID 추적
     const chatService = useRef(ChatService.getInstance());
+    const avatarSessionIdRef = useRef<string | null>(null); // 아바타 창 세션 ID
 
     // 말풍선 표시
     const showBubble = useCallback((message: ChatMessage) => {
@@ -85,6 +87,22 @@ const ChatUI: React.FC<ChatUIProps> = ({
         }, bubbleDuration);
     }, [bubbleDuration]);
 
+    // 아바타 창 세션 초기화
+    useEffect(() => {
+        // 모든 세션을 확인해서 "아바타 대화" 세션 찾기
+        const allSessions = chatHistoryService.getAllSessions();
+        const avatarSession = allSessions.find(s => s.title === '아바타 대화');
+        
+        if (avatarSession) {
+            // 기존 아바타 세션 사용
+            avatarSessionIdRef.current = avatarSession.id;
+        } else {
+            // 새 아바타 세션 생성
+            const newSession = chatHistoryService.createSession('아바타 대화');
+            avatarSessionIdRef.current = newSession.id;
+        }
+    }, []);
+
     // WebSocket 연결 및 메시지 핸들러 설정
     useEffect(() => {
         const service = chatService.current;
@@ -94,10 +112,24 @@ const ChatUI: React.FC<ChatUIProps> = ({
             setConnectionStatus(status);
         });
 
+        // 서버 세션 ID 연결
+        const unsubscribeSessionId = service.onSessionIdChange((serverSessionId) => {
+            if (avatarSessionIdRef.current) {
+                chatHistoryService.setServerSessionId(avatarSessionIdRef.current, serverSessionId);
+            }
+        });
+
         // 메시지 수신 핸들러
         const unsubscribeMessage = service.onMessage((message) => {
             console.log(`[ChatUI] Received message:`, message.isStreaming ? 'streaming' : 'complete', message.content.substring(0, 50));
             showBubble(message);
+            
+            // 완료된 메시지만 저장 (스트리밍 완료 후, 서버에도 저장)
+            if (!message.isStreaming && avatarSessionIdRef.current) {
+                chatHistoryService.addMessage(avatarSessionIdRef.current, message).catch(error => {
+                    console.warn('[ChatUI] Failed to save message:', error);
+                });
+            }
         });
 
         // WebSocket 연결 (URL이 제공된 경우)
@@ -106,6 +138,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
         return () => {
             unsubscribeStatus();
             unsubscribeMessage();
+            unsubscribeSessionId();
         };
     }, [websocketUrl, showBubble]);
 
@@ -175,6 +208,18 @@ const ChatUI: React.FC<ChatUIProps> = ({
         }
 
         const userMessage = chatService.current.sendMessage(messageToSend);
+
+        // 사용자 메시지를 아바타 세션에 저장 (서버에도 저장)
+        if (avatarSessionIdRef.current) {
+            // 원본 질문만 저장 (컨텍스트 제외)
+            const userMessageToSave = {
+                ...userMessage,
+                content: inputValue
+            };
+            chatHistoryService.addMessage(avatarSessionIdRef.current, userMessageToSave).catch(error => {
+                console.warn('[ChatUI] Failed to save user message:', error);
+            });
+        }
 
         // 사용자 메시지도 말풍선에 잠깐 표시 (원본 질문만)
         showBubble({

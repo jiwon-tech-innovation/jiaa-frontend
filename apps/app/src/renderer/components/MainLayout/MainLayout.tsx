@@ -13,10 +13,11 @@ export const MainLayout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     // Determine active tab based on current path
-    const getActiveTab = (): 'home' | 'dashboard' | 'group' | 'setting' | 'roadmap' | 'avatar' | 'profile' | null => {
+    const getActiveTab = (): 'home' | 'dashboard' | 'group' | 'setting' | 'roadmap' | 'avatar' | 'profile' | 'chat' | null => {
         const path = location.pathname;
         if (path === '/profile') return 'profile';
         if (path === '/dashboard') return 'home';
+        if (path.startsWith('/chat')) return 'chat';
         if (path === '/statistics') return 'dashboard';
         if (path.startsWith('/roadmap')) return 'roadmap';
         if (path === '/social') return 'group';
@@ -81,6 +82,13 @@ export const MainLayout: React.FC = () => {
             label: '홈',
             active: activeTab === 'home',
             onClick: () => navigate('/dashboard')
+        },
+        {
+            id: 'chat',
+            icon: '/Chat Icon 24px.svg',
+            label: '채팅',
+            active: activeTab === 'chat',
+            onClick: () => navigate('/chat')
         },
         {
             id: 'dashboard',

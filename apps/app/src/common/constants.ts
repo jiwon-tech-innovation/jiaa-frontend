@@ -5,8 +5,8 @@ export const API_BASE_URL = 'http://localhost:8080'; // Spring Boot 백엔드 �
 export const AI_CHAT_API_BASE_URL = 'http://localhost:8000'; // FastAPI AI Chat 서비스
 
 // AI Chat 서비스 엔드포인트
-export const CHAT_WS_URL = `${AI_CHAT_API_BASE_URL.replace('http://', 'ws://')}/ws/chat`; // WebSocket URL
-export const CHAT_API_URL = `${AI_CHAT_API_BASE_URL}/chat`; // HTTP API URL (WebSocket 실패 시 fallback)
+export const CHAT_WS_URL = `${AI_CHAT_API_BASE_URL.replace('http://', 'ws://')}/api/v1/chat/ws`; // WebSocket URL
+export const CHAT_API_URL = `${AI_CHAT_API_BASE_URL}/api/v1/chat`; // HTTP API URL (WebSocket 실패 시 fallback)
 
 // 백엔드 API 엔드포인트 경로
 export const API_ENDPOINTS = {
@@ -29,9 +29,8 @@ export const AUTH_REFRESH_URL = `${API_BASE_URL}${API_ENDPOINTS.AUTH_REFRESH}`;
 
 // AI Chat 서비스 엔드포인트 경로
 export const AI_CHAT_ENDPOINTS = {
-  ROADMAPS: '/roadmaps',
-  ROADMAP_START: '/chat/roadmap/start',
-  STATS: '/stats',
+  ROADMAPS: '/api/v1/roadmaps',
+  ROADMAP_START: '/roadmap/start', // CHAT_API_URL과 결합하여 /api/v1/chat/roadmap/start가 됨
 } as const;
 
 // CSP 정책용 URL 문자열 생성

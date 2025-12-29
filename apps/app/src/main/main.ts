@@ -21,6 +21,11 @@ if (started) {
 }
 
 app.whenReady().then(() => {
+  // macOS에서 Dock 표시
+  if (process.platform === 'darwin') {
+    app.dock.show();
+  }
+
   // Handle local-model protocol
   protocol.handle('local-model', (request) => {
     try {

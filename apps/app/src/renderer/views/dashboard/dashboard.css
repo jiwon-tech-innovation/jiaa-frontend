@@ -86,7 +86,8 @@ html {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
-    max-height: 100%;
+    /* 2개 아이템 높이만큼만 보이도록 설정 (각 아이템 약 80px + gap 12px) */
+    max-height: calc(80px * 2 + 12px);
 }
 
 /* Roadmap list scrollbar styles */
@@ -217,7 +218,7 @@ html {
 .roadmap-footer {
     width: 100%;
     margin-top: auto;
-    padding-top: 20px;
+    padding-top: 12px;
     display: flex;
     justify-content: center;
 }

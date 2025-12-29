@@ -15,6 +15,8 @@ import AvatarSetting from "./views/avatar_setting/Avatar_setting";
 import Avatar_select from "./views/avatar_select/avatr_select";
 import FirstCreateLoadmap from "./views/first_create_loadmap/first_create_loadmap";
 import ProfileView from "./views/profile/ProfileView";
+import ChatList from "./views/chat/ChatList";
+import ChatView from "./views/chat/ChatView";
 import { MainLayout } from "./components/MainLayout/MainLayout";
 
 export const App = () => {
@@ -33,6 +35,8 @@ export const App = () => {
                 {/* Routes with MainLayout (avatar persists) */}
                 <Route element={<MainLayout />}>
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/chat" element={<ChatList />} />
+                    <Route path="/chat/:sessionId" element={<ChatView />} />
                     <Route path="/statistics" element={<Statistics />} />
                     <Route path="/roadmap-list" element={<RoadmapList />} />
                     <Route path="/roadmap/:id" element={<RoadmapView />} />

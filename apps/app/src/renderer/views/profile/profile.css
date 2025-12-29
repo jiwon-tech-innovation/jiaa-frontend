@@ -220,3 +220,231 @@
     font-weight: 800;
     color: var(--accent-secondary);
 }
+
+/* 활동기록 섹션 */
+.activity-log-section {
+    margin-top: 30px;
+}
+
+.activity-log-title {
+    font-family: var(--font-family);
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-title);
+    color: var(--text-primary);
+    margin: 0 0 20px 0;
+}
+
+.activity-log-content {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+    .activity-log-content {
+        flex-direction: column;
+    }
+}
+
+/* 스트릭 카드 */
+.streak-card {
+    background: linear-gradient(135deg, #7c5cdb, #9e73ff);
+    border-radius: 16px;
+    padding: 24px;
+    min-width: 200px;
+    max-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 4px 20px rgba(124, 92, 219, 0.3);
+    flex-shrink: 0;
+    align-self: flex-start;
+}
+
+.streak-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ff9d00;
+}
+
+.streak-progress {
+    font-size: 32px;
+    font-weight: 800;
+    color: white;
+}
+
+.progress-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.progress-bar {
+    background: rgba(255, 255, 255, 0.2);
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar.secondary {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.progress-fill {
+    height: 100%;
+    background: #00ff9d;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.progress-bar.secondary .progress-fill {
+    background: #4d7cff;
+}
+
+/* 활동 그리드 래퍼 */
+.activity-graph-wrapper {
+    flex: 1;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: visible;
+    align-self: flex-start;
+}
+
+/* Contribution Graph 스타일 (dashboard.css에서 가져옴) */
+.activity-graph-wrapper .contribution-wrapper {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.activity-graph-wrapper .contribution-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow-x: auto;
+}
+
+.activity-graph-wrapper .months-label {
+    display: flex;
+    margin-left: 35px;
+    margin-bottom: 5px;
+    font-size: 10px;
+    color: var(--text-muted);
+    position: relative;
+    height: 15px;
+}
+
+.activity-graph-wrapper .months-label span {
+    position: absolute;
+    font-size: 10px;
+}
+
+.activity-graph-wrapper .graph-area {
+    display: flex;
+    position: relative;
+}
+
+.activity-graph-wrapper .days-label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-right: 5px;
+    font-size: 9px;
+    color: var(--text-muted);
+    width: 30px;
+    text-align: right;
+}
+
+.activity-graph-wrapper .days-label li {
+    height: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    line-height: 1;
+}
+
+.activity-graph-wrapper .contribution-grid {
+    display: flex;
+    gap: 3px;
+}
+
+.activity-graph-wrapper .grid-week {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.activity-graph-wrapper .grid-cell {
+    width: 13px;
+    height: 13px;
+    background-color: var(--input-bg);
+    border-radius: 2px;
+    border: 1px solid var(--border-subtle);
+    box-sizing: border-box;
+}
+
+.activity-graph-wrapper .grid-cell.level-0 {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--border-subtle);
+}
+
+.activity-graph-wrapper .grid-cell.level-1 {
+    background-color: #0e4429;
+    border-color: #0e4429;
+}
+
+.activity-graph-wrapper .grid-cell.level-2 {
+    background-color: #006d32;
+    border-color: #006d32;
+}
+
+.activity-graph-wrapper .grid-cell.level-3 {
+    background-color: #26a641;
+    border-color: #26a641;
+}
+
+.activity-graph-wrapper .grid-cell.level-4 {
+    background-color: #39d353;
+    border-color: #39d353;
+}
+
+.activity-graph-wrapper .year-list {
+    display: flex;
+    flex-direction: column;
+    padding-top: 30px;
+    gap: 8px;
+}
+
+.activity-graph-wrapper .year-item {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.activity-graph-wrapper .year-item:hover {
+    background: var(--hover-bg);
+    color: var(--text-secondary);
+}
+
+.activity-graph-wrapper .year-item.active {
+    background: var(--accent-primary);
+    color: #000;
+    font-weight: bold;
+}
