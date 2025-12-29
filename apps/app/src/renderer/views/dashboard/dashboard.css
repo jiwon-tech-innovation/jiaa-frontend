@@ -84,6 +84,29 @@ html {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    max-height: 100%;
+}
+
+/* Roadmap list scrollbar styles */
+.roadmap-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.roadmap-list::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 3px;
+}
+
+.roadmap-list::-webkit-scrollbar-thumb {
+    background: var(--border-subtle);
+    border-radius: 3px;
+}
+
+.roadmap-list::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
 }
 
 .roadmap-item-box {
@@ -254,13 +277,13 @@ html {
 .radar-bg {
     fill: var(--input-bg);
     stroke: var(--border-subtle);
-    stroke-width: 1;
+    stroke-width: 3;
 }
 
 .radar-grid {
     fill: none;
     stroke: var(--border-subtle);
-    stroke-width: 1;
+    stroke-width: 2.5;
 }
 
 .radar-data {

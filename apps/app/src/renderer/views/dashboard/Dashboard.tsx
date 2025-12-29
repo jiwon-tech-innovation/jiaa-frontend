@@ -105,7 +105,27 @@ const Dashboard: React.FC = () => {
     // 진행률 계산 함수
     const calculateProgress = (roadmap: any): number => {
         if (!roadmap.items || roadmap.items.length === 0) return 0;
-        const completedCount = roadmap.items.filter((item: any) => item.is_completed === true).length;
+        
+        let completedCount = 0;
+
+        roadmap.items.forEach((item: any) => {
+            // 새 구조: tasks 배열이 있는 경우
+            if (item.tasks && item.tasks.length > 0) {
+                // 모든 task가 완료되었는지 확인
+                const allTasksCompleted = item.tasks.every((task: any) => 
+                    task.is_completed === 1 || task.is_completed === true
+                );
+                if (allTasksCompleted && item.tasks.length > 0) {
+                    completedCount++;
+                }
+            } else {
+                // 레거시 구조: item 자체에 is_completed가 있는 경우
+                if (item.is_completed === true || item.is_completed === 1) {
+                    completedCount++;
+                }
+            }
+        });
+
         const totalCount = roadmap.items.length;
         if (totalCount === 0) return 0;
         return Math.round((completedCount / totalCount) * 100);
@@ -283,21 +303,24 @@ const Dashboard: React.FC = () => {
                         <div className="card-body">
                             <svg viewBox="0 0 200 200" className="radar-chart" preserveAspectRatio="xMidYMid meet">
                                 {/* Background hexagon */}
-                                <polygon points={generateGridHexagon(100, 100, 65)} className="radar-bg" />
-                                {/* Grid lines - inner hexagons */}
-                                <polygon points={generateGridHexagon(100, 100, 48)} className="radar-grid" />
+                                <polygon points={generateGridHexagon(100, 100, 80)} className="radar-bg" />
+                                {/* Grid lines - inner hexagons (더 많은 그리드 선) */}
+                                <polygon points={generateGridHexagon(100, 100, 68)} className="radar-grid" />
+                                <polygon points={generateGridHexagon(100, 100, 56)} className="radar-grid" />
+                                <polygon points={generateGridHexagon(100, 100, 44)} className="radar-grid" />
                                 <polygon points={generateGridHexagon(100, 100, 32)} className="radar-grid" />
-                                <polygon points={generateGridHexagon(100, 100, 16)} className="radar-grid" />
+                                <polygon points={generateGridHexagon(100, 100, 20)} className="radar-grid" />
+                                <polygon points={generateGridHexagon(100, 100, 8)} className="radar-grid" />
                                 {/* Data polygon */}
                                 {radarData.length > 0 && (
                                     <polygon
-                                        points={calculateRadarPoints(100, 100, 65, radarData.map(d => d.value))}
+                                        points={calculateRadarPoints(100, 100, 80, radarData.map(d => d.value))}
                                         className="radar-data"
                                     />
                                 )}
                                 {/* Labels */}
                                 {radarData.map((item, index) => {
-                                    const pos = getLabelPosition(100, 100, 65, index);
+                                    const pos = getLabelPosition(100, 100, 80, index);
                                     return (
                                         <text
                                             key={index}
@@ -365,7 +388,7 @@ const Dashboard: React.FC = () => {
                                     <div className="progress-fill" style={{ width: `${fullStats && fullStats.totalDays > 0 ? Math.round((fullStats.completedItems / fullStats.totalDays) * 100) : 0}%` }}></div>
                                 </div>
                                 <div className="progress-bar secondary">
-                                    <div className="progress-fill" style={{ width: `${fullStats?.completedDays || 0}%` }}></div>
+                                    <div className="progress-fill" style={{ width: `${fullStats && fullStats.totalDays > 0 ? Math.round((fullStats.completedDays / fullStats.totalDays) * 100) : 0}%` }}></div>
                                 </div>
                             </div>
                             <ContributionGraph

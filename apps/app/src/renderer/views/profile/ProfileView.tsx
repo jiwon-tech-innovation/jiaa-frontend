@@ -1,14 +1,85 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { signout as signoutAction } from '../../store/slices/authSlice';
-import { signout } from '../../services/api';
+import { signout as signoutAction, updateUser } from '../../store/slices/authSlice';
+import { signout, getCurrentUser, updateProfile, UserInfo } from '../../services/api';
 import './profile.css';
 
 const ProfileView: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const user = useAppSelector((state) => state.auth.user);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+    const [formData, setFormData] = useState({
+        name: '',
+    });
+
+    useEffect(() => {
+        loadUserInfo();
+    }, []);
+
+    const loadUserInfo = async () => {
+        try {
+            setIsLoading(true);
+            const info = await getCurrentUser();
+            setUserInfo(info);
+            setFormData({ name: info.name || '' });
+            dispatch(updateUser({ 
+                email: info.email, 
+                name: info.name,
+                id: info.id,
+                username: info.username,
+                avatarId: info.avatarId
+            }));
+        } catch (error) {
+            console.error('[ProfileView] Failed to load user info:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleEdit = () => {
+        setIsEditing(true);
+        if (userInfo) {
+            setFormData({ name: userInfo.name || '' });
+        }
+    };
+
+    const handleCancel = () => {
+        setIsEditing(false);
+        if (userInfo) {
+            setFormData({ name: userInfo.name || '' });
+        }
+    };
+
+    const handleSave = async () => {
+        if (!formData.name.trim()) {
+            alert('이름을 입력해주세요.');
+            return;
+        }
+
+        try {
+            setIsSaving(true);
+            const updatedInfo = await updateProfile({ name: formData.name.trim() });
+            setUserInfo(updatedInfo);
+            dispatch(updateUser({ 
+                email: updatedInfo.email, 
+                name: updatedInfo.name,
+                id: updatedInfo.id,
+                username: updatedInfo.username,
+                avatarId: updatedInfo.avatarId
+            }));
+            setIsEditing(false);
+        } catch (error: any) {
+            console.error('[ProfileView] Failed to update profile:', error);
+            alert(error.message || '프로필 수정에 실패했습니다.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const handleSignout = async () => {
         try {
@@ -21,6 +92,19 @@ const ProfileView: React.FC = () => {
             navigate('/signin');
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="profile-view-container">
+                <div className="profile-content">
+                    <div style={{ textAlign: 'center', padding: '2rem' }}>로딩 중...</div>
+                </div>
+            </div>
+        );
+    }
+
+    const displayName = userInfo?.name || user?.name || '사용자';
+    const displayEmail = userInfo?.email || user?.email || 'user@example.com';
 
     return (
         <div className="profile-view-container">
@@ -43,21 +127,48 @@ const ProfileView: React.FC = () => {
                     <div className="profile-info">
                         <div className="info-group">
                             <label>이름</label>
-                            <div className="info-value">사용자</div>
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    className="info-input"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="이름을 입력하세요"
+                                />
+                            ) : (
+                                <div className="info-value">{displayName}</div>
+                            )}
                         </div>
                         <div className="info-group">
                             <label>이메일</label>
-                            <div className="info-value">{user?.email || 'user@example.com'}</div>
-                        </div>
-                        <div className="info-group">
-                            <label>소개</label>
-                            <div className="info-value muted">자기소개를 입력해주세요.</div>
+                            <div className="info-value">{displayEmail}</div>
                         </div>
                     </div>
 
                     <div className="profile-actions">
-                        <button className="btn-primary">프로필 수정</button>
-                        <button className="btn-secondary" onClick={handleSignout}>로그아웃</button>
+                        {isEditing ? (
+                            <>
+                                <button 
+                                    className="btn-primary" 
+                                    onClick={handleSave}
+                                    disabled={isSaving}
+                                >
+                                    {isSaving ? '저장 중...' : '저장'}
+                                </button>
+                                <button 
+                                    className="btn-secondary" 
+                                    onClick={handleCancel}
+                                    disabled={isSaving}
+                                >
+                                    취소
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button className="btn-primary" onClick={handleEdit}>프로필 수정</button>
+                                <button className="btn-secondary" onClick={handleSignout}>로그아웃</button>
+                            </>
+                        )}
                     </div>
                 </div>
 
