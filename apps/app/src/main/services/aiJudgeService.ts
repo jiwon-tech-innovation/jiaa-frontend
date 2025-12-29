@@ -40,9 +40,9 @@ const saveCache = async (cache: JudgeCache): Promise<void> => {
 // AI 판사 백엔드 API 호출
 const callJudgeAPI = async (windowTitle: string, processName?: string): Promise<'STUDY' | 'DISTRACTION'> => {
     try {
-        // 환경 변수에서 API URL 가져오기 (기본값: ai-judge-service)
-        const apiBaseUrl = process.env.AI_JUDGE_API_URL || 'http://localhost:8002';
-        const apiUrl = `${apiBaseUrl}/judge`;
+        // 환경 변수에서 API URL 가져오기 (기본값: Gateway를 통해 접근)
+        const apiBaseUrl = process.env.AI_JUDGE_API_URL || 'http://localhost:8080';
+        const apiUrl = `${apiBaseUrl}/api/v1/judge`;
         
         const requestBody: { window_title: string; process_name?: string } = {
             window_title: windowTitle

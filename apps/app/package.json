@@ -15,7 +15,9 @@
     "make:win-x64": "electron-forge make --platform=win32 --arch=x64",
     "make:win-arm64": "electron-forge make --platform=win32 --arch=arm64",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "echo \"No linting configured\"",
+    "build:native": "bash scripts/build-native.sh",
+    "prebuild": "npm run build:native"
   },
   "keywords": [],
   "author": {

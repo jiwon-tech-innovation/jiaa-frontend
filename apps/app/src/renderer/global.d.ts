@@ -30,6 +30,13 @@ export interface IElectronAPI {
     getModelBasePath: () => Promise<string>;
     onModelDownloadProgress: (callback: (progress: number) => void) => () => void;
     onOpenChat: (callback: () => void) => () => void;
+
+    // Surveillance
+    cancelFinalWarning: () => void;
+    getSurveillanceState: () => Promise<string | null>;
+    getFinalWarningRemainingTime: () => Promise<number | null>;
+    onSurveillanceFinalWarning: (callback: (data: { timeout: number; startTime: number | null }) => void) => () => void;
+    onSurveillanceAbsence: (callback: () => void) => () => void;
 }
 
 declare global {
