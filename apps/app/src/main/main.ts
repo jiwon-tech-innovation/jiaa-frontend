@@ -30,18 +30,37 @@ app.whenReady().then(() => {
   protocol.handle('local-model', (request) => {
     try {
       const urlObj = new URL(request.url);
-      const pathname = decodeURIComponent(urlObj.pathname);
+      let pathname = decodeURIComponent(urlObj.pathname);
 
-      // pathname starts with '/', e.g. /뉵/뉵.model3.json
+      // Remove '/local-file' prefix if present (used to avoid Punycode issues)
+      // e.g., /local-file/Hiyori/Hiyori.model3.json -> /Hiyori/Hiyori.model3.json
+      if (pathname.startsWith('/local-file/')) {
+        pathname = pathname.substring('/local-file'.length);
+      }
+
+      // pathname starts with '/', e.g. /Hiyori/Hiyori.model3.json
       // path.join handles the leading slash correctly
       const filePath = path.join(app.getPath('userData'), 'live2d', pathname);
 
       const fileUrl = url.pathToFileURL(filePath).toString();
       console.log(`[Protocol] Serving: ${request.url}`);
-      console.log(`[Protocol] Path: ${filePath}`);
+      console.log(`[Protocol] Decoded pathname: ${pathname}`);
+      console.log(`[Protocol] Resolved path: ${filePath}`);
 
       if (!fs.existsSync(filePath)) {
         console.error(`[Protocol] File NOT found: ${filePath}`);
+        // List directory contents for debugging
+        const dirPath = path.dirname(filePath);
+        if (fs.existsSync(dirPath)) {
+          try {
+            const files = fs.readdirSync(dirPath);
+            console.error(`[Protocol] Directory contents: ${files.join(', ')}`);
+          } catch (e) {
+            console.error(`[Protocol] Could not read directory: ${e}`);
+          }
+        } else {
+          console.error(`[Protocol] Directory NOT found: ${dirPath}`);
+        }
         return new Response('File Not Found', { status: 404 });
       }
 

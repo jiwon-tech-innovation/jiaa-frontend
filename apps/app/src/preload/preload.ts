@@ -49,5 +49,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.on('open-chat-event', handler);
         return () => ipcRenderer.removeListener('open-chat-event', handler);
     },
+
+    // Surveillance
+    cancelFinalWarning: () => ipcRenderer.send('cancel-final-warning'),
+    getSurveillanceState: () => ipcRenderer.invoke('get-surveillance-state'),
+    getFinalWarningRemainingTime: () => ipcRenderer.invoke('get-final-warning-remaining-time'),
+    onSurveillanceFinalWarning: (callback: (data: { timeout: number; startTime: number | null }) => void) => {
+        const handler = (_event: Electron.IpcRendererEvent, data: { timeout: number; startTime: number | null }) => callback(data);
+        ipcRenderer.on('surveillance-final-warning', handler);
+        return () => ipcRenderer.removeListener('surveillance-final-warning', handler);
+    },
+    onSurveillanceAbsence: (callback: () => void) => {
+        const handler = () => callback();
+        ipcRenderer.on('surveillance-absence', handler);
+        return () => ipcRenderer.removeListener('surveillance-absence', handler);
+    },
 });
 

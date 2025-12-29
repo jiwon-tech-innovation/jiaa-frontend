@@ -283,6 +283,22 @@ export const registerIpcHandlers = (): void => {
         return `local-model://local-file/${MODEL_NAME}/`;
     });
 
+    // Surveillance IPC Handlers
+    ipcMain.on('cancel-final-warning', () => {
+        const { cancelFinalWarning } = require('../services/processMonitor');
+        cancelFinalWarning();
+    });
+
+    ipcMain.handle('get-surveillance-state', () => {
+        const { getSurveillanceState } = require('../services/processMonitor');
+        return getSurveillanceState();
+    });
+
+    ipcMain.handle('get-final-warning-remaining-time', () => {
+        const { getFinalWarningRemainingTime } = require('../services/processMonitor');
+        return getFinalWarningRemainingTime();
+    });
+
     handleTokenStorage();
 };
 

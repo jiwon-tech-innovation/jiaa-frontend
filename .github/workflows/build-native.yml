@@ -1,0 +1,115 @@
+name: Build Native Monitors
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'electron-app/apps/app/src/native/**'
+      - 'electron-app/apps/app/scripts/build-native.sh'
+      - 'electron-app/apps/app/scripts/build-native.bat'
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - macos
+          - windows
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    if: github.event.inputs.platform == 'all' || github.event.inputs.platform == 'macos' || github.event.inputs.platform == ''
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Build macOS Native Monitor
+        run: |
+          cd electron-app/apps/app
+          chmod +x scripts/build-native.sh
+          ./scripts/build-native.sh
+      
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: monitor-mac
+          path: electron-app/apps/app/build/native/monitor_mac
+          retention-days: 30
+  
+  build-windows:
+    runs-on: windows-latest
+    if: github.event.inputs.platform == 'all' || github.event.inputs.platform == 'windows' || github.event.inputs.platform == ''
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup MinGW
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+      
+      - name: Build Windows Native Monitor
+        shell: cmd
+        run: |
+          cd electron-app\apps\app\scripts
+          build-native.bat
+      
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: monitor-win
+          path: electron-app/apps/app/build/native/monitor_win.exe
+          retention-days: 30
+  
+  build-electron:
+    needs: [build-macos, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Download macOS Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: monitor-mac
+          path: electron-app/apps/app/build/native/
+      
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: monitor-win
+          path: electron-app/apps/app/build/native/
+      
+      - name: Install dependencies
+        run: |
+          cd electron-app/apps/app
+          pnpm install
+      
+      - name: Build Electron App
+        run: |
+          cd electron-app/apps/app
+          pnpm run package
+      
+      - name: Upload Electron Build
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-app
+          path: electron-app/apps/app/out/**
+          retention-days: 30
+

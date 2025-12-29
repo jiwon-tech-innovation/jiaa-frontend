@@ -1,0 +1,161 @@
+pipeline {
+    agent none
+    
+    parameters {
+        choice(name: 'PLATFORM', 
+               choices: ['macos', 'windows', 'all'], 
+               description: '빌드할 플랫폼을 선택하세요')
+    }
+    
+    environment {
+        // AWS S3에 아티팩트 저장용
+        S3_BUCKET = 'jiaa-build-artifacts'
+        BUILD_ID = "${env.BUILD_NUMBER}"
+    }
+    
+    stages {
+        stage('Checkout') {
+            agent any
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build Native Monitors') {
+            parallel {
+                stage('macOS - Build') {
+                    when {
+                        anyOf {
+                            params.PLATFORM == 'all'
+                            params.PLATFORM == 'macos'
+                        }
+                    }
+                    agent {
+                        label 'macos' // AWS Mac1 인스턴스에 Jenkins 에이전트 설치 필요
+                    }
+                    steps {
+                        dir('apps/app') {
+                            sh '''
+                                chmod +x scripts/build-native.sh
+                                ./scripts/build-native.sh
+                            '''
+                            
+                            // S3에 업로드
+                            sh '''
+                                aws s3 cp build/native/monitor_mac \
+                                    s3://${S3_BUCKET}/native/${BUILD_ID}/monitor_mac \
+                                    --region ap-northeast-2
+                            '''
+                        }
+                    }
+                }
+                
+                stage('Windows - Build') {
+                    when {
+                        anyOf {
+                            params.PLATFORM == 'all'
+                            params.PLATFORM == 'windows'
+                        }
+                    }
+                    agent {
+                        label 'windows' // AWS Windows EC2에 Jenkins 에이전트 설치 필요
+                    }
+                    steps {
+                        dir('apps/app') {
+                            bat '''
+                                cd scripts
+                                build-native.bat
+                            '''
+                            
+                            // S3에 업로드
+                            bat '''
+                                aws s3 cp build\\native\\monitor_win.exe ^
+                                    s3://%S3_BUCKET%/native/%BUILD_ID%/monitor_win.exe ^
+                                    --region ap-northeast-2
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Download Native Monitors') {
+            agent any
+            steps {
+                dir('apps/app/build/native') {
+                    sh 'mkdir -p .'
+                    
+                    script {
+                        if (params.PLATFORM == 'all' || params.PLATFORM == 'macos') {
+                            sh '''
+                                aws s3 cp \
+                                    s3://${S3_BUCKET}/native/${BUILD_ID}/monitor_mac \
+                                    monitor_mac \
+                                    --region ap-northeast-2
+                                chmod +x monitor_mac
+                            '''
+                        }
+                        
+                        if (params.PLATFORM == 'all' || params.PLATFORM == 'windows') {
+                            sh '''
+                                aws s3 cp \
+                                    s3://${S3_BUCKET}/native/${BUILD_ID}/monitor_win.exe \
+                                    monitor_win.exe \
+                                    --region ap-northeast-2
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Build Electron App') {
+            agent any
+            steps {
+                dir('apps/app') {
+                    sh 'npm install -g pnpm'
+                    sh 'pnpm install'
+                    sh 'pnpm run package'
+                }
+            }
+        }
+        
+        stage('Package Electron') {
+            agent any
+            steps {
+                dir('apps/app') {
+                    script {
+                        if (params.PLATFORM == 'all' || params.PLATFORM == 'macos') {
+                            sh 'pnpm run make:mac-arm || pnpm run make:mac-x64 || true'
+                        }
+                        if (params.PLATFORM == 'all' || params.PLATFORM == 'windows') {
+                            sh 'pnpm run make:win-x64 || true'
+                        }
+                    }
+                    
+                    // S3에 최종 패키지 업로드
+                    sh '''
+                        aws s3 sync out/ \
+                            s3://${S3_BUCKET}/electron/${BUILD_ID}/ \
+                            --region ap-northeast-2
+                    '''
+                    
+                    archiveArtifacts 'out/**'
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo "✅ Build completed! Artifacts uploaded to S3: s3://${S3_BUCKET}/"
+        }
+        failure {
+            echo "❌ Build failed!"
+        }
+        always {
+            cleanWs()
+        }
+    }
+}
+

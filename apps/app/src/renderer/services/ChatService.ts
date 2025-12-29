@@ -436,7 +436,7 @@ class ChatService {
                 error.message?.includes('NetworkError') ||
                 error.message?.includes('Network request failed') ||
                 error.name === 'TypeError') {
-                errorMessage = `서버에 연결할 수 없습니다.\n\nFastAPI 서버가 실행 중인지 확인해주세요:\n${CHAT_API_URL}\n\n서버 실행 명령어:\ncd jiaa-fastapi/ai-chat-service\nuvicorn main:app --host 0.0.0.0 --port 8000 --reload`;
+                errorMessage = `서버에 연결할 수 없습니다.\n\n백엔드 서버가 실행 중인지 확인해주세요:\n${CHAT_API_URL}\n\n서버는 Gateway(포트 8080)를 통해 접근됩니다.`;
             }
             // HTTP 오류 (서버는 실행 중이지만 오류 발생)
             else if (error.message?.includes('HTTP') || error.message?.includes('서버 오류')) {
