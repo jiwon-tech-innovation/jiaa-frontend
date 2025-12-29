@@ -17,52 +17,6 @@
     padding-top: 68px !important;
 }
 
-.title-bar-drag-area {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    /* space for window controls (46px * 3) */
-    height: 52px;
-    -webkit-app-region: drag;
-    z-index: 999;
-    background: var(--bg-primary);
-    border-bottom: 1px solid var(--border-subtle);
-}
-
-.nav-controls {
-    position: fixed;
-    top: 14px;
-    left: 90px;
-    /* Traffic lights (approx 60-70px) + spacing */
-    display: flex;
-    gap: 8px;
-    z-index: 1000;
-    -webkit-app-region: no-drag;
-}
-
-.nav-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.nav-btn:hover {
-    background: var(--hover-bg);
-    color: var(--text-primary);
-}
-
-.nav-btn:active {
-    transform: scale(0.95);
-}
-
 .app-title {
     position: fixed;
     top: 14px;
@@ -96,7 +50,7 @@
     position: relative;
     overflow-y: auto;
     -webkit-app-region: no-drag;
-    padding-top: 52px;
+    padding: 82px 30px 30px 30px;
 }
 
 /* 아바타가 없을 때 메인 컨텐츠가 전체 너비 차지 */

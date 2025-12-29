@@ -24,7 +24,7 @@
     margin-bottom: 30px;
     background: var(--input-bg);
     border: 1px solid var(--input-border);
-    border-radius: 8px;
+    border-radius: 16px;
     color: var(--text-secondary);
     font-size: 14px;
     outline: none;
@@ -117,7 +117,7 @@
     height: 220px;
     background: var(--input-bg);
     border: 1px solid var(--border-subtle);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -136,7 +136,7 @@
 .user-card-avatar {
     width: 120px;
     height: 120px;
-    border-radius: 12px;
+    border-radius: 16px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
@@ -163,7 +163,7 @@
 .group-card {
     background: var(--input-bg);
     border: 1px solid var(--border-subtle);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -182,7 +182,7 @@
 .group-card-avatar {
     width: 120px;
     height: 120px;
-    border-radius: 12px;
+    border-radius: 16px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
@@ -217,7 +217,7 @@
     background: var(--card-bg);
     color: var(--text-primary);
     border: none;
-    border-radius: 8px;
+    border-radius: 16px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -357,7 +357,7 @@
     padding: 20px;
     background: var(--input-bg);
     border: 2px solid var(--border-subtle);
-    border-radius: 12px;
+    border-radius: 16px;
     color: var(--text-primary);
     font-size: 16px;
     cursor: pointer;
@@ -413,7 +413,7 @@
 .detail-settings-placeholder {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 100px 40px;
     text-align: center;
 }
@@ -430,7 +430,7 @@
     padding: 16px;
     background: #7c5cdb;
     border: none;
-    border-radius: 10px;
+    border-radius: 16px;
     color: white;
     font-size: 16px;
     font-weight: 600;
@@ -455,7 +455,7 @@
     padding: 16px 20px;
     background: var(--input-bg);
     border: 2px solid var(--input-border);
-    border-radius: 10px;
+    border-radius: 16px;
     color: var(--text-primary);
     font-size: 16px;
     outline: none;
@@ -540,7 +540,7 @@
     width: 100px;
     height: 100px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 20px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -577,14 +577,14 @@
     line-height: 1.6;
     background: var(--input-bg);
     padding: 20px;
-    border-radius: 12px;
+    border-radius: 16px;
     margin: 0;
 }
 
 .activity-placeholder {
     background: rgba(255, 255, 255, 0.03);
     border: 1px dashed rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 40px;
     text-align: center;
     color: rgba(255, 255, 255, 0.4);
@@ -600,7 +600,7 @@
 .roadmap-sync-btn {
     flex: 1;
     padding: 16px;
-    border-radius: 10px;
+    border-radius: 16px;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
@@ -643,7 +643,7 @@
     gap: 16px;
     background: var(--input-bg);
     padding: 16px;
-    border-radius: 12px;
+    border-radius: 16px;
     border: 1px solid var(--border-subtle);
     transition: all 0.2s;
 }
@@ -714,7 +714,7 @@
     height: 100%;
     background: var(--bg-tertiary);
     backdrop-filter: blur(20px);
-    border-radius: 12px;
+    border-radius: 16px;
     border: 1px solid var(--border-subtle);
     overflow: hidden;
     animation: fadeIn 0.3s ease;
@@ -1036,7 +1036,7 @@
 .message-bubble {
     padding: 12px 16px;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -1069,7 +1069,7 @@
     backdrop-filter: blur(10px);
     width: 100%;
     padding: 12px 20px;
-    border-radius: 10px;
+    border-radius: 16px;
     color: white;
     outline: none;
     transition: all 0.2s;

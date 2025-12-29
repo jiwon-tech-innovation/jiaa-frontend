@@ -8,6 +8,15 @@
     padding: 24px 30px;
     overflow-y: auto;
     height: 100%;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 /* Header Styles */
@@ -17,6 +26,8 @@
 
 .main-title {
     margin: 0;
+    font-size: 32px;
+    font-weight: 800;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -76,6 +87,9 @@
     border: 1px solid var(--card-border);
     border-radius: 20px;
     padding: 24px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
     flex: 1;
     overflow: hidden;
     display: flex;
@@ -131,6 +145,11 @@
 
 .calendar-cell {
     aspect-ratio: 0.85;
+    background: var(--input-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 8px;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -359,6 +378,12 @@
     color: var(--text-primary);
     margin: 0 0 4px 0;
     transition: color 0.3s ease;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    background: var(--input-bg);
+    border-radius: 16px;
+    transition: background 0.2s;
 }
 
 .timeline-item.completed .timeline-title {
@@ -465,6 +490,9 @@
     border: 1px solid var(--card-border);
     border-radius: 16px;
     width: 90%;
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
     max-width: 600px;
     max-height: 80vh;
     overflow: hidden;
@@ -591,6 +619,12 @@
     font-size: 13px;
     color: #f59e0b;
     font-weight: 500;
+    background-color: var(--input-bg);
+    padding: 0.3rem 0.8rem;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    border: 1px solid var(--border-subtle);
 }
 
 /* Step Duration */
@@ -614,6 +648,10 @@
     border: 1px solid rgba(102, 126, 234, 0.2);
     border-radius: 12px;
     padding: 16px 20px;
+    background-color: var(--input-bg);
+    padding: 1rem;
+    border-radius: 16px;
+    margin-top: 1rem;
     color: var(--text-secondary);
     font-size: 14px;
     line-height: 1.6;
@@ -648,6 +686,9 @@
     border-radius: 10px;
     font-size: 15px;
     font-weight: 600;
+    padding: 0.8rem 2rem;
+    border-radius: 16px;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
     border: none;

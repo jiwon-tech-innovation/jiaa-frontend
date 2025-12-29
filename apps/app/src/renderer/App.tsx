@@ -1,5 +1,5 @@
 import React from "react";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useTheme } from "./hooks/useTheme";
 
 import Signin from "./views/signin/Signin";
@@ -25,7 +25,7 @@ export const App = () => {
         <HashRouter>
             <Routes>
                 {/* Routes without MainLayout */}
-                <Route path="/" element={<Signin />} />
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/signin" element={<Signin />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/first-create-loadmap" element={<FirstCreateLoadmap />} />
