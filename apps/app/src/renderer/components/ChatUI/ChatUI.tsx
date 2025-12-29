@@ -92,7 +92,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
         // 모든 세션을 확인해서 "아바타 대화" 세션 찾기
         const allSessions = chatHistoryService.getAllSessions();
         const avatarSession = allSessions.find(s => s.title === '아바타 대화');
-        
+
         if (avatarSession) {
             // 기존 아바타 세션 사용
             avatarSessionIdRef.current = avatarSession.id;
@@ -123,7 +123,7 @@ const ChatUI: React.FC<ChatUIProps> = ({
         const unsubscribeMessage = service.onMessage((message) => {
             console.log(`[ChatUI] Received message:`, message.isStreaming ? 'streaming' : 'complete', message.content.substring(0, 50));
             showBubble(message);
-            
+
             // 완료된 메시지만 저장 (스트리밍 완료 후, 서버에도 저장)
             if (!message.isStreaming && avatarSessionIdRef.current) {
                 chatHistoryService.addMessage(avatarSessionIdRef.current, message).catch(error => {
