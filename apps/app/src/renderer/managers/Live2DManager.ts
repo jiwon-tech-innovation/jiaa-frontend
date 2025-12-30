@@ -47,17 +47,13 @@ export class Live2DManager {
         }
     }
 
-    public initialize(canvas: HTMLCanvasElement): boolean {
-        electronAPI.log(`Live2DManager.initialize called (id=${canvas.id})`);
+    public initialize(canvas: HTMLCanvasElement, modelName: string, modelUrl?: string): boolean {
+        electronAPI.log(`Live2DManager.initialize called (id=${canvas.id}, modelName=${modelName})`);
 
-        // Early return if already initialized with the same canvas
+        // Early return if already initialized with the same canvas and model
         if (Live2DManager._isInitialized) {
-            if (this._canvas === canvas) {
-                electronAPI.log('Already initialized with same canvas');
-                return true;
-            }
-            // Clean up before re-initializing with different canvas
-            electronAPI.log('Canvas changed, cleaning up and re-initializing');
+            // If model changed, we need to reload
+            // But simple implementation for now: only reload if canvas or model changes
             this.cleanupModel();
             this._canvas = canvas;
             this._gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: true });
@@ -65,7 +61,7 @@ export class Live2DManager {
                 this._gl.enable(this._gl.BLEND);
                 this._gl.blendFunc(this._gl.ONE, this._gl.ONE_MINUS_SRC_ALPHA);
             }
-            this.loadModel();
+            this.loadModel(modelName, modelUrl);
             this.resizeCanvas();
             return true;
         }
@@ -103,13 +99,13 @@ export class Live2DManager {
 
         this.resizeCanvas();
 
-        this.loadModel();
+        this.loadModel(modelName, modelUrl);
         this.run();
 
         return true;
     }
 
-    public async loadModel(): Promise<void> {
+    public async loadModel(modelName: string, modelUrl?: string): Promise<void> {
         // Check guards first
         if (!this._gl || !this._textureManager) {
             electronAPI.log('loadModel: Missing gl or textureManager, skipping');
@@ -126,10 +122,24 @@ export class Live2DManager {
 
         // Set loading flag immediately (synchronously)
         this._isModelLoading = true;
-        electronAPI.log(`loadModel: Starting model load for ${MODEL_NAME}`);
+        electronAPI.log(`loadModel: Starting model load for ${modelName}`);
 
         try {
-            const basePath = await electronAPI.getModelBasePath();
+            // Check if model exists locally
+            const exists = await electronAPI.checkModelExists(modelName);
+            if (!exists) {
+                if (modelUrl) {
+                    electronAPI.log(`loadModel: Model ${modelName} missing, starting download from ${modelUrl}`);
+                    const downloadResult = await electronAPI.downloadModel(modelName, modelUrl);
+                    if (!downloadResult.success) {
+                        throw new Error(`Failed to download model: ${downloadResult.error}`);
+                    }
+                } else {
+                    throw new Error(`Model ${modelName} not found and no URL provided`);
+                }
+            }
+
+            const basePath = await electronAPI.getModelBasePath(modelName);
             electronAPI.log(`loadModel: Using base path: ${basePath}`);
 
             // Guard against the instance being released during the await
@@ -140,8 +150,8 @@ export class Live2DManager {
 
             this._model = new LAppModel();
 
-            // Note: ${MODEL_NAME}.model3.json must match exactly what's on disk
-            await this._model.loadAssets(basePath, `${MODEL_NAME}.model3.json`, this._textureManager, this._gl);
+            // Note: ${modelName}.model3.json must match exactly what's on disk
+            await this._model.loadAssets(basePath, `${modelName}.model3.json`, this._textureManager, this._gl);
 
             // Final check if we were released during the long loadAssets call
             if (!this._model) {
@@ -152,6 +162,7 @@ export class Live2DManager {
             electronAPI.log('loadModel: Model load successful');
         } catch (e) {
             electronAPI.log(`loadModel error: ${e}`);
+            console.error('[Live2DManager] loadModel error:', e);
             this._model = null;
         } finally {
             this._isModelLoading = false;

@@ -139,8 +139,14 @@ class TokenService {
     // 로그인 성공 시 토큰 설정
     async setTokensOnLogin(accessToken: string, refreshToken: string): Promise<void> {
         this.setAccessToken(accessToken);
-        await electronAPI.saveRefreshToken(refreshToken);
-        console.log('[TokenService] Tokens saved on login');
+        console.log('[TokenService] Saving refresh token...');
+        const result = await electronAPI.saveRefreshToken(refreshToken);
+        console.log('[TokenService] saveRefreshToken result:', result);
+        if (!result?.success) {
+            console.error('[TokenService] Failed to save refresh token:', result?.error);
+        } else {
+            console.log('[TokenService] Refresh token saved successfully');
+        }
     }
 
     // 인증 여부 확인

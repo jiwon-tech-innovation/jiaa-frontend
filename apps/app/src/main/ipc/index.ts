@@ -258,23 +258,23 @@ export const registerIpcHandlers = (): void => {
         }
     });
 
-    ipcMain.handle('check-model-exists', async () => {
-        return checkModelExists();
+    ipcMain.handle('check-model-exists', async (_, modelName: string) => {
+        return checkModelExists(modelName);
     });
 
-    ipcMain.handle('download-model', async (event) => {
+    ipcMain.handle('download-model', async (event, modelName: string, modelUrl: string) => {
         const win = BrowserWindow.fromWebContents(event.sender);
-        return await downloadAndExtractModel((progress) => {
+        return await downloadAndExtractModel(modelName, modelUrl, (progress) => {
             if (win && !win.isDestroyed()) {
                 win.webContents.send('model-download-progress', progress);
             }
         });
     });
 
-    ipcMain.handle('get-model-base-path', async () => {
+    ipcMain.handle('get-model-base-path', async (_, modelName: string) => {
         // Return local-model protocol URL for the model directory
         // Use a dummy host 'local-file' to avoid Punycode issues with non-ASCII model names
-        return `local-model://local-file/${MODEL_NAME}/`;
+        return `local-model://local-file/${modelName}/`;
     });
 
     // Surveillance IPC Handlers
@@ -304,10 +304,15 @@ const handleTokenStorage = () => {
     const getTokenPath = () => path.join(app.getPath('userData'), 'secure_token.enc');
 
     ipcMain.handle('save-refresh-token', async (_, token: string) => {
+        const tokenPath = getTokenPath();
+        console.log('[Main] save-refresh-token called');
+        console.log('[Main] Token path:', tokenPath);
+        console.log('[Main] safeStorage available:', safeStorage.isEncryptionAvailable());
         try {
             if (safeStorage.isEncryptionAvailable()) {
                 const encryptedBuffer = safeStorage.encryptString(token);
-                await fs.writeFile(getTokenPath(), encryptedBuffer);
+                await fs.writeFile(tokenPath, encryptedBuffer);
+                console.log('[Main] Token saved successfully to:', tokenPath);
                 return { success: true };
             } else {
                 console.warn('[Main] safeStorage not available. Token NOT saved.');
@@ -320,20 +325,28 @@ const handleTokenStorage = () => {
     });
 
     ipcMain.handle('get-refresh-token', async () => {
+        const tokenPath = getTokenPath();
+        console.log('[Main] get-refresh-token called');
+        console.log('[Main] Token path:', tokenPath);
+        console.log('[Main] safeStorage available:', safeStorage.isEncryptionAvailable());
         try {
-            const tokenPath = getTokenPath();
             // Check if file exists
             try {
                 await fs.access(tokenPath);
+                console.log('[Main] Token file exists');
             } catch {
+                console.log('[Main] Token file does NOT exist');
                 return null; // File doesn't exist
             }
 
             const encryptedBuffer = await fs.readFile(tokenPath);
+            console.log('[Main] Token file read, buffer size:', encryptedBuffer.length);
             if (safeStorage.isEncryptionAvailable()) {
                 const decryptedString = safeStorage.decryptString(encryptedBuffer);
+                console.log('[Main] Token decrypted successfully, length:', decryptedString.length);
                 return decryptedString;
             } else {
+                console.log('[Main] safeStorage not available for decryption');
                 return null;
             }
         } catch (error) {

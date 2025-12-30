@@ -3,13 +3,14 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { Sidebar, type SidebarItem } from '@repo/ui';
 import { useAppDispatch } from '../../store/hooks';
 import { signout as signoutAction } from '../../store/slices/authSlice';
-import { signout } from '../../services/api';
+import { signout, tryAutoLogin } from '../../services/api';
 import { Live2DManager } from '../../managers/Live2DManager';
 import { TitleBar } from '../TitleBar';
 import './MainLayout.css';
 
 export const MainLayout: React.FC = () => {
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+    const [isTokenReady, setIsTokenReady] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     // Determine active tab based on current path
@@ -34,6 +35,27 @@ export const MainLayout: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const dispatch = useAppDispatch();
 
+    // 전역 자동 로그인 시도 (Cmd + Shift + R 등 하드 리로드 시 대응)
+    useEffect(() => {
+        const attemptAutoLogin = async () => {
+            try {
+                console.log('[MainLayout] Attempting auto-login...');
+                const success = await tryAutoLogin();
+                if (success) {
+                    console.log('[MainLayout] Auto-login successful, tokens refreshed');
+                } else {
+                    console.log('[MainLayout] Auto-login failed or no refresh token');
+                }
+            } catch (error) {
+                console.error('[MainLayout] Auto-login error:', error);
+            } finally {
+                setIsTokenReady(true);
+            }
+        };
+
+        attemptAutoLogin();
+    }, []);
+
     const handleSignout = async () => {
         try {
             console.log('[MainLayout] Logging out...');
@@ -53,12 +75,31 @@ export const MainLayout: React.FC = () => {
     useEffect(() => {
         if (!shouldShowAvatar || !canvasRef.current) return;
 
-        // Temporarily disabled for debugging
-        const manager = Live2DManager.getInstance();
-        manager.initialize(canvasRef.current);
-        manager.enableSync();
+        const initSidebarAvatar = async () => {
+            if (!canvasRef.current) return;
+            const manager = Live2DManager.getInstance();
+
+            try {
+                // Fetch user info for avatar
+                const { getCurrentUser } = await import('../../services/api');
+                const user = await getCurrentUser();
+                const modelName = user.avatarId === 'default' ? 'robot' : user.avatarId;
+                const modelUrl = user.avatarUrl;
+
+                manager.initialize(canvasRef.current, modelName, modelUrl);
+                manager.enableSync();
+            } catch (err) {
+                console.error('[MainLayout] Failed to initialize sidebar avatar:', err);
+                // Fallback to 'robot' if failed to fetch user
+                manager.initialize(canvasRef.current, 'robot');
+                manager.enableSync();
+            }
+        };
+
+        initSidebarAvatar();
 
         return () => {
+            const manager = Live2DManager.getInstance();
             manager.disableSync();
         };
     }, [shouldShowAvatar]);
@@ -78,49 +119,49 @@ export const MainLayout: React.FC = () => {
     const sidebarItems: SidebarItem[] = [
         {
             id: 'home',
-            icon: '/Home Icon 16px.svg',
+            icon: 'Home Icon 16px.svg',
             label: '홈',
             active: activeTab === 'home',
             onClick: () => navigate('/dashboard')
         },
         {
             id: 'chat',
-            icon: '/Chat Icon 24px.svg',
+            icon: 'Chat Icon 24px.svg',
             label: '채팅',
             active: activeTab === 'chat',
             onClick: () => navigate('/chat')
         },
         {
             id: 'dashboard',
-            icon: '/DashBoard Icon 24px.svg',
+            icon: 'DashBoard Icon 24px.svg',
             label: '대시보드',
             active: activeTab === 'dashboard',
             onClick: () => navigate('/statistics')
         },
         {
             id: 'roadmap',
-            icon: '/Roadmap Icon 24px.svg',
+            icon: 'Roadmap Icon 24px.svg',
             label: '로드맵',
             active: activeTab === 'roadmap',
             onClick: () => navigate('/roadmap-list')
         },
         {
             id: 'group',
-            icon: '/Group Icon 24px.svg',
+            icon: 'Group Icon 24px.svg',
             label: '그룹',
             active: activeTab === 'group',
             onClick: () => navigate('/social')
         },
         {
             id: 'avatar',
-            icon: '/Avartar Icon 36px.svg',
+            icon: 'Avartar Icon 36px.svg',
             label: '아바타',
             active: activeTab === 'avatar',
             onClick: () => navigate('/avatar-setting')
         },
         {
             id: 'setting',
-            icon: '/Setting Icon 24px.svg',
+            icon: 'Setting Icon 24px.svg',
             label: '설정',
             active: activeTab === 'setting',
             onClick: () => navigate('/setting')
@@ -140,7 +181,7 @@ export const MainLayout: React.FC = () => {
             />
 
             <main className="main-content">
-                <Outlet />
+                <Outlet context={{ isTokenReady }} />
             </main>
 
             <div className={`avatar-sidebar-container ${!shouldShowAvatar ? 'hidden' : ''}`}>

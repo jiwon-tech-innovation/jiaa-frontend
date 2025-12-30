@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getRoadmap, updateRoadmapItem } from '../../services/chatApiService';
 import './roadmap.css';
@@ -64,12 +64,13 @@ const RoadmapView: React.FC = () => {
     const { id: roadmapId } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { isTokenReady } = useOutletContext<{ isTokenReady: boolean }>();
 
     // React Query로 로드맵 데이터 가져오기
     const { data: roadmapData, isLoading: loading } = useQuery<RoadmapData | null>({
         queryKey: ['roadmap', roadmapId],
         queryFn: () => roadmapId ? getRoadmap(roadmapId) : Promise.resolve(null),
-        enabled: !!roadmapId,
+        enabled: isTokenReady && !!roadmapId,
         staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
     });
 

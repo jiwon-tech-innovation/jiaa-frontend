@@ -25,9 +25,9 @@ export interface IElectronAPI {
     onAvatarMovementUpdate: (callback: (mouseX: number, mouseY: number) => void) => () => void;
 
     // Model management
-    checkModelExists: () => Promise<boolean>;
-    downloadModel: () => Promise<{ success: boolean; error?: string }>;
-    getModelBasePath: () => Promise<string>;
+    checkModelExists: (modelName: string) => Promise<boolean>;
+    downloadModel: (modelName: string, modelUrl: string) => Promise<{ success: boolean; error?: string }>;
+    getModelBasePath: (modelName: string) => Promise<string>;
     onModelDownloadProgress: (callback: (progress: number) => void) => () => void;
     onOpenChat: (callback: () => void) => () => void;
     onAvatarShow: (callback: () => void) => () => void;

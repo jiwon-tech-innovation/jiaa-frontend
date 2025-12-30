@@ -1,5 +1,11 @@
 @import './variables.css';
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 /* Basic Reset & Dark Theme */
 body,
 html {
