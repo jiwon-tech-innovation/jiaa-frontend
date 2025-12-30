@@ -30,6 +30,7 @@ export interface IElectronAPI {
     getModelBasePath: () => Promise<string>;
     onModelDownloadProgress: (callback: (progress: number) => void) => () => void;
     onOpenChat: (callback: () => void) => () => void;
+    onAvatarShow: (callback: () => void) => () => void;
 
     // Surveillance
     cancelFinalWarning: () => void;

@@ -18,3 +18,12 @@ export function getAvatarWindow(): BrowserWindow | null {
 export function setAvatarWindow(window: BrowserWindow | null): void {
     avatarWindow = window;
 }
+
+// Helper function to show avatar window and trigger token refresh in renderer
+export function showAvatarWindowWithAuth(): void {
+    if (avatarWindow && !avatarWindow.isDestroyed()) {
+        avatarWindow.show();
+        // Send event to trigger token refresh in renderer
+        avatarWindow.webContents.send('avatar-show');
+    }
+}

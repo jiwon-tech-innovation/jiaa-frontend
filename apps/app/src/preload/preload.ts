@@ -50,6 +50,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
         return () => ipcRenderer.removeListener('open-chat-event', handler);
     },
 
+    // Avatar show event (for token refresh when avatar becomes visible)
+    onAvatarShow: (callback: () => void) => {
+        const handler = () => callback();
+        ipcRenderer.on('avatar-show', handler);
+        return () => ipcRenderer.removeListener('avatar-show', handler);
+    },
+
     // Surveillance
     cancelFinalWarning: () => ipcRenderer.send('cancel-final-warning'),
     getSurveillanceState: () => ipcRenderer.invoke('get-surveillance-state'),

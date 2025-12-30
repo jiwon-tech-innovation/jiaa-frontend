@@ -1,6 +1,6 @@
 import { Tray, Menu, nativeImage, app } from 'electron';
 import path from 'node:path';
-import { getAvatarWindow, getMainWindow } from '../windows/manager';
+import { getAvatarWindow, getMainWindow, showAvatarWindowWithAuth } from '../windows/manager';
 import { createMainWindow } from '../windows/mainWindow';
 
 let tray: Tray | null = null;
@@ -38,12 +38,14 @@ export const createTray = (): void => {
                 }
 
                 if (avatarWindow && !avatarWindow.isDestroyed()) {
-                    avatarWindow.show();
+                    showAvatarWindowWithAuth();
                     avatarWindow.focus();
                 } else {
                     // Try to recreate if missing
                     const { createAvatarWindow } = require('../windows/avatarWindow');
-                    createAvatarWindow().show();
+                    const newWindow = createAvatarWindow();
+                    newWindow.show();
+                    newWindow.webContents.send('avatar-show');
                 }
             }
         },
@@ -88,11 +90,13 @@ export const createTray = (): void => {
             // Main -> Avatar
             mainWindow.hide();
             if (avatarWindow && !avatarWindow.isDestroyed()) {
-                avatarWindow.show();
+                showAvatarWindowWithAuth();
                 avatarWindow.focus();
             } else {
                 const { createAvatarWindow } = require('../windows/avatarWindow');
-                createAvatarWindow().show();
+                const newWindow = createAvatarWindow();
+                newWindow.show();
+                newWindow.webContents.send('avatar-show');
             }
         } else {
             // Avatar -> Main (or recreate Main)

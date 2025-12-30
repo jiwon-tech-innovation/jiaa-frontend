@@ -117,14 +117,18 @@ class TokenService {
     // 앱 시작 시 저장된 토큰으로 자동 로그인 시도
     async tryAutoLogin(): Promise<boolean> {
         try {
+            console.log('[TokenService] tryAutoLogin called');
             const refreshToken = await electronAPI.getRefreshToken();
+            console.log(`[TokenService] getRefreshToken result: ${refreshToken ? 'TOKEN_EXISTS (length=' + refreshToken.length + ')' : 'null'}`);
 
             if (!refreshToken) {
                 console.log('[TokenService] No stored refresh token for auto-login');
                 return false;
             }
 
+            console.log('[TokenService] Calling refreshAccessToken...');
             const accessToken = await this.refreshAccessToken();
+            console.log(`[TokenService] refreshAccessToken result: ${accessToken ? 'SUCCESS' : 'FAILED'}`);
             return accessToken !== null;
         } catch (error) {
             console.error('[TokenService] Auto-login failed:', error);
