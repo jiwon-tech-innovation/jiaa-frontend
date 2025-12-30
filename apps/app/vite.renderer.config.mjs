@@ -10,6 +10,9 @@ export default defineConfig({
     resolve: {
         dedupe: ['react', 'react-dom', 'react-router-dom'],
     },
+    optimizeDeps: {
+        exclude: ['@repo/ui'],
+    },
     build: {
         outDir: '../../.vite/renderer/main_window',
         rollupOptions: {

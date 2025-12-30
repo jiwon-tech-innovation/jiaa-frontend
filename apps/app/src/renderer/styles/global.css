@@ -67,6 +67,8 @@ a:hover {
 }
 
 /* Force Sidebar Theme Overrides (Resolving @repo/ui update issues) */
+nav.sidebar,
+.main-layout .sidebar,
 .sidebar {
     background-color: var(--bg-secondary) !important;
     border-right: 1px solid var(--border-subtle) !important;
@@ -74,25 +76,32 @@ a:hover {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
+    box-sizing: border-box !important;
 }
 
+nav.sidebar .nav-group-top,
+.sidebar .nav-group-top,
 .nav-group-top {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 16px !important;
 }
 
+nav.sidebar .nav-group-bottom,
+.sidebar .nav-group-bottom,
 .nav-group-bottom {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
 }
 
+nav.sidebar .nav-group,
+.sidebar .nav-group,
 .nav-group {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
 }
 
 .nav-item:hover {
