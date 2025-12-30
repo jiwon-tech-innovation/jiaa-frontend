@@ -90,11 +90,18 @@ export async function sendChatMessage(
  */
 export async function startRoadmapMode(sessionId: string): Promise<string | null> {
     try {
+        const accessToken = tokenService.getAccessToken();
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+        };
+
+        if (accessToken) {
+            headers['Authorization'] = `Bearer ${accessToken}`;
+        }
+
         const response = await fetch(`${CHAT_API_URL}${AI_CHAT_ENDPOINTS.ROADMAP_START}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify({
                 session_id: sessionId,
             }),
@@ -137,15 +144,26 @@ export function parseRoadmapResponse(text: string): RoadmapResponse | null {
  */
 export async function getRoadmaps(userId?: string): Promise<any[]> {
     try {
+        const accessToken = tokenService.getAccessToken();
+
+        // 토큰이 없으면 빈 목록 반환 (보안 강화)
+        if (!accessToken) {
+            console.warn('[getRoadmaps] No access token found, returning empty list.');
+            return [];
+        }
+
         const url = userId
             ? `${API_BASE_URL}${AI_CHAT_ENDPOINTS.ROADMAPS}?user_id=${userId}`
             : `${API_BASE_URL}${AI_CHAT_ENDPOINTS.ROADMAPS}`;
 
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+        };
+
         const response = await fetch(url, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
         });
 
         if (!response.ok) {
@@ -165,11 +183,22 @@ export async function getRoadmaps(userId?: string): Promise<any[]> {
  */
 export async function getRoadmap(roadmapId: string): Promise<any | null> {
     try {
+        const accessToken = tokenService.getAccessToken();
+
+        // 토큰이 없으면 null 반환
+        if (!accessToken) {
+            console.warn('[getRoadmap] No access token found.');
+            return null;
+        }
+
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+        };
+
         const response = await fetch(`${API_BASE_URL}${AI_CHAT_ENDPOINTS.ROADMAPS}/${roadmapId}`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
         });
 
         if (!response.ok) {
@@ -189,12 +218,22 @@ export async function getRoadmap(roadmapId: string): Promise<any | null> {
  */
 export async function updateRoadmapItem(roadmapItemId: string, isCompleted: boolean): Promise<any | null> {
     try {
+        const accessToken = tokenService.getAccessToken();
+
+        if (!accessToken) {
+            console.warn('[updateRoadmapItem] No access token found.');
+            return null;
+        }
+
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+        };
+
         // roadmapItemId 형식: "roadmap_id:item_index" (예: "507f1f77bcf86cd799439011:0")
         const response = await fetch(`${API_BASE_URL}${AI_CHAT_ENDPOINTS.ROADMAPS}/items/${roadmapItemId}`, {
             method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify({
                 is_completed: isCompleted
             }),
@@ -232,6 +271,20 @@ export interface ActivityStats {
  */
 export async function getActivityStats(userId?: string, year?: number): Promise<ActivityStats> {
     try {
+        const accessToken = tokenService.getAccessToken();
+
+        // 토큰이 없으면 빈 데이터 반환
+        if (!accessToken) {
+            console.warn('[getActivityStats] No access token found.');
+            return {
+                currentStreak: 0,
+                completedDays: 0,
+                totalDays: 0,
+                completedItems: 0,
+                contributionData: [],
+            };
+        }
+
         let url = `${API_BASE_URL}${AI_CHAT_ENDPOINTS.STATS}`;
         const params = new URLSearchParams();
 
@@ -246,11 +299,14 @@ export async function getActivityStats(userId?: string, year?: number): Promise<
             url += `?${params.toString()}`;
         }
 
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+        };
+
         const response = await fetch(url, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
         });
 
         if (!response.ok) {

@@ -14,7 +14,15 @@
 }
 
 .main-layout .sidebar {
-    padding-top: 68px !important;
+    padding: 68px 0 24px 0 !important;
+    overflow-y: auto;
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.main-layout .sidebar::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
 }
 
 .app-title {

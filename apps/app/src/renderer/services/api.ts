@@ -286,14 +286,59 @@ export interface UserInfo {
     email: string;
     name: string;
     avatarId: string;
+    avatarName: string;
+    avatarUrl: string;
+    personalityId: string;
+    personalityName: string;
+    personalityDescription: string;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface AvatarInfo {
+    id: string;
+    name: string;
+    description: string;
+    s3Url: string;
+}
+
+export interface PersonalityInfo {
+    id: string;
+    name: string;
+    description: string;
+    systemPrompt: string;
 }
 
 // 현재 사용자 정보 조회
 export const getCurrentUser = async (): Promise<UserInfo> => {
     return apiRequest<UserInfo>(API_ENDPOINTS.USER_ME, {
         method: 'GET',
+    });
+};
+
+export const getAvatars = async (): Promise<AvatarInfo[]> => {
+    return apiRequest<AvatarInfo[]>(API_ENDPOINTS.USER_AVATARS, {
+        method: 'GET',
+    });
+};
+
+export const getPersonalities = async (): Promise<PersonalityInfo[]> => {
+    return apiRequest<PersonalityInfo[]>(API_ENDPOINTS.USER_PERSONALITIES, {
+        method: 'GET',
+    });
+};
+
+export const updateAvatar = async (avatarId: string): Promise<UserInfo> => {
+    return apiRequest<UserInfo>(API_ENDPOINTS.USER_UPDATE_AVATAR, {
+        method: 'PATCH',
+        body: JSON.stringify({ avatarId }),
+    });
+};
+
+export const updatePersonality = async (personalityId: string): Promise<UserInfo> => {
+    return apiRequest<UserInfo>(API_ENDPOINTS.USER_UPDATE_PERSONALITY, {
+        method: 'PATCH',
+        body: JSON.stringify({ personalityId }),
     });
 };
 

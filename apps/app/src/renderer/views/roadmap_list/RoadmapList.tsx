@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getRoadmaps } from '../../services/chatApiService';
 import './roadmap_list.css';
@@ -28,10 +28,12 @@ interface RoadmapItem {
 }
 
 const RoadmapList: React.FC = () => {
+    const { isTokenReady } = useOutletContext<{ isTokenReady: boolean }>();
     // React Query로 로드맵 목록 가져오기
     const { data: roadmaps = [], isLoading: loading } = useQuery<RoadmapItem[]>({
         queryKey: ['roadmaps'],
         queryFn: () => getRoadmaps(),
+        enabled: isTokenReady,
         staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
     });
 
@@ -45,8 +47,8 @@ const RoadmapList: React.FC = () => {
             // 새 구조: tasks 배열이 있는 경우
             if (item.tasks && item.tasks.length > 0) {
                 // 모든 task가 완료되었는지 확인
-                const allTasksCompleted = item.tasks.every(task => 
-                    task.is_completed === 1 || task.is_completed === true
+                const allTasksCompleted = item.tasks.every(task =>
+                    task.is_completed === 1
                 );
                 if (allTasksCompleted && item.tasks.length > 0) {
                     completedCount++;

@@ -136,6 +136,18 @@ class ChatService {
     }
 
     /**
+     * WebSocket 재연결 (세션 초기화 등 필요할 때 사용)
+     */
+    public reconnect(): void {
+        console.log('[ChatService] Reconnecting...');
+        this.disconnect();
+        // 약간의 지연 후 연결 (기존 연결이 완전히 닫히길 대기)
+        setTimeout(() => {
+            this.connect();
+        }, 100);
+    }
+
+    /**
      * 메시지 전송
      * @param content 전송할 메시지 내용
      */

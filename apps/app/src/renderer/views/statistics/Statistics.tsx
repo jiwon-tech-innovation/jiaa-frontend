@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchDashboardStats, tryAutoLogin } from '../../services/api';
 import { getRoadmaps } from '../../services/chatApiService';
@@ -6,28 +7,7 @@ import './statistics.css';
 
 export const Statistics: React.FC = () => {
     const [weekIndex, setWeekIndex] = useState(0); // 0: 이번 주, 1: 1주 전, 2: 2주 전, 3: 3주 전
-    const [isTokenReady, setIsTokenReady] = useState(false);
-
-    // 앱 시작 시 자동 로그인 시도 (토큰이 없을 경우)
-    useEffect(() => {
-        const attemptAutoLogin = async () => {
-            try {
-                const success = await tryAutoLogin();
-                if (success) {
-                    console.log('[Statistics] Auto-login successful, tokens refreshed');
-                } else {
-                    console.log('[Statistics] Auto-login failed or no refresh token');
-                }
-            } catch (error) {
-                console.error('[Statistics] Auto-login error:', error);
-            } finally {
-                // 토큰 준비 완료 (성공/실패 여부와 관계없이)
-                setIsTokenReady(true);
-            }
-        };
-
-        attemptAutoLogin();
-    }, []);
+    const { isTokenReady } = useOutletContext<{ isTokenReady: boolean }>();
 
     // Fetch Dashboard Stats (토큰 준비 완료 후 실행)
     const { data: radarData = [] } = useQuery({
@@ -48,21 +28,21 @@ export const Statistics: React.FC = () => {
     // 시간 문자열을 시간(숫자)로 변환하는 함수
     const parseTimeToHours = (timeStr: string): number => {
         if (!timeStr) return 0;
-        
+
         let totalHours = 0;
-        
+
         // "시간" 단위 추출
         const hourMatch = timeStr.match(/(\d+)\s*시간/);
         if (hourMatch) {
             totalHours += parseInt(hourMatch[1], 10);
         }
-        
+
         // "분" 단위 추출
         const minuteMatch = timeStr.match(/(\d+)\s*분/);
         if (minuteMatch) {
             totalHours += parseInt(minuteMatch[1], 10) / 60;
         }
-        
+
         // "시간"이나 "분"이 없으면 숫자만 있는 경우 처리
         if (!hourMatch && !minuteMatch) {
             const numMatch = timeStr.match(/(\d+)/);
@@ -71,7 +51,7 @@ export const Statistics: React.FC = () => {
                 totalHours = parseInt(numMatch[1], 10) / 60;
             }
         }
-        
+
         return totalHours;
     };
 
@@ -105,7 +85,7 @@ export const Statistics: React.FC = () => {
             for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
                 const currentDate = new Date(weekStart);
                 currentDate.setDate(weekStart.getDate() + dayOffset);
-                
+
                 let dayHours = 0;
 
                 // 모든 로드맵에서 완료된 태스크 찾기
@@ -119,7 +99,7 @@ export const Statistics: React.FC = () => {
                                 if (task.is_completed === 1 && task.completed_at) {
                                     const completedDate = new Date(task.completed_at);
                                     completedDate.setHours(0, 0, 0, 0);
-                                    
+
                                     if (completedDate.getTime() === currentDate.getTime()) {
                                         dayHours += parseTimeToHours(task.time || '0분');
                                     }
@@ -130,7 +110,7 @@ export const Statistics: React.FC = () => {
                             if (item.is_completed === 1 && item.completed_at) {
                                 const completedDate = new Date(item.completed_at);
                                 completedDate.setHours(0, 0, 0, 0);
-                                
+
                                 if (completedDate.getTime() === currentDate.getTime()) {
                                     dayHours += parseTimeToHours(item.time || '0분');
                                 }
@@ -172,7 +152,7 @@ export const Statistics: React.FC = () => {
     const monthlyRecords = useMemo(() => {
         const records: Array<{ month: string; hours: number; goal: string; status: string }> = [];
         const today = new Date();
-        
+
         // 가장 오래된 로드맵의 생성일 찾기 (가입일 기준)
         let earliestRoadmapDate: Date | null = null;
         roadmapsData.forEach((roadmap: any) => {
@@ -187,7 +167,7 @@ export const Statistics: React.FC = () => {
         // 가입일이 없으면 오늘 날짜를 기준으로 함
         const startDate = earliestRoadmapDate || today;
         const startMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-        
+
         // 최근 4개월 데이터 생성 (가입일 이후만)
         for (let monthOffset = 0; monthOffset < 4; monthOffset++) {
             const targetDate = new Date(today.getFullYear(), today.getMonth() - monthOffset, 1);
@@ -211,7 +191,7 @@ export const Statistics: React.FC = () => {
                         item.tasks.forEach((task: any) => {
                             if (task.is_completed === 1 && task.completed_at) {
                                 const completedDate = new Date(task.completed_at);
-                                
+
                                 if (completedDate >= monthStart && completedDate <= monthEnd) {
                                     totalHours += parseTimeToHours(task.time || '0분');
                                 }
@@ -221,7 +201,7 @@ export const Statistics: React.FC = () => {
                         // 레거시 구조
                         if (item.is_completed === 1 && item.completed_at) {
                             const completedDate = new Date(item.completed_at);
-                            
+
                             if (completedDate >= monthStart && completedDate <= monthEnd) {
                                 totalHours += parseTimeToHours(item.time || '0분');
                             }
@@ -292,7 +272,7 @@ export const Statistics: React.FC = () => {
     const hoursList = weeklyData.map(d => d.hours);
     const maxDataValue = hoursList.length > 0 ? Math.max(...hoursList) : 0;
     const minDataValue = hoursList.length > 0 ? Math.min(...hoursList) : 0;
-    
+
     // 실제 학습한 일수만으로 평균 계산 (0시간인 날 제외)
     const completedDays = hoursList.filter(hours => hours > 0);
     const avgValue = completedDays.length > 0
@@ -347,21 +327,21 @@ export const Statistics: React.FC = () => {
                                 {/* Average Line - 실제 데이터 기반 평균선 */}
                                 {avgY !== null && avgValue > 0 && (
                                     <g>
-                                        <line 
-                                            x1={padding} 
-                                            y1={avgY} 
-                                            x2={svgWidth - padding} 
-                                            y2={avgY} 
-                                            stroke="#7c5cdb" 
-                                            strokeWidth="1.5" 
-                                            strokeDasharray="5,5" 
-                                            opacity="0.6" 
+                                        <line
+                                            x1={padding}
+                                            y1={avgY}
+                                            x2={svgWidth - padding}
+                                            y2={avgY}
+                                            stroke="#7c5cdb"
+                                            strokeWidth="1.5"
+                                            strokeDasharray="5,5"
+                                            opacity="0.6"
                                         />
-                                        <text 
-                                            x={svgWidth - padding + 5} 
-                                            y={avgY + 4} 
-                                            fill="#7c5cdb" 
-                                            fontSize="10" 
+                                        <text
+                                            x={svgWidth - padding + 5}
+                                            y={avgY + 4}
+                                            fill="#7c5cdb"
+                                            fontSize="10"
                                             fontWeight="500"
                                         >
                                             평균 {avgValue.toFixed(1)}h

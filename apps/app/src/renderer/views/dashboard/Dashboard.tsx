@@ -4,7 +4,7 @@ import { fetchDashboardFullStats, tryAutoLogin } from '../../services/api';
 import { ContributionGraph } from '../../components/ContributionGraph';
 import { sendChatMessage, startRoadmapMode, parseRoadmapResponse, RoadmapResponse, getRoadmaps } from '../../services/chatApiService';
 import './dashboard.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 
 interface Message {
     id: number;
@@ -16,36 +16,17 @@ interface Message {
 const Dashboard: React.FC = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { isTokenReady } = useOutletContext<{ isTokenReady: boolean }>();
     const [selectedYear, setSelectedYear] = useState(2025);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [isTokenReady, setIsTokenReady] = useState(false);
     const [roadmapSessionId, setRoadmapSessionId] = useState<string | null>(null);
     const [roadmapData, setRoadmapData] = useState<RoadmapResponse | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // 앱 시작 시 자동 로그인 시도 (토큰이 없을 경우)
-    useEffect(() => {
-        const attemptAutoLogin = async () => {
-            try {
-                const success = await tryAutoLogin();
-                if (success) {
-                    console.log('[Dashboard] Auto-login successful, tokens refreshed');
-                } else {
-                    console.log('[Dashboard] Auto-login failed or no refresh token');
-                }
-            } catch (error) {
-                console.error('[Dashboard] Auto-login error:', error);
-            } finally {
-                // 토큰 준비 완료 (성공/실패 여부와 관계없이)
-                setIsTokenReady(true);
-            }
-        };
 
-        attemptAutoLogin();
-    }, []);
 
     // Fetch Dashboard Full Stats (레이더, 스트릭, 컨트리비셔 포함)
     const { data: fullStats } = useQuery({
@@ -105,14 +86,14 @@ const Dashboard: React.FC = () => {
     // 진행률 계산 함수
     const calculateProgress = (roadmap: any): number => {
         if (!roadmap.items || roadmap.items.length === 0) return 0;
-        
+
         let completedCount = 0;
 
         roadmap.items.forEach((item: any) => {
             // 새 구조: tasks 배열이 있는 경우
             if (item.tasks && item.tasks.length > 0) {
                 // 모든 task가 완료되었는지 확인
-                const allTasksCompleted = item.tasks.every((task: any) => 
+                const allTasksCompleted = item.tasks.every((task: any) =>
                     task.is_completed === 1 || task.is_completed === true
                 );
                 if (allTasksCompleted && item.tasks.length > 0) {

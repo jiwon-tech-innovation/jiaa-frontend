@@ -34,9 +34,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     },
 
     // Model management
-    checkModelExists: () => ipcRenderer.invoke('check-model-exists'),
-    downloadModel: () => ipcRenderer.invoke('download-model'),
-    getModelBasePath: () => ipcRenderer.invoke('get-model-base-path'),
+    checkModelExists: (modelName: string) => ipcRenderer.invoke('check-model-exists', modelName),
+    downloadModel: (modelName: string, modelUrl: string) => ipcRenderer.invoke('download-model', modelName, modelUrl),
+    getModelBasePath: (modelName: string) => ipcRenderer.invoke('get-model-base-path', modelName),
     onModelDownloadProgress: (callback: (progress: number) => void) => {
         const handler = (_event: Electron.IpcRendererEvent, progress: number) => callback(progress);
         ipcRenderer.on('model-download-progress', handler);

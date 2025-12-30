@@ -179,7 +179,50 @@ html {
 }
 
 /* Model Loading Overlay */
-.model-loading-overlay,
+.model-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(15, 16, 20, 0.9);
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.settings-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 1000;
+}
+
+.settings-btn:hover {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  transform: rotate(45deg);
+}
+
+.settings-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
 .error-overlay {
   position: absolute;
   top: 0;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { signout as signoutAction, updateUser } from '../../store/slices/authSlice';
@@ -12,6 +12,7 @@ const ProfileView: React.FC = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const user = useAppSelector((state) => state.auth.user);
+    const { isTokenReady } = useOutletContext<{ isTokenReady: boolean }>();
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -21,7 +22,7 @@ const ProfileView: React.FC = () => {
 
     // 토큰이 있는지 확인
     const hasToken = tokenService.isAuthenticated();
-    
+
     // React Query로 사용자 정보 가져오기 (토큰이 있을 때만 실행)
     const { data: userInfo, isLoading, error, isError } = useQuery<UserInfo>({
         queryKey: ['user', 'current'],
@@ -36,7 +37,7 @@ const ProfileView: React.FC = () => {
                 throw err;
             }
         },
-        enabled: hasToken, // 토큰이 있을 때만 API 호출
+        enabled: isTokenReady, // 토큰 준비 완료 후에만 API 호출
         staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
         retry: (failureCount, error: any) => {
             // 403 에러는 재시도하지 않음 (인증 문제)
@@ -52,7 +53,7 @@ const ProfileView: React.FC = () => {
     const { data: fullStats } = useQuery<DashboardStatsResponse>({
         queryKey: ['dashboardFullStats', selectedYear],
         queryFn: () => fetchDashboardFullStats(selectedYear),
-        enabled: hasToken,
+        enabled: isTokenReady,
         staleTime: 5 * 60 * 1000,
     });
 
@@ -66,8 +67,8 @@ const ProfileView: React.FC = () => {
     // userInfo가 로드되면 Redux store와 formData 업데이트
     useEffect(() => {
         if (userInfo) {
-            dispatch(updateUser({ 
-                email: userInfo.email, 
+            dispatch(updateUser({
+                email: userInfo.email,
                 name: userInfo.name,
                 id: userInfo.id,
                 username: userInfo.username,
@@ -104,8 +105,8 @@ const ProfileView: React.FC = () => {
             const updatedInfo = await updateProfile({ name: formData.name.trim() });
             // React Query 캐시 업데이트
             queryClient.setQueryData(['user', 'current'], updatedInfo);
-            dispatch(updateUser({ 
-                email: updatedInfo.email, 
+            dispatch(updateUser({
+                email: updatedInfo.email,
                 name: updatedInfo.name,
                 id: updatedInfo.id,
                 username: updatedInfo.username,
@@ -171,8 +172,8 @@ const ProfileView: React.FC = () => {
                             {error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'}
                         </p>
                         {hasToken && (
-                            <button 
-                                className="btn-primary" 
+                            <button
+                                className="btn-primary"
                                 onClick={() => queryClient.invalidateQueries({ queryKey: ['user', 'current'] })}
                             >
                                 다시 시도
@@ -226,15 +227,15 @@ const ProfileView: React.FC = () => {
                     <div className="profile-actions">
                         {isEditing ? (
                             <>
-                                <button 
-                                    className="btn-primary" 
+                                <button
+                                    className="btn-primary"
                                     onClick={handleSave}
                                     disabled={isSaving}
                                 >
                                     {isSaving ? '저장 중...' : '저장'}
                                 </button>
-                                <button 
-                                    className="btn-secondary" 
+                                <button
+                                    className="btn-secondary"
                                     onClick={handleCancel}
                                     disabled={isSaving}
                                 >
@@ -279,18 +280,18 @@ const ProfileView: React.FC = () => {
                             </div>
                             <div className="progress-bars">
                                 <div className="progress-bar">
-                                    <div 
-                                        className="progress-fill" 
-                                        style={{ 
-                                            width: `${fullStats?.totalDays ? ((fullStats.completedDays / fullStats.totalDays) * 100) : 0}%` 
+                                    <div
+                                        className="progress-fill"
+                                        style={{
+                                            width: `${fullStats?.totalDays ? ((fullStats.completedDays / fullStats.totalDays) * 100) : 0}%`
                                         }}
                                     ></div>
                                 </div>
                                 <div className="progress-bar secondary">
-                                    <div 
-                                        className="progress-fill" 
-                                        style={{ 
-                                            width: `${fullStats?.totalDays ? ((fullStats.completedDays / fullStats.totalDays) * 100) : 0}%` 
+                                    <div
+                                        className="progress-fill"
+                                        style={{
+                                            width: `${fullStats?.totalDays ? ((fullStats.completedDays / fullStats.totalDays) * 100) : 0}%`
                                         }}
                                     ></div>
                                 </div>
