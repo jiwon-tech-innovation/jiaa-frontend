@@ -156,6 +156,17 @@ const Avatar: React.FC = () => {
 
         document.addEventListener('mousemove', handleMouseMove);
 
+        // Listen for avatar-show event to refresh token when avatar window becomes visible again
+        // This happens after user logs in on main window and closes dashboard
+        const cleanupAvatarShow = electronAPI.onAvatarShow(async () => {
+            console.log('[Avatar] Window shown, attempting token refresh...');
+            const isLoggedIn = await tokenService.tryAutoLogin();
+            console.log(`[Avatar] Token refresh on show: ${isLoggedIn ? '성공' : '실패 또는 미로그인'}`);
+            if (isLoggedIn) {
+                console.log(`[Avatar] Access token now available: ${!!tokenService.getAccessToken()}`);
+            }
+        });
+
         return () => {
             const manager = Live2DManager.getInstance();
             manager.disableSync();
@@ -163,6 +174,7 @@ const Avatar: React.FC = () => {
             window.removeEventListener('resize', handleResize);
             window.removeEventListener('contextmenu', handleContextMenu);
             document.removeEventListener('mousemove', handleMouseMove);
+            cleanupAvatarShow();
         };
     }, []);
 

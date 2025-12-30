@@ -1,5 +1,5 @@
 import { ipcMain, BrowserWindow, Menu, app, IpcMainEvent } from 'electron';
-import { getMainWindow, getAvatarWindow } from '../windows/manager';
+import { getMainWindow, getAvatarWindow, showAvatarWindowWithAuth } from '../windows/manager';
 import { createMainWindow, loadSigninPage, loadSignupPage, loadDashboardPage, loadSettingPage, loadProfilePage, loadFirstCreateLoadmap, loadAvartarSelect, loadAvatarSetting, loadRoadmapList } from '../windows/mainWindow';
 import { checkModelExists, downloadAndExtractModel, getModelDirectory } from '../services/modelManager';
 import { MODEL_NAME } from '../../common/constants';
@@ -128,10 +128,7 @@ export const registerIpcHandlers = (): void => {
             mainWindow.close();
         }
         // Show Avatar Window when Dashboard closes
-        const avatarWindow = getAvatarWindow();
-        if (avatarWindow && !avatarWindow.isDestroyed()) {
-            avatarWindow.show();
-        }
+        showAvatarWindowWithAuth();
     });
 
     // IPC Event for Opening Setting Page
@@ -178,11 +175,8 @@ export const registerIpcHandlers = (): void => {
         if (mainWindow && !mainWindow.isDestroyed()) {
             mainWindow.close();
         }
-        // Show Avatar Window when Dashboard closes
-        const avatarWindow = getAvatarWindow();
-        if (avatarWindow && !avatarWindow.isDestroyed()) {
-            avatarWindow.show();
-        }
+        // Show Avatar Window when Setting closes
+        showAvatarWindowWithAuth();
     });
 
     ipcMain.on('open-first-create-loadmap', () => {
